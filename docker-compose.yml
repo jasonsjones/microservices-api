@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+    node-server:
+        container_name: server
+        build:
+            context: .
+        volumes:
+            - .:/home/blacktab
+        tty: true
+        env_file:
+            - .env
+        ports:
+            - "3000:3000"
+            - "5858:5858"
+        depends_on:
+            - mongo
+
+    node-test:
+        container_name: tests
+        build:
+            context: .
+        volumes:
+            - .:/home/blacktab
+        environment:
+            - NODE_ENV=test
+            - PORT=3003
+            - DEBUG=db*
+        tty: true
+        ports:
+            - "3003:3003"
+        depends_on:
+            - mongo
+        command: ["yarn", "test:api"]
+
+    mongo:
+        container_name: database
+        image: mongo
+        tty: true
+        volumes:
+            - sandboxdb:/data/db
+        ports:
+            - "27017:27017"
+
+volumes:
+    sandboxdb:
+
+networks:
+    local-network:
+        driver: bridge
