@@ -19,6 +19,19 @@
         "mocha": true
     },
     "rules": {
-        "no-console": 0
+        "no-console": "off",
+        "semi": "warn",
+        "curly": "warn",
+        "eqeqeq": "error",
+        "space-before-function-paren": ["error", {
+            "anonymous": "always",
+            "named": "never",
+            "asyncArrow": "always"
+        }],
+        "no-multi-spaces": "warn",
+        "indent": "warn",
+        "no-tabs": "error",
+        "no-trailing-spaces": "error",
+        "wrap-iife": "warn"
     }
 }
