@@ -486,7 +486,7 @@ describe('User repository', () => {
         });
 
         it('rejects with error if something goes wrong saving the avatar', () => {
-            avatarStub.rejects(new Error('Oops, problem saving the avatar...'))
+            avatarStub.rejects(new Error('Oops, problem saving the avatar...'));
             userStub.resolves(new User(mockUsers[1]));
 
             UserMock.expects('findById').withArgs(userId)
@@ -619,7 +619,7 @@ describe('User repository', () => {
 
         it('rejects with Error if the user email is not provided', () => {
             const promise = Repository.changePassword({currentPassword: 'password',
-                                                       newPassword: 'newPassword'});
+                newPassword: 'newPassword'});
             expect(promise).to.be.a('Promise');
 
             return promise.catch(err => {
@@ -630,7 +630,7 @@ describe('User repository', () => {
 
         it('rejects with Error if the current password is not provided', () => {
             const promise = Repository.changePassword({email: 'oliver@qc.com',
-                                                       newPassword: 'newPassword'});
+                newPassword: 'newPassword'});
             expect(promise).to.be.a('Promise');
 
             return promise.catch(err => {
@@ -641,7 +641,7 @@ describe('User repository', () => {
 
         it('rejects with Error if the new password is not provided', () => {
             const promise = Repository.changePassword({email: 'oliver@qc.com',
-                                                       currentPassword: 'password'});
+                currentPassword: 'password'});
             expect(promise).to.be.a('Promise');
 
             return promise.catch(err => {
@@ -681,7 +681,7 @@ describe('User repository', () => {
                 .resolves(returnedUser);
             const userStub = sinon.stub(User.prototype, 'verifyPassword').returns(true);
             const userSaveStub = sinon.stub(User.prototype, 'save').resolves(
-              returnedUser
+                returnedUser
             );
             const promise = Repository.changePassword(userData);
             expect(promise).to.be.a('Promise');

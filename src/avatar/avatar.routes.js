@@ -19,7 +19,7 @@ export default (app) => {
                 .then(response => res.json(response))
                 .catch(err => {
                     res.status(500);
-                    res.json(err)
+                    res.json(err);
                 });
         });
 
@@ -44,4 +44,4 @@ export default (app) => {
                     res.json(err);
                 });
         });
-}
+};

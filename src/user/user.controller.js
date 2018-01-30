@@ -182,7 +182,7 @@ export const unlinkSFDCAccount = (req) => {
                 error: err
             };
         });
-}
+};
 
 export function changePassword(req) {
     if (!req) {
@@ -207,7 +207,7 @@ export function changePassword(req) {
                 return {
                     success: true,
                     message: 'user password changed'
-                }
+                };
             }
         })
         .catch(err => {

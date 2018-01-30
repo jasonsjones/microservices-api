@@ -49,7 +49,7 @@ export function deleteUser(id) {
     if (!id) {
         return Promise.reject(new Error('user id is required'));
     }
-        return User.findByIdAndRemove(id).exec();
+    return User.findByIdAndRemove(id).exec();
 }
 
 export function updateUser(id, userData) {
@@ -60,11 +60,11 @@ export function updateUser(id, userData) {
         return Promise.reject(new Error('userData is required'));
     }
     return User.findById(id).exec()
-            .then(user => {
-                Object.assign(user, userData);
-                return user.save();
-            })
-            .catch(err => Promise.reject(err));
+        .then(user => {
+            Object.assign(user, userData);
+            return user.save();
+        })
+        .catch(err => Promise.reject(err));
 }
 
 export function uploadUserAvatar(id, file, deleteAfterUpload = true) {
@@ -94,7 +94,7 @@ export function uploadUserAvatar(id, file, deleteAfterUpload = true) {
         user.avatarUrl = `http://localhost:3000/api/avatar/${img._id}`;
         return user.save();
     })
-    .catch(err => Promise.reject(err));
+        .catch(err => Promise.reject(err));
 }
 
 export function changePassword(userData) {
@@ -135,4 +135,4 @@ export const unlinkSFDCAccount = (user) => {
     user.sfdc.refreshToken = null;
     user.sfdc.profile = {};
     return user.save();
-}
+};

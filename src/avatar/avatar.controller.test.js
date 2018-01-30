@@ -8,56 +8,56 @@ import Avatar from './avatar.model';
 
 const mockAvatars = [
     {
-      "_id": "59c44d83f2943200228467b0",
-      "defaultImg": true,
-      "fileSize": 5012,
-      "contentType": "image/png",
-      "user": null,
-      "data": {
-          "type": "Buffer",
-          "data": [
-              137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0
-          ]
-      }
+        "_id": "59c44d83f2943200228467b0",
+        "defaultImg": true,
+        "fileSize": 5012,
+        "contentType": "image/png",
+        "user": null,
+        "data": {
+            "type": "Buffer",
+            "data": [
+                137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0
+            ]
+        }
     },
     {
-      "_id": "59c44d85f2943200228467b4",
-      "defaultImg": false,
-      "fileSize": 62079,
-      "contentType": "image/png",
-      "user": "59c44d83f2943200228467b1",
-      "data": {
-          "type": "Buffer",
-          "data": [
-              137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0
-          ]
-      }
+        "_id": "59c44d85f2943200228467b4",
+        "defaultImg": false,
+        "fileSize": 62079,
+        "contentType": "image/png",
+        "user": "59c44d83f2943200228467b1",
+        "data": {
+            "type": "Buffer",
+            "data": [
+                137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0
+            ]
+        }
     },
     {
-      "_id": "59c44d9d0e584d00425c1722",
-      "defaultImg": false,
-      "fileSize": 71955,
-      "contentType": "image/png",
-      "user": "59c44d83f2943200228467b2",
-      "data": {
-          "type": "Buffer",
-          "data": [
-              137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0
-          ]
-      }
+        "_id": "59c44d9d0e584d00425c1722",
+        "defaultImg": false,
+        "fileSize": 71955,
+        "contentType": "image/png",
+        "user": "59c44d83f2943200228467b2",
+        "data": {
+            "type": "Buffer",
+            "data": [
+                137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0
+            ]
+        }
     },
     {
-      "_id": "59e4062a4c3bc800574e895f",
-      "defaultImg": false,
-      "fileSize": 117632,
-      "contentType": "image/png",
-      "user": "59c6c317f9760b01a35c63b1",
-      "data": {
-          "type": "Buffer",
-          "data": [
-              137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0
-          ]
-      }
+        "_id": "59e4062a4c3bc800574e895f",
+        "defaultImg": false,
+        "fileSize": 117632,
+        "contentType": "image/png",
+        "user": "59c6c317f9760b01a35c63b1",
+        "data": {
+            "type": "Buffer",
+            "data": [
+                137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0
+            ]
+        }
     }
 ];
 
@@ -78,7 +78,7 @@ describe('Avatar controller', () => {
             return Controller.getAvatars().then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('payload');
-                expect(response.success).to.be.true
+                expect(response.success).to.be.true;
                 expect(response.payload).to.be.an('Array');
             });
         });
@@ -108,7 +108,7 @@ describe('Avatar controller', () => {
             stub.withArgs('default')
                 .resolves(mockAvatars[0]);
             req.params = {
-               id : 'default'
+                id : 'default'
             };
             return Controller.getAvatar(req).then(response => {
                 expect(response).to.have.property('contentType');
@@ -122,7 +122,7 @@ describe('Avatar controller', () => {
                 .rejects(new Error('Oops, something went wrong...'));
 
             req.params = {
-               id : mockAvatars[1]._id
+                id : mockAvatars[1]._id
             };
 
             return Controller.getAvatar(req).catch(response => {
@@ -132,8 +132,8 @@ describe('Avatar controller', () => {
 
         it('rejects with error when avatar id is not provided', () => {
             return Controller.getAvatar().catch(response => {
-                    expectErrorResponse(response);
-                });
+                expectErrorResponse(response);
+            });
         });
     });
 
@@ -157,21 +157,21 @@ describe('Avatar controller', () => {
                 .resolves(modelStub());
 
             req.params = {
-               id : mockAvatars[1]._id
+                id : mockAvatars[1]._id
             };
 
             return Controller.deleteAvatar(req).then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
                 expect(response).to.have.property('payload');
-                expect(response.success).to.be.true
+                expect(response.success).to.be.true;
                 expect(response.payload).to.be.an('Object');
                 expect(response.payload).to.have.property('_id');
                 expect(response.payload).to.have.property('contentType');
                 expect(response.payload).to.have.property('user');
                 expect(response.payload).to.have.property('fileSize');
                 modelStub.restore();
-                });
+            });
         });
 
         it('sends a success false and message when error occurs', () => {
@@ -179,7 +179,7 @@ describe('Avatar controller', () => {
                 .rejects(new Error('Oops, something went wrong...'));
 
             req.params = {
-               id : mockAvatars[1]._id
+                id : mockAvatars[1]._id
             };
 
             return Controller.deleteAvatar(req).catch(response => {
@@ -189,8 +189,8 @@ describe('Avatar controller', () => {
 
         it('rejects with error when req is not provided', () => {
             return Controller.deleteAvatar().catch(response => {
-                    expectErrorResponse(response);
-                });
+                expectErrorResponse(response);
+            });
         });
     });
 
@@ -212,7 +212,7 @@ describe('Avatar controller', () => {
                     size: 62079,
                     path: __dirname + '/../../assets/male3.png'
                 }
-            }
+            };
             const avatar = Repository.makeAvatarModel(req.file, mockAvatars[1].user, false);
             stub.withArgs(req.file)
                 .resolves(avatar);
@@ -220,7 +220,7 @@ describe('Avatar controller', () => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
                 expect(response).to.have.property('payload');
-                expect(response.success).to.be.true
+                expect(response.success).to.be.true;
             });
         });
 
@@ -232,7 +232,7 @@ describe('Avatar controller', () => {
                     size: 62079,
                     path: __dirname + '/../../assets/male3.png'
                 }
-            }
+            };
 
             stub.withArgs(req.file)
                 .rejects(new Error('Oops, something went wrong uploading the image...'));
@@ -244,8 +244,8 @@ describe('Avatar controller', () => {
 
         it('rejects with error when req.file is not provided', () => {
             return Controller.uploadAvatar().catch(response => {
-                    expectErrorResponse(response);
-                });
+                expectErrorResponse(response);
+            });
         });
     });
 });
@@ -254,6 +254,6 @@ const expectErrorResponse = response => {
     expect(response).to.have.property('success');
     expect(response).to.have.property('message');
     expect(response).to.have.property('error');
-    expect(response.success).to.be.false
-    expect(response.error instanceof Error).to.be.true
-}
+    expect(response.success).to.be.false;
+    expect(response.error instanceof Error).to.be.true;
+};

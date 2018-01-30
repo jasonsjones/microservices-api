@@ -7,9 +7,9 @@ export function hashPassword(next) {
         return next();
     }
     bcrypt.genSalt(12, (err, salt) => {
-        if (err) return next(err);
+        if (err) {return next(err);}
         bcrypt.hash(user.password, salt, null, (err, hash) => {
-            if (err) return next(err);
+            if (err) {return next(err);}
             user.password = hash;
             next(null, user);
         });
@@ -17,8 +17,8 @@ export function hashPassword(next) {
 }
 
 export function checkForErrors(err, user, next) {
-    if (err.name === 'MongoError' && err.code == 11000) {
-        next(new Error('There was a duplicate key error'))
+    if (err.name === 'MongoError' && err.code === 11000) {
+        next(new Error('There was a duplicate key error'));
     } else {
         next(err);
     }

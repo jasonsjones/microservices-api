@@ -79,7 +79,7 @@ describe('Auth controller', () => {
                 expect(response).to.have.property('iat');
                 expect(response).to.have.property('exp');
                 jwtStub.restore();
-            })
+            });
         });
 
         it('rejects if no token is provided', () => {
@@ -189,7 +189,7 @@ describe('Auth controller', () => {
 
             UserMock.expects('findById').withArgs(mockUsers[0]._id)
                 .chain('exec')
-                .rejects(new Error('Oops, something went wrong getting the user'))
+                .rejects(new Error('Oops, something went wrong getting the user'));
 
             const promise = Controller.adminRoute(req);
             expect(promise).to.be.a('Promise');

@@ -80,7 +80,7 @@ export function uploadAvatar(req) {
                 success: true,
                 message: 'avatar uploaded and saved.',
                 payload: avatar
-            }
+            };
         })
         .catch(err => {
             return Promise.reject({

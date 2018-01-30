@@ -14,7 +14,7 @@ describe('Avatar Model', () => {
         });
         avatar.validate(function (err) {
             expect(err).to.not.exist;
-            done()
+            done();
         });
     });
 
@@ -27,7 +27,7 @@ describe('Avatar Model', () => {
         avatar.validate(function (err) {
             expect(err.errors.contentType).to.exist;
             expect(err.name).to.equal("ValidationError");
-            done()
+            done();
         });
     });
 
@@ -40,7 +40,7 @@ describe('Avatar Model', () => {
         avatar.validate(function (err) {
             expect(err.errors.data).to.exist;
             expect(err.name).to.equal("ValidationError");
-            done()
+            done();
         });
     });
 
@@ -54,7 +54,7 @@ describe('Avatar Model', () => {
         avatar.validate(function (err) {
             expect(err.errors.user).to.exist;
             expect(err.name).to.equal("ValidationError");
-            done()
+            done();
         });
     });
 });

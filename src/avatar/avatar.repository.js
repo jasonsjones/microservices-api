@@ -71,7 +71,7 @@ function getDefaultAvatar() {
     return new Promise((resolve, reject) => {
         Avatar.findOne({defaultImg: true}).exec()
             .then(avatar => {
-                resolve(avatar)
+                resolve(avatar);
             })
             .catch(err => {
                 reject(err);
@@ -87,6 +87,6 @@ function getAvatarById(id) {
             })
             .catch(err => {
                 reject(err);
-            })
+            });
     });
 }

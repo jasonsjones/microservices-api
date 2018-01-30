@@ -47,7 +47,7 @@ app.use('/graphql', graphqlHTTP({
 }));
 
 app.use((req, res, next) => {
-    console.log('******************')
+    console.log('******************');
     console.log(`Session ID: ${req.session.id}`);
     console.log(`user is authenticated: ${req.isAuthenticated()}`);
     next();

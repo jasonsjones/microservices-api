@@ -69,7 +69,7 @@ describe('User controller', () => {
             return promise.then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('payload');
-                expect(response.success).to.be.true
+                expect(response.success).to.be.true;
                 expect(response.payload.users).to.be.an('Array');
             });
         });
@@ -292,7 +292,7 @@ describe('User controller', () => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
                 expect(response.success).to.be.true;
-            })
+            });
         });
     });
 
@@ -537,8 +537,8 @@ const expectErrorResponse = response => {
     expect(response).to.have.property('success');
     expect(response).to.have.property('message');
     expect(response).to.have.property('error');
-    expect(response.success).to.be.false
-    expect(response.error instanceof Error).to.be.true
+    expect(response.success).to.be.false;
+    expect(response.error instanceof Error).to.be.true;
 };
 
 const expectUserResponse = response => {

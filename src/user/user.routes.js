@@ -7,16 +7,16 @@ export default (app) => {
     const upload = multer({dest: './uploads/'});
 
     app.get('/api/users',
-            //  AuthController.verifyToken,
-            //  AuthController.adminRoute,
-            (req, res) => {
-                UserController.getUsers()
-                    .then(response => res.json(response))
-                    .catch(err => {
-                        res.status(500);
-                        res.json(err);
-                    });
-            });
+        //  AuthController.verifyToken,
+        //  AuthController.adminRoute,
+        (req, res) => {
+            UserController.getUsers()
+                .then(response => res.json(response))
+                .catch(err => {
+                    res.status(500);
+                    res.json(err);
+                });
+        });
 
     app.get('/api/user/:id', (req, res) => {
         UserController.getUser(req)
@@ -65,17 +65,17 @@ export default (app) => {
     });
 
     app.post('/api/user/:userid/avatar',
-            //   AuthController.verifyToken,
-            //   AuthController.protectRouteByUser,
-              upload.single('avatar'),
+        //   AuthController.verifyToken,
+        //   AuthController.protectRouteByUser,
+        upload.single('avatar'),
 
-              (req, res) => {
-                UserController.uploadUserAvatar(req)
-                    .then(response => res.json(response))
-                    .catch(err => {
-                        res.status(500);
-                        res.json(err);
-                    });
-              }
+        (req, res) => {
+            UserController.uploadUserAvatar(req)
+                .then(response => res.json(response))
+                .catch(err => {
+                    res.status(500);
+                    res.json(err);
+                });
+        }
     );
-}
+};

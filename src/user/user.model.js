@@ -50,7 +50,7 @@ userSchema.methods.removeRole = function (role) {
 
 userSchema.methods.hasCustomAvatar = function () {
     return !!this.avatar;
-}
+};
 
 userSchema.methods.toClientJSON = function () {
     let userDataForClient = {
@@ -67,7 +67,7 @@ userSchema.methods.toClientJSON = function () {
         userDataForClient.hasSFDCProfile = false;
     }
     return userDataForClient;
-}
+};
 
 const User = mongoose.model('User', userSchema);
 export default User;

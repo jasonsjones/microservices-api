@@ -5,9 +5,9 @@ export default (app) => {
             message: 'Welcome to the sandbox API!',
             version: '1.0'
         });
-    })
+    });
 
     app.get('/*', (req, res) => {
         res.render('index', {title: 'React-Node Sandbox'});
     });
-}
+};

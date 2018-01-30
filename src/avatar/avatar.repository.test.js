@@ -8,39 +8,39 @@ import * as AvatarRepository from './avatar.repository';
 
 const mockAvatars = [
     {
-      "_id": "59c44d83f2943200228467b0",
-      "contentType": "image/png",
-      "fileSize": 5012,
-      "defaultImg": true,
-      "user": null
+        "_id": "59c44d83f2943200228467b0",
+        "contentType": "image/png",
+        "fileSize": 5012,
+        "defaultImg": true,
+        "user": null
     },
     {
-      "_id": "59c44d85f2943200228467b4",
-      "contentType": "image/png",
-      "fileSize": 62079,
-      "defaultImg": false,
-      "user": "59c44d83f2943200228467b1"
+        "_id": "59c44d85f2943200228467b4",
+        "contentType": "image/png",
+        "fileSize": 62079,
+        "defaultImg": false,
+        "user": "59c44d83f2943200228467b1"
     },
     {
-      "_id": "59c44d9d0e584d00425c1722",
-      "contentType": "image/png",
-      "fileSize": 71955,
-      "defaultImg": false,
-      "user": "59c44d83f2943200228467b2"
+        "_id": "59c44d9d0e584d00425c1722",
+        "contentType": "image/png",
+        "fileSize": 71955,
+        "defaultImg": false,
+        "user": "59c44d83f2943200228467b2"
     },
     {
-      "_id": "59c44dc50e584d00425c1723",
-      "contentType": "image/png",
-      "fileSize": 138317,
-      "defaultImg": false,
-      "user": "59c44d83f2943200228467b3"
+        "_id": "59c44dc50e584d00425c1723",
+        "contentType": "image/png",
+        "fileSize": 138317,
+        "defaultImg": false,
+        "user": "59c44d83f2943200228467b3"
     },
     {
-      "_id": "59e4062a4c3bc800574e895f",
-      "contentType": "image/png",
-      "fileSize": 117632,
-      "defaultImg": false,
-      "user": "59c6c317f9760b01a35c63b1"
+        "_id": "59e4062a4c3bc800574e895f",
+        "contentType": "image/png",
+        "fileSize": 117632,
+        "defaultImg": false,
+        "user": "59c6c317f9760b01a35c63b1"
     }
 ];
 
@@ -259,7 +259,7 @@ describe('Avatar Repository', () => {
 
                     expect(spy.calledOnce).to.be.true;
                     expect(spy.firstCall.args.length).to.equal(3);
-            });
+                });
         });
 
         it('generates the avatar model and saves to db then deletes the file for fs', () => {
@@ -288,7 +288,7 @@ describe('Avatar Repository', () => {
                     expect(spy.calledOnce).to.be.true;
                     expect(spy.firstCall.args.length).to.equal(3);
                     expect(fs.existsSync(copyiedAvatar.path)).to.be.false;
-            });
+                });
         });
 
         it('catches an error if the avatar is unable to be saved to db', () => {

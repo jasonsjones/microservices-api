@@ -7,7 +7,7 @@ export default (app, passport) => {
             display: 'page',
             prompt: '',
             login_hint: ''
-    }));
+        }));
 
     app.get('/auth/callback',
         passport.authenticate('forcedotcom', {successRedirect: '/profile'}));
@@ -52,4 +52,4 @@ export default (app, passport) => {
                 }});
         }
     });
-}
+};

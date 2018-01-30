@@ -15,7 +15,7 @@ describe('User model', () => {
         user.validate((err) => {
             expect(err.errors.name).to.exist;
             expect(err.name).to.equal('ValidationError');
-            done()
+            done();
         });
     });
 
@@ -28,7 +28,7 @@ describe('User model', () => {
         user.validate((err) => {
             expect(err.errors.email).to.exist;
             expect(err.name).to.equal('ValidationError');
-            done()
+            done();
         });
     });
 
@@ -41,7 +41,7 @@ describe('User model', () => {
         user.validate((err) => {
             expect(err.errors.password).to.exist;
             expect(err.name).to.equal('ValidationError');
-            done()
+            done();
         });
     });
 
@@ -56,7 +56,7 @@ describe('User model', () => {
         });
         user.validate((err) => {
             expect(err).to.not.exist;
-            done()
+            done();
         });
 
     });

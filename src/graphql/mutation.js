@@ -23,7 +23,7 @@ export default new GraphQLObjectType({
                     email: args.email,
                     password: args.password
                 });
-                return newUser.save()
+                return newUser.save();
             }
         },
         deleteUser: {

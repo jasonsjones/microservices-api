@@ -21,4 +21,4 @@ export const verifyToken = (token) => {
         throw new Error('token is required to verify');
     }
     return jwt.verify(token, config.token_secret);
-}
+};

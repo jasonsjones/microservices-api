@@ -10,9 +10,9 @@ export default (passport) => {
     passport.deserializeUser((id, done) => {
         User.findById(id, (err, user) => {
             done(err, user);
-        })
+        });
     });
 
     passport.use('local', LocalStrategy);
     passport.use('forcedotcom', ForceDotComStrategy);
-}
+};

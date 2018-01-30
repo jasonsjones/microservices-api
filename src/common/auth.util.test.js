@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import jwt from 'jsonwebtoken';
 import sinon from 'sinon';
 
-import * as Util from './auth.utils'
+import * as Util from './auth.utils';
 
 describe('Auth util', () => {
     let token;
