@@ -1,3 +1,4 @@
+import debug from 'debug';
 import express from 'express';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
@@ -14,7 +15,9 @@ import avatarRoute from '../avatar/avatar.routes';
 import userRoute from '../user/user.routes';
 import indexRoute from '../index/index.routes';
 
+const log = debug('app');
 const env = process.env.NODE_ENV || "development";
+log(`Running in ${env} mode`);
 const config = Config[env];
 
 const app = express();
@@ -47,9 +50,9 @@ app.use('/graphql', graphqlHTTP({
 }));
 
 app.use((req, res, next) => {
-    console.log('******************');
-    console.log(`Session ID: ${req.session.id}`);
-    console.log(`user is authenticated: ${req.isAuthenticated()}`);
+    log('******************');
+    log(`Session ID: ${req.session.id}`);
+    log(`user is authenticated: ${req.isAuthenticated()}`);
     next();
 });
 
