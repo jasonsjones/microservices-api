@@ -29,7 +29,7 @@ export function deleteAvatar(id) {
         return Promise.reject(new Error('avatar id is required'));
     }
     return new Promise((resolve, reject) => {
-        Avatar.findById(id,).exec()
+        Avatar.findById(id).exec()
             .then(avatar => {
                 resolve(avatar.remove());
             })
