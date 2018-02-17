@@ -6,9 +6,9 @@ const token_secret = process.env.JWT_SECRET;
 const session_secret = process.env.SESSION_SECRET;
 
 const dockerDbUri = 'mongodb://mongo/sandboxapi';
-// const dockerDbUriTest = 'mongodb://mongo/sandboxapi-test'
+const dockerDbUriTest = 'mongodb://mongo/sandboxapi-test';
 // const mLabDbUri = `mongodb://${process.env.MLAB_USER}:${process.env.DB_PASSWD}@ds119436.mlab.com:19436/sandboxapi`
-const mLabDbUriTest = `mongodb://${process.env.MLAB_USER}:${process.env.DB_PASSWD}@ds135966.mlab.com:35966/sandboxapi-test`;
+// const mLabDbUriTest = `mongodb://${process.env.MLAB_USER}:${process.env.DB_PASSWD}@ds135966.mlab.com:35966/sandboxapi-test`;
 
 
 // TODO: Need to start up another cluster to use the atlas Mongo SAAS solution.
@@ -28,6 +28,6 @@ export default {
         port,
         token_secret,
         session_secret,
-        dbUrl: mLabDbUriTest
+        dbUrl: dockerDbUriTest
     }
 };
