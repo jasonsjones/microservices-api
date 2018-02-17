@@ -18,12 +18,14 @@
   "scripts": {
     "predev": "npm run dbSeed",
     "dev": "nodemon src/server.js --inspect=0.0.0.0:5858 --watch src/ --exec babel-node",
+    "up:dev": "docker-compose up node-server mongo",
     "prebuild": "rm -f public/bundle.js* public/styles/styles.css*",
     "dbSeed": "babel-node src/dbSeed.js",
     "security-check": "nsp check",
     "lt": "lt --port 3000 --subdomain sandboxapi",
     "lint": "eslint webpack.config.js src/**/*.js",
-    "test:api": "NODE_ENV=test nyc mocha src/**/*.test.js --exit --require babel-register"
+    "test:api": "nodemon --exec 'nyc mocha --exit src/**/*.test.js --require babel-register'",
+    "up:test": "docker-compose up node-test mongo"
   },
   "repository": {
     "type": "git",
