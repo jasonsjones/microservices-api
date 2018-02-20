@@ -445,8 +445,9 @@ describe('User controller', () => {
             return promise.then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('payload');
+                expect(response.payload).to.have.property('user');
+                expect(response.payload.user).to.be.an('object');
                 expect(response.success).to.be.true;
-                expect(response.payload).to.be.an('object');
             });
         });
 

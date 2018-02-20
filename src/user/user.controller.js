@@ -143,8 +143,7 @@ export function signupUser(req) {
                 success: true,
                 message: 'new user saved',
                 payload: {
-                    name: user.name,
-                    email: user.email
+                    user
                 }
             };
         })
