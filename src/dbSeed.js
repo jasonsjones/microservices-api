@@ -82,7 +82,7 @@ function seedDefaultAvatar() {
             if (avatars.length === 0) {
                 let defaultAvatar = createDefaultAvatar();
                 log('default avatar saved');
-                return defaultAvatar.save()
+                return defaultAvatar.save();
             }
         });
 }
@@ -98,7 +98,7 @@ function createDefaultAvatar() {
 }
 
 function makeCustomAvatar(userId, filename) {
-    let filepath = `${assetPath}/${filename}`
+    let filepath = `${assetPath}/${filename}`;
     const avatar = new Avatar({
         contentType: "image/png",
         fileSize: fs.statSync(filepath).size,
