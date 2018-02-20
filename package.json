@@ -7,6 +7,7 @@
     "exclude": [
       "src/**/*.test.js",
       "src/**/*.routes.js",
+      "src/utils/*.js",
       "src/config",
       "src/graphql",
       "src/dbSeed.js",
@@ -23,7 +24,7 @@
     "dbSeed": "babel-node src/dbSeed.js",
     "security-check": "nsp check",
     "lt": "lt --port 3000 --subdomain sandboxapi",
-    "lint": "eslint webpack.config.js src/**/*.js",
+    "lint": "eslint webpack.config.js src/**/*.js src/*.js",
     "test:api": "nodemon --exec 'nyc mocha --exit src/**/*.test.js --require babel-register'",
     "up:test": "docker-compose up node-test mongo"
   },
