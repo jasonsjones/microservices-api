@@ -1,5 +1,5 @@
-import chai, { expect } from 'chai';
-import chaiHttp from 'chai-http';
+import { expect } from 'chai';
+import request from 'supertest';
 
 import app from '../config/app';
 import Config from '../config/config';
@@ -8,7 +8,6 @@ import db from '../config/db';
 const env = process.env.NODE_ENV || "development";
 const config = Config[env];
 
-chai.use(chaiHttp);
 let dbConnection;
 
 describe('Index integration tests', () => {
@@ -26,11 +25,13 @@ describe('Index integration tests', () => {
     });
 
     it('returns status 200 and json payload', () => {
-        return chai.request(app).get('/api').then(res => {
-            expect(res).to.have.status(200);
-            expect(res).to.be.json;
-            expect(res.body).to.have.property('version');
-            expect(res.body).to.have.property('message');
-        });
+        return request(app)
+            .get('/api')
+            .expect(200)
+            .then(res => {
+                expect(res).to.be.an('Object');
+                expect(res.body).to.have.property('version');
+                expect(res.body).to.have.property('message');
+            });
     });
 });
