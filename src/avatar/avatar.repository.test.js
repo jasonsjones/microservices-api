@@ -203,12 +203,12 @@ describe('Avatar Repository', () => {
     describe('makeAvatarModel()', () => {
         it('returns an avatar model', () => {
             const file = {
-                originalName: 'default.png',
+                originalName: 'male3.png',
                 mimetype: 'image/png',
                 size: 62079,
                 path: __dirname + '/../../assets/male3.png'
             };
-            const avatar = AvatarRepository.makeAvatarModel(file, mockAvatars[1].user, false);
+            const avatar = AvatarRepository.makeAvatarModel(file, mockAvatars[1].user, false, false);
             expect(avatar).to.exist;
             expect(avatar).to.have.property('_id');
             expect(avatar).to.have.property('user');
@@ -217,6 +217,24 @@ describe('Avatar Repository', () => {
             expect(avatar).to.have.property('defaultImg');
             expect(avatar).to.have.property('data');
             expect(avatar.defaultImg).to.be.false;
+        });
+
+        it('returns a default avatar model', () => {
+            const file = {
+                originalName: 'default.png',
+                mimetype: 'image/png',
+                size: 5012,
+                path: __dirname + '/../../assets/sfdc_default_avatar.png'
+            };
+            const avatar = AvatarRepository.makeAvatarModel(file, mockAvatars[1].user, false, true);
+            expect(avatar).to.exist;
+            expect(avatar).to.have.property('_id');
+            expect(avatar).to.have.property('user');
+            expect(avatar).to.have.property('fileSize');
+            expect(avatar).to.have.property('contentType');
+            expect(avatar).to.have.property('defaultImg');
+            expect(avatar).to.have.property('data');
+            expect(avatar.defaultImg).to.be.true;
         });
     });
 
@@ -242,7 +260,7 @@ describe('Avatar Repository', () => {
         });
 
         it('generates the avatar model and saves to db', () => {
-            const avatar = AvatarRepository.makeAvatarModel(file, userId, false);
+            const avatar = AvatarRepository.makeAvatarModel(file, userId, false, false);
             stub.resolves(avatar);
             spy.reset();
 
@@ -270,7 +288,7 @@ describe('Avatar Repository', () => {
                 size: 62079,
                 path: __dirname + '/../../assets/avatarCopy.png'
             };
-            const avatar = AvatarRepository.makeAvatarModel(copyiedAvatar, userId, false);
+            const avatar = AvatarRepository.makeAvatarModel(copyiedAvatar, userId, false, false);
             stub.resolves(avatar);
             spy.reset();
 

@@ -50,12 +50,12 @@ export function uploadAvatar(file, userId, deleteAfter) {
     return avatar.save();
 }
 
-export function makeAvatarModel(file, userId, deleteAfter = true) {
+export function makeAvatarModel(file, userId, deleteAfter = true, isDefault = false) {
     let avatar = new Avatar();
     avatar.fileName = file.originalname;
     avatar.contentType = file.mimetype;
     avatar.fileSize = file.size;
-    avatar.defaultImg = false;
+    avatar.defaultImg = isDefault;
     avatar.data = fs.readFileSync(file.path);
     if (deleteAfter) {
         fs.unlinkSync(file.path);
