@@ -50,6 +50,14 @@ export function uploadAvatar(file, userId, deleteAfter) {
     return avatar.save();
 }
 
+export function uploadDefaultAvatar(file, deleteAfter) {
+    if (!file) {
+        return Promise.reject(new Error('file is required'));
+    }
+    let avatar = this.makeAvatarModel(file, null, deleteAfter, true);
+    return avatar.save();
+}
+
 export function makeAvatarModel(file, userId, deleteAfter = true, isDefault = false) {
     let avatar = new Avatar();
     avatar.fileName = file.originalname;
