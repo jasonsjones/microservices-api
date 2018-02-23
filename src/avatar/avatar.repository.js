@@ -2,15 +2,7 @@ import fs from 'fs';
 import Avatar from './avatar.model';
 
 export function getAvatars(queryConditions = {}, selectionStr = '') {
-    return new Promise((resolve, reject) => {
-        Avatar.find(queryConditions, selectionStr).exec()
-            .then(avatars => {
-                resolve(avatars);
-            })
-            .catch(err => {
-                reject(err);
-            });
-    });
+    return Avatar.find(queryConditions, selectionStr).exec();
 }
 
 export function getAvatar(id) {
@@ -28,15 +20,13 @@ export function deleteAvatar(id) {
     if (!id) {
         return Promise.reject(new Error('avatar id is required'));
     }
-    return new Promise((resolve, reject) => {
-        Avatar.findById(id).exec()
-            .then(avatar => {
-                resolve(avatar.remove());
-            })
-            .catch(err => {
-                reject(err);
-            });
-    });
+    return Avatar.findById(id).exec()
+        .then(avatar => {
+            return avatar.remove();
+        })
+        .catch(err => {
+            return Promise.reject(err);
+        });
 }
 
 export function uploadAvatar(file, userId, deleteAfter) {
@@ -76,25 +66,9 @@ export function makeAvatarModel(file, userId, deleteAfter = true, isDefault = fa
 }
 
 function getDefaultAvatar() {
-    return new Promise((resolve, reject) => {
-        Avatar.findOne({defaultImg: true}).exec()
-            .then(avatar => {
-                resolve(avatar);
-            })
-            .catch(err => {
-                reject(err);
-            });
-    });
+    return Avatar.findOne({defaultImg: true}).exec();
 }
 
 function getAvatarById(id) {
-    return new Promise((resolve, reject) => {
-        Avatar.findById(id).exec()
-            .then(avatar => {
-                resolve(avatar);
-            })
-            .catch(err => {
-                reject(err);
-            });
-    });
+    return Avatar.findById(id).exec();
 }
