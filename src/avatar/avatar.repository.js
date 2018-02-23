@@ -9,11 +9,22 @@ export function getAvatar(id) {
     if (!id) {
         return Promise.reject(new Error('avatar id is required'));
     }
-    if (id === 'default') {
-        return getDefaultAvatar();
-    } else {
-        return getAvatarById(id);
+    return Avatar.findById(id).exec();
+}
+
+export function getDefaultAvatar(idx) {
+    if (idx === undefined) {
+        return Promise.reject(new Error('default avatar index is required'));
     }
+    return Avatar.find({defaultImg: true}).exec()
+        .then(defaults => {
+            if (idx > -1 && idx < defaults.length) {
+                return defaults[idx];
+            } else {
+                return Promise.reject(new Error(`default avatar with index: ${idx} does not exist`));
+            }
+        })
+        .catch(err => Promise.reject(err));
 }
 
 export function deleteAvatar(id) {
@@ -63,12 +74,4 @@ export function makeAvatarModel(file, userId, deleteAfter = true, isDefault = fa
         avatar.user = userId;
     }
     return avatar;
-}
-
-function getDefaultAvatar() {
-    return Avatar.findOne({defaultImg: true}).exec();
-}
-
-function getAvatarById(id) {
-    return Avatar.findById(id).exec();
 }

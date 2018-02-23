@@ -12,7 +12,7 @@ const mockAvatars = [
         "contentType": "image/png",
         "fileSize": 5012,
         "defaultImg": true,
-        "user": null
+        "user": undefined
     },
     {
         "_id": "59c44d85f2943200228467b4",
@@ -83,39 +83,6 @@ describe('Avatar Repository', () => {
     });
 
     describe('getAvatar()', () => {
-        it('with default id resolves to the default image', () => {
-            AvatarMock = sinon.mock(Avatar);
-            AvatarMock.expects('findOne').withArgs({defaultImg: true})
-                .chain('exec')
-                .resolves(mockAvatars[0]);
-
-            const promise = AvatarRepository.getAvatar('default');
-            expect(promise).to.be.a('Promise');
-            return promise.then(avatar => {
-                expect(avatar).to.be.an('object');
-                expect(avatar).to.have.property('contentType');
-                expect(avatar).to.have.property('fileSize');
-                expect(avatar).to.have.property('defaultImg');
-                expect(avatar).to.have.property('user');
-                expect(avatar.defaultImg).to.equal(true);
-                expect(avatar.user).to.be.null;
-            });
-        });
-
-        it('with default id rejects with error if something goes wrong', () => {
-            AvatarMock = sinon.mock(Avatar);
-            AvatarMock.expects('findOne').withArgs({defaultImg: true})
-                .chain('exec')
-                .rejects(new Error('Oops, something went wrong getting default image'));
-
-            const promise = AvatarRepository.getAvatar('default');
-            expect(promise).to.be.a('Promise');
-            return promise.catch(err => {
-                expect(err).to.exist;
-                expect(err).to.be.an('Error');
-            });
-        });
-
         it('with avatar id resolves to the avatar with that id', () => {
             AvatarMock = sinon.mock(Avatar);
             AvatarMock.expects('findById').withArgs(mockAvatars[1]._id)
@@ -150,6 +117,55 @@ describe('Avatar Repository', () => {
 
         it('rejects with error if the id param is not provided', () => {
             const promise = AvatarRepository.getAvatar();
+            expect(promise).to.be.a('Promise');
+            return promise.catch(err => {
+                expect(err).to.exist;
+                expect(err).to.be.an('Error');
+            });
+        });
+    });
+
+    describe('getDefaultAvatar()', () => {
+        it('with index resolves to the default image', () => {
+            AvatarMock = sinon.mock(Avatar);
+            AvatarMock.expects('find').withArgs({defaultImg: true})
+                .chain('exec')
+                .resolves([mockAvatars[0]]);
+
+            const promise = AvatarRepository.getDefaultAvatar(0);
+            expect(promise).to.be.a('Promise');
+            return promise.then(avatar => {
+                expect(avatar).to.be.an('object');
+                expect(avatar).to.have.property('contentType');
+                expect(avatar).to.have.property('fileSize');
+                expect(avatar).to.have.property('defaultImg');
+                expect(avatar).to.have.property('user');
+                expect(avatar.defaultImg).to.equal(true);
+                expect(avatar.user).to.be.undefined;
+            });
+        });
+
+        it('rejects with error if the index is out of bounds', () => {
+            AvatarMock = sinon.mock(Avatar);
+            AvatarMock.expects('find').withArgs({defaultImg: true})
+                .chain('exec')
+                .resolves([mockAvatars[0]]);
+
+            const promise = AvatarRepository.getDefaultAvatar(3);
+            expect(promise).to.be.a('Promise');
+            return promise.catch(err => {
+                expect(err).to.exist;
+                expect(err).to.be.an('Error');
+            });
+        });
+
+        it('rejects with error if something goes wrong getting the default avatars from the db', () => {
+            AvatarMock = sinon.mock(Avatar);
+            AvatarMock.expects('find').withArgs({defaultImg: true})
+                .chain('exec')
+                .rejects(new Error('Oops, something went wrong getting default image'));
+
+            const promise = AvatarRepository.getDefaultAvatar(1);
             expect(promise).to.be.a('Promise');
             return promise.catch(err => {
                 expect(err).to.exist;
