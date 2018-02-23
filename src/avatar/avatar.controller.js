@@ -91,3 +91,28 @@ export function uploadAvatar(req) {
         });
 }
 
+export function uploadDefaultAvatar(req) {
+    if (!req || !req.file) {
+        return Promise.reject({
+            success: false,
+            message: 'request parameter is required',
+            error: new Error('request parameter is required')
+        });
+    }
+    return AvatarRepository.uploadDefaultAvatar(req.file)
+        .then(avatar => {
+            return {
+                success: true,
+                message: 'default avatar uploaded and saved.',
+                payload: avatar
+            };
+        })
+        .catch(err => {
+            return Promise.reject({
+                success: false,
+                message: 'error saving default avatar: ' + err.message,
+                error: err
+            });
+        });
+
+}
