@@ -137,6 +137,54 @@ describe('Avatar controller', () => {
         });
     });
 
+    describe('getDefaultAvatar()', () => {
+        let req, stub;
+        beforeEach(() => {
+            stub = sinon.stub(Repository, 'getDefaultAvatar');
+            req = {};
+        });
+
+        afterEach(() => {
+            stub.restore();
+            req = {};
+        });
+
+        it('sends the avatar data in the response', () => {
+            stub.withArgs(0)
+                .resolves(mockAvatars[0]);
+
+            req.params = {
+                index : 0
+            };
+
+            return Controller.getDefaultAvatar(req).then(response => {
+                expect(response).to.have.property('contentType');
+                expect(response).to.have.property('payload');
+                expect(response.payload).to.be.an('Object');
+            });
+        });
+
+        it('sends a success false and message when error occurs', () => {
+            stub.withArgs(0)
+                .rejects(new Error('Oops, something went wrong...'));
+
+            req.params = {
+                index : 0
+            };
+
+            return Controller.getDefaultAvatar(req).catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error when index is not provided', () => {
+            return Controller.getAvatar().catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+    });
+
     describe('deleteAvatar()', () => {
         let req, stub;
         beforeEach(() => {
