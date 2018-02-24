@@ -14,7 +14,7 @@ const userSchema = new Schema({
     }},
     roles: {type: [String], enum: allowedRoles, default: ["user"]},
     avatar: {type: Schema.Types.ObjectId, ref: 'Avatar'},
-    avatarUrl: {type: String, default: `${baseUrl}/api/avatar/default`},
+    avatarUrl: {type: String, default: `${baseUrl}/api/avatar/default/0`},
     sfdc: {
         id: {type: String},
         accessToken: {type: String},
