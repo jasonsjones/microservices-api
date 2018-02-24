@@ -178,7 +178,7 @@ describe('Avatar controller', () => {
         });
 
         it('rejects with error when index is not provided', () => {
-            return Controller.getAvatar().catch(response => {
+            return Controller.getDefaultAvatar().catch(response => {
                 expectErrorResponse(response);
             });
         });
