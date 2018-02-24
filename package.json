@@ -24,7 +24,7 @@
     "security-check": "nsp check",
     "lt": "lt --port 3000 --subdomain sandboxapi",
     "lint": "eslint webpack.config.js src/**/*.js src/*.js",
-    "test:api": "nodemon --exec 'nyc mocha --exit src/**/*.test.js --require babel-register'",
+    "test:unit": "nodemon --exec 'nyc mocha --exit src/utils/testSetup.js src/**/*.test.js --require babel-register'",
     "up:dev": "docker-compose up node-server mongo",
     "up:test": "docker-compose up -d node-test mongo",
     "down": "docker-compose down",
