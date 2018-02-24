@@ -159,6 +159,20 @@ describe('Avatar Repository', () => {
             });
         });
 
+        it('rejects with error if the index is not provided', () => {
+            AvatarMock = sinon.mock(Avatar);
+            AvatarMock.expects('find').withArgs({defaultImg: true})
+                .chain('exec')
+                .resolves([mockAvatars[0]]);
+
+            const promise = AvatarRepository.getDefaultAvatar();
+            expect(promise).to.be.a('Promise');
+            return promise.catch(err => {
+                expect(err).to.exist;
+                expect(err).to.be.an('Error');
+            });
+        });
+
         it('rejects with error if something goes wrong getting the default avatars from the db', () => {
             AvatarMock = sinon.mock(Avatar);
             AvatarMock.expects('find').withArgs({defaultImg: true})
