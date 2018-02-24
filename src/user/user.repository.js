@@ -90,7 +90,7 @@ export function uploadUserAvatar(id, file, deleteAfterUpload = true) {
     });
 
     let avatarPromise = userPromise.then(user => {
-        let avatar = makeAvatarModel(file, user._id, deleteAfterUpload);
+        let avatar = makeAvatarModel(file, user._id, deleteAfterUpload, false /* idDefaultAvatar */);
         return avatar.save();
     });
 

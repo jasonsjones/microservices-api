@@ -2,41 +2,42 @@ import fs from 'fs';
 import Avatar from './avatar.model';
 
 export function getAvatars(queryConditions = {}, selectionStr = '') {
-    return new Promise((resolve, reject) => {
-        Avatar.find(queryConditions, selectionStr).exec()
-            .then(avatars => {
-                resolve(avatars);
-            })
-            .catch(err => {
-                reject(err);
-            });
-    });
+    return Avatar.find(queryConditions, selectionStr).exec();
 }
 
 export function getAvatar(id) {
     if (!id) {
         return Promise.reject(new Error('avatar id is required'));
     }
-    if (id === 'default') {
-        return getDefaultAvatar();
-    } else {
-        return getAvatarById(id);
+    return Avatar.findById(id).exec();
+}
+
+export function getDefaultAvatar(idx) {
+    if (idx === undefined) {
+        return Promise.reject(new Error('default avatar index is required'));
     }
+    return Avatar.find({defaultImg: true}).exec()
+        .then(defaults => {
+            if (idx > -1 && idx < defaults.length) {
+                return defaults[idx];
+            } else {
+                return Promise.reject(new Error(`default avatar with index: ${idx} does not exist`));
+            }
+        })
+        .catch(err => Promise.reject(err));
 }
 
 export function deleteAvatar(id) {
     if (!id) {
         return Promise.reject(new Error('avatar id is required'));
     }
-    return new Promise((resolve, reject) => {
-        Avatar.findById(id).exec()
-            .then(avatar => {
-                resolve(avatar.remove());
-            })
-            .catch(err => {
-                reject(err);
-            });
-    });
+    return Avatar.findById(id).exec()
+        .then(avatar => {
+            return avatar.remove();
+        })
+        .catch(err => {
+            return Promise.reject(err);
+        });
 }
 
 export function uploadAvatar(file, userId, deleteAfter) {
@@ -50,12 +51,20 @@ export function uploadAvatar(file, userId, deleteAfter) {
     return avatar.save();
 }
 
-export function makeAvatarModel(file, userId, deleteAfter = true) {
+export function uploadDefaultAvatar(file, deleteAfter) {
+    if (!file) {
+        return Promise.reject(new Error('file is required'));
+    }
+    let avatar = this.makeAvatarModel(file, null, deleteAfter, true);
+    return avatar.save();
+}
+
+export function makeAvatarModel(file, userId, deleteAfter = true, isDefault = false) {
     let avatar = new Avatar();
     avatar.fileName = file.originalname;
     avatar.contentType = file.mimetype;
     avatar.fileSize = file.size;
-    avatar.defaultImg = false;
+    avatar.defaultImg = isDefault;
     avatar.data = fs.readFileSync(file.path);
     if (deleteAfter) {
         fs.unlinkSync(file.path);
@@ -65,28 +74,4 @@ export function makeAvatarModel(file, userId, deleteAfter = true) {
         avatar.user = userId;
     }
     return avatar;
-}
-
-function getDefaultAvatar() {
-    return new Promise((resolve, reject) => {
-        Avatar.findOne({defaultImg: true}).exec()
-            .then(avatar => {
-                resolve(avatar);
-            })
-            .catch(err => {
-                reject(err);
-            });
-    });
-}
-
-function getAvatarById(id) {
-    return new Promise((resolve, reject) => {
-        Avatar.findById(id).exec()
-            .then(avatar => {
-                resolve(avatar);
-            })
-            .catch(err => {
-                reject(err);
-            });
-    });
 }

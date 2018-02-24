@@ -12,7 +12,7 @@ const mockAvatars = [
         "defaultImg": true,
         "fileSize": 5012,
         "contentType": "image/png",
-        "user": null,
+        "user": undefined,
         "data": {
             "type": "Buffer",
             "data": [
@@ -137,6 +137,54 @@ describe('Avatar controller', () => {
         });
     });
 
+    describe('getDefaultAvatar()', () => {
+        let req, stub;
+        beforeEach(() => {
+            stub = sinon.stub(Repository, 'getDefaultAvatar');
+            req = {};
+        });
+
+        afterEach(() => {
+            stub.restore();
+            req = {};
+        });
+
+        it('sends the avatar data in the response', () => {
+            stub.withArgs(0)
+                .resolves(mockAvatars[0]);
+
+            req.params = {
+                index : 0
+            };
+
+            return Controller.getDefaultAvatar(req).then(response => {
+                expect(response).to.have.property('contentType');
+                expect(response).to.have.property('payload');
+                expect(response.payload).to.be.an('Object');
+            });
+        });
+
+        it('sends a success false and message when error occurs', () => {
+            stub.withArgs(0)
+                .rejects(new Error('Oops, something went wrong...'));
+
+            req.params = {
+                index : 0
+            };
+
+            return Controller.getDefaultAvatar(req).catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error when index is not provided', () => {
+            return Controller.getAvatar().catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+    });
+
     describe('deleteAvatar()', () => {
         let req, stub;
         beforeEach(() => {
@@ -195,17 +243,10 @@ describe('Avatar controller', () => {
     });
 
     describe('uploadAvatar()', () => {
-        let stub;
+        let stub, req;
         beforeEach(() => {
             stub = sinon.stub(Repository, 'uploadAvatar');
-        });
-
-        afterEach(() => {
-            stub.restore();
-        });
-
-        it('returns the avatar in payload when successfully uploaded', () => {
-            const req = {
+            req = {
                 file: {
                     originalName: 'male3.png',
                     mimetype: 'image/png',
@@ -213,9 +254,18 @@ describe('Avatar controller', () => {
                     path: __dirname + '/../../assets/male3.png'
                 }
             };
+        });
+
+        afterEach(() => {
+            stub.restore();
+            req = {};
+        });
+
+        it('returns the avatar in payload when successfully uploaded', () => {
             const avatar = Repository.makeAvatarModel(req.file, mockAvatars[1].user, false);
             stub.withArgs(req.file)
                 .resolves(avatar);
+
             return Controller.uploadAvatar(req).then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
@@ -225,15 +275,6 @@ describe('Avatar controller', () => {
         });
 
         it('sends a success false and message when error occurs', () => {
-            const req = {
-                file: {
-                    originalName: 'male3.png',
-                    mimetype: 'image/png',
-                    size: 62079,
-                    path: __dirname + '/../../assets/male3.png'
-                }
-            };
-
             stub.withArgs(req.file)
                 .rejects(new Error('Oops, something went wrong uploading the image...'));
 
@@ -244,6 +285,56 @@ describe('Avatar controller', () => {
 
         it('rejects with error when req.file is not provided', () => {
             return Controller.uploadAvatar().catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+    });
+
+    describe('uploadDefaultAvatar()', () => {
+        let stub, req;
+        beforeEach(() => {
+            stub = sinon.stub(Repository, 'uploadDefaultAvatar');
+            req = {
+                file: {
+                    originalName: 'default.png',
+                    mimetype: 'image/png',
+                    size: 5012,
+                    path: __dirname + '/../../assets/sfdc_default_avatar.png'
+                }
+            };
+        });
+
+        afterEach(() => {
+            stub.restore();
+            req = {};
+        });
+
+        it('returns the default avatar in payload when successfully uploaded', () => {
+            const avatar = Repository.makeAvatarModel(req.file, null, false, true);
+            stub.withArgs(req.file)
+                .resolves(avatar);
+
+            return Controller.uploadDefaultAvatar(req).then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response).to.have.property('payload');
+                expect(response.success).to.be.true;
+                expect(response.payload.defaultImg).to.be.true;
+                expect(response.payload.user).to.be.undefined;
+            });
+        });
+
+        it('sends a success false and message when error occurs', () => {
+            stub.withArgs(req.file)
+                .rejects(new Error('Oops, something went wrong uploading the image...'));
+
+            return Controller.uploadDefaultAvatar(req).catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error when req.file is not provided', () => {
+            return Controller.uploadDefaultAvatar().catch(response => {
                 expectErrorResponse(response);
             });
         });

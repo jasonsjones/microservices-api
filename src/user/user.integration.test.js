@@ -1,10 +1,13 @@
 import { expect } from 'chai';
 import request from 'supertest';
+import debug from 'debug';
+
 
 import app from '../config/app';
 import Config from '../config/config';
 import db from '../config/db';
 
+const log = debug('db:integration-test');
 const env = process.env.NODE_ENV || "development";
 const config = Config[env];
 
@@ -18,7 +21,7 @@ describe('User integration tests', () => {
 
     after(() => {
         dbConnection.dropCollection('users', () => {
-            console.log('***** dropped users collection');
+            log('dropped users collection');
         });
         dbConnection.close();
     });
