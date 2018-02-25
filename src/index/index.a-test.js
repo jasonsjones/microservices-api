@@ -5,10 +5,6 @@ import app from '../config/app';
 
 describe('Index integration tests', () => {
 
-    it('app is present', () => {
-        expect(app).to.exist;
-    });
-
     it('GET /api', () => {
         return request(app)
             .get('/api')
