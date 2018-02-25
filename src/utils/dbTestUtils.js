@@ -2,8 +2,13 @@ import fs from 'fs';
 import debug from 'debug';
 
 import Avatar from '../avatar/avatar.model';
+import Config from '../config/config';
+import db from '../config/db';
 
+const config = Config['test'];
 const log = debug('db:collections');
+
+export const dbConnection = db(config);
 
 export const dropCollections = (connection) => {
     let collections = Object.keys(connection.collections);
