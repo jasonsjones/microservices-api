@@ -25,7 +25,7 @@ services:
         environment:
             - NODE_ENV=test
             - PORT=3003
-            - DEBUG=db*,app
+            - DEBUG=db*,app,test
         tty: true
         ports:
             - "3003:3003"
