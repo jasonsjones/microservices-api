@@ -2,28 +2,17 @@ import { expect } from 'chai';
 import request from 'supertest';
 import debug from 'debug';
 
-
 import app from '../config/app';
-import Config from '../config/config';
-import db from '../config/db';
+import { dbConnection } from '../utils/dbTestUtils';
 
 const log = debug('db:integration-test');
-const env = process.env.NODE_ENV || "development";
-const config = Config[env];
-
-let dbConnection;
 
 describe('User integration tests', () => {
 
-    before(() => {
-        dbConnection = db(config);
-    });
-
-    after(() => {
+    afterEach(() => {
         dbConnection.dropCollection('users', () => {
             log('dropped users collection');
         });
-        dbConnection.close();
     });
 
     it('POST /api/signup', () => {
