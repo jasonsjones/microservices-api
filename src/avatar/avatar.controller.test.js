@@ -78,8 +78,9 @@ describe('Avatar controller', () => {
             return Controller.getAvatars().then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('payload');
+                expect(response.payload).to.have.property('avatars');
                 expect(response.success).to.be.true;
-                expect(response.payload).to.be.an('Array');
+                expect(response.payload.avatars).to.be.an('Array');
             });
         });
 
