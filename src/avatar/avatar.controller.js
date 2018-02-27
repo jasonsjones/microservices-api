@@ -5,7 +5,9 @@ export function getAvatars() {
         .then(avatars => {
             return {
                 success: true,
-                payload: avatars
+                payload: {
+                    avatars
+                }
             };
         })
         .catch(err => {

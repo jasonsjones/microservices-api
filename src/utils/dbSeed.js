@@ -1,9 +1,9 @@
 import fs from 'fs';
 import debug from 'debug';
-import Config from './config/config';
-import db from './config/db';
-import User from './user/user.model';
-import Avatar from './avatar/avatar.model';
+import Config from '../config/config';
+import db from '../config/db';
+import User from '../user/user.model';
+import Avatar from '../avatar/avatar.model';
 
 const env = process.env.NODE_ENV || "development";
 const config = Config[env];
@@ -11,7 +11,7 @@ const config = Config[env];
 const log = debug('db:seed');
 const dbConn = db(config);
 
-const assetPath = `${__dirname}/../assets`;
+const assetPath = `${__dirname}/../../assets`;
 const avatarFile = `${assetPath}/sfdc_default_avatar.png`;
 
 const initialUsers = [
