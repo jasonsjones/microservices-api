@@ -13,14 +13,6 @@ export default (app) => {
                     res.status(500);
                     res.json(err);
                 });
-        })
-        .post(upload.single('avatar'), (req, res) => {
-            AvatarController.uploadAvatar(req)
-                .then(response => res.json(response))
-                .catch(err => {
-                    res.status(500);
-                    res.json(err);
-                });
         });
 
     app.route('/api/avatar/:id')
@@ -38,6 +30,30 @@ export default (app) => {
         })
         .delete((req, res) => {
             AvatarController.deleteAvatar(req)
+                .then(response => res.json(response))
+                .catch(err => {
+                    res.status(500);
+                    res.json(err);
+                });
+        });
+
+    app.route('/api/avatar/default/:index')
+        .get((req, res) => {
+            AvatarController.getDefaultAvatar(req)
+                .then(response => {
+                    res.contentType(response.contentType);
+                    res.write(response.payload);
+                    res.end();
+                })
+                .catch(err => {
+                    res.status(500);
+                    res.json(err);
+                });
+        });
+
+    app.route('/api/avatar/default')
+        .post(upload.single('avatar'), (req, res) => {
+            AvatarController.uploadDefaultAvatar(req)
                 .then(response => res.json(response))
                 .catch(err => {
                     res.status(500);

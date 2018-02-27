@@ -79,12 +79,18 @@ export function uploadUserAvatar(id, file, deleteAfterUpload = true) {
     // if the user already has a custom avatar image, delete it first
     userPromise.then(user => {
         if (user.hasCustomAvatar()) {
-            deleteAvatar(user.avatar);
+            deleteAvatar(user.avatar)
+                .catch(err => {
+                    /* istanbul ignore next */
+                    if (!process.env.ENV === 'test') {
+                        console.log(err.message);
+                    }
+                });
         }
     });
 
     let avatarPromise = userPromise.then(user => {
-        let avatar = makeAvatarModel(file, user._id, deleteAfterUpload);
+        let avatar = makeAvatarModel(file, user._id, deleteAfterUpload, false /* idDefaultAvatar */);
         return avatar.save();
     });
 

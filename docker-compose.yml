@@ -17,7 +17,7 @@ services:
             - mongo
 
     node-test:
-        container_name: tests
+        container_name: test
         build:
             context: .
         volumes:
@@ -25,13 +25,13 @@ services:
         environment:
             - NODE_ENV=test
             - PORT=3003
-            - DEBUG=db*
+            - DEBUG=db*,app,test
         tty: true
         ports:
             - "3003:3003"
         depends_on:
             - mongo
-        command: ["yarn", "test:api"]
+        command: ["yarn", "test:acceptance"]
 
     mongo:
         container_name: database
