@@ -47,7 +47,7 @@ export function uploadAvatar(file, userId, deleteAfter) {
     if (!userId) {
         return Promise.reject(new Error('user id is required'));
     }
-    let avatar = this.makeAvatarModel(file, userId, deleteAfter);
+    let avatar = makeAvatarModel(file, userId, deleteAfter);
     return avatar.save();
 }
 
@@ -55,7 +55,7 @@ export function uploadDefaultAvatar(file, deleteAfter) {
     if (!file) {
         return Promise.reject(new Error('file is required'));
     }
-    let avatar = this.makeAvatarModel(file, null, deleteAfter, true);
+    let avatar = makeAvatarModel(file, null, deleteAfter, true);
     return avatar.save();
 }
 
