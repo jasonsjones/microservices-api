@@ -22,6 +22,7 @@ export default {
         port,
         token_secret,
         session_secret,
+        baseUrl: 'http://localhost',
         dbUrl: dockerDbUri
     },
     'test': {
