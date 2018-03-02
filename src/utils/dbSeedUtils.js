@@ -11,7 +11,7 @@ const log = debug('db:seed');
 
 const baseUrl = `${config.baseUrl}:${config.port}`;
 const assetPath = `${__dirname}/../../assets`;
-const avatarFile = `${assetPath}/sfdc_default_avatar.png`;
+const defaultAvatarFile = `${assetPath}/sfdc_default_avatar.png`;
 const initialUsers = [
     {
         name: "Oliver Queen",
@@ -51,9 +51,12 @@ const seedDefaultAvatarImage = () => {
     const avatar = {
         originalName: 'sfdc_default_avatar.png',
         mimetype: 'image/png',
-        size: fs.statSync(avatarFile).size,
-        path: avatarFile
+        size: fs.statSync(defaultAvatarFile).size,
+        path: defaultAvatarFile
     };
+    // Utilize the repository function here to add the image to the db
+    // for some reason, not able to create an HTML File obj to attach
+    // to the payload to use the POST endpoint (/api/avatar/default)
     return uploadDefaultAvatar(avatar, false);
 };
 
@@ -70,7 +73,7 @@ const seedUser = (userData) => {
 
 const getDefaultAvatars = (data) => {
     return data.payload.avatars.filter(image => image.defaultImg);
-}
+};
 
 const seedDefaultAvatarAPI = () => {
     return getResource('/api/avatars')
@@ -79,6 +82,7 @@ const seedDefaultAvatarAPI = () => {
                 const defaults = getDefaultAvatars(data);
                 if (defaults.length === 0) {
                     log('adding default avatar...');
+                    // only seed oliver for now...
                     return seedUser(initialUsers[0]);
                 } else {
                     log('default avatar(s) already in db');
