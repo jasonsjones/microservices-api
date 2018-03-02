@@ -19,7 +19,7 @@
   "scripts": {
     "predev": "npm run dbSeed",
     "dev": "nodemon src/server.js --inspect=0.0.0.0:5858 --watch src/ --exec babel-node",
-    "prebuild": "rm -f public/bundle.js* public/styles/styles.css*",
+    "clean": "rm -rf .v8flags*",
     "dbSeed": "babel-node src/utils/dbSeed.js",
     "security-check": "nsp check",
     "lt": "lt --port 3000 --subdomain sandboxapi",
