@@ -1,8 +1,7 @@
-import fs from 'fs';
 import debug from 'debug';
 import fetch from 'node-fetch';
+import request from 'supertest';
 import Config from '../config/config';
-import { uploadDefaultAvatar } from '../avatar/avatar.repository';
 
 const env = process.env.NODE_ENV || "development";
 const config = Config[env];
@@ -47,17 +46,10 @@ const getResource = (endpoint) => {
         .then(response => response.json());
 };
 
-const seedDefaultAvatarImage = () => {
-    const avatar = {
-        originalName: 'sfdc_default_avatar.png',
-        mimetype: 'image/png',
-        size: fs.statSync(defaultAvatarFile).size,
-        path: defaultAvatarFile
-    };
-    // Utilize the repository function here to add the image to the db
-    // for some reason, not able to create an HTML File obj to attach
-    // to the payload to use the POST endpoint (/api/avatar/default)
-    return uploadDefaultAvatar(avatar, false);
+const seedAvatarImage = (imgPath) => {
+    return request(`${baseUrl}`)
+        .post('/api/avatar/default')
+        .attach('avatar', imgPath);
 };
 
 const seedUser = (userData) => {
@@ -82,8 +74,7 @@ const seedDefaultAvatarAPI = () => {
                 const defaults = getDefaultAvatars(data);
                 if (defaults.length === 0) {
                     log('adding default avatar...');
-                    // only seed oliver for now...
-                    return seedUser(initialUsers[0]);
+                    return seedAvatarImage(defaultAvatarFile);
                 } else {
                     log('default avatar(s) already in db');
                     return Promise.resolve('avatar not required');
@@ -97,7 +88,8 @@ const seedDefaultUserAPI = () => {
         .then(data => {
             if (data.success && data.payload.users.length === 0) {
                 log('adding user...');
-                return seedDefaultAvatarImage();
+                // only seed oliver for now...
+                return seedUser(initialUsers[0]);
             } else {
                 log('users already in db');
                 return Promise.resolve('users not required');
