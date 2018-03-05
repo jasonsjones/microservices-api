@@ -31,11 +31,13 @@ describe('Avatar repository integration tests', () => {
             };
             return Repository.uploadDefaultAvatar(avatar, false)
                 .then(response => {
+                    expect(response).to.have.property('_id');
                     expect(response).to.have.property('data');
                     expect(response).to.have.property('fileSize');
                     expect(response).to.have.property('defaultImg');
                     expect(response).to.have.property('contentType');
                     expect(response.contentType).to.equal('image/png');
+                    expect(response.defaultImg).to.be.true;
                 });
         });
 
