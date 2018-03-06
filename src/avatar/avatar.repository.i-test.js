@@ -106,4 +106,31 @@ describe('Avatar repository integration tests', () => {
                 });
         });
     });
+
+    context('getDefaultAvatar()', () => {
+        it('returns the first default avatar when passed index 0', () => {
+            return Repository.getDefaultAvatar(0)
+                .then(response => {
+                    expectAvatarShape(response);
+                    expect(response.defaultImg).to.be.true;
+                });
+        });
+
+        it('returns an error if a default avatar does not exist at the give index', () => {
+            return Repository.getDefaultAvatar(2)
+                .catch(error => {
+                    expect(error).to.exist;
+                    expect(error.message).to.contain('default avatar with index');
+                    expect(error.message).to.contain('does not exist');
+                });
+        });
+
+        it('returns an error if the index paramater is not provided', () => {
+            return Repository.getDefaultAvatar()
+                .catch(error => {
+                    expect(error).to.exist;
+                    expect(error.message).to.contain('default avatar index is required');
+                });
+        });
+    });
 });
