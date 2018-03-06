@@ -23,6 +23,7 @@ const expectAvatarShape = response => {
 };
 
 describe('Avatar repository integration tests', () => {
+    let defatultAvatarId, customAvatarId;
 
     after(() => {
         dropAvatarCollection();
@@ -39,6 +40,7 @@ describe('Avatar repository integration tests', () => {
             };
             return Repository.uploadDefaultAvatar(avatar, false)
                 .then(response => {
+                    defatultAvatarId = response._id;
                     expectAvatarShape(response);
                     expect(response.contentType).to.equal('image/png');
                     expect(response.defaultImg).to.be.true;
@@ -66,6 +68,7 @@ describe('Avatar repository integration tests', () => {
             };
             return Repository.uploadAvatar(avatar, userId, false)
                 .then(response => {
+                    customAvatarId = response._id;
                     expectAvatarShape(response);
                     expect(response.contentType).to.equal('image/png');
                     expect(response.defaultImg).to.be.false;
@@ -103,6 +106,41 @@ describe('Avatar repository integration tests', () => {
                     expect(response.length).to.equal(2);
                     expectAvatarShape(response[0]);
                     expectAvatarShape(response[1]);
+                });
+        });
+    });
+
+    context('getAvatar()', () => {
+        it('returns the avatar given the id', () => {
+            return Repository.getAvatar(customAvatarId)
+                .then(response => {
+                    expectAvatarShape(response);
+                    expect(response.defaultImg).to.be.false;
+                });
+        });
+
+        it('returns the default avatar given the id', () => {
+            return Repository.getAvatar(defatultAvatarId)
+                .then(response => {
+                    expectAvatarShape(response);
+                    expect(response.defaultImg).to.be.true;
+                });
+        });
+
+        it('returns null if an avatar does not exist with the given id', () => {
+            const idDoesNotExist = "59c44d83f2943200228467b0";
+
+            return Repository.getAvatar(idDoesNotExist)
+                .then(response => {
+                    expect(response).to.be.null;
+                });
+        });
+
+        it('returns an error if the id paramater is not provided', () => {
+            return Repository.getAvatar()
+                .catch(error => {
+                    expect(error).to.exist;
+                    expect(error.message).to.contain('avatar id is required');
                 });
         });
     });
