@@ -171,4 +171,40 @@ describe('Avatar repository integration tests', () => {
                 });
         });
     });
+
+    context('deleteAvatar()', () => {
+        it('returns the deleted (custome) avatar given the id', () => {
+            return Repository.deleteAvatar(customAvatarId)
+                .then(response => {
+                    expectAvatarShape(response);
+                    expect(response.defaultImg).to.be.false;
+                });
+        });
+
+        it('returns the deleted (default) avatar given the id', () => {
+            return Repository.deleteAvatar(defatultAvatarId)
+                .then(response => {
+                    expectAvatarShape(response);
+                    expect(response.defaultImg).to.be.true;
+                });
+        });
+
+        it('returns an error if an avatar does not exist with the given id', () => {
+            const idDoesNotExist = "59c44d83f2943200228467b0";
+
+            return Repository.deleteAvatar(idDoesNotExist)
+                .catch(error => {
+                    expect(error).to.exist;
+                    expect(error.message).to.contain('avatar does not exist with id ');
+                });
+        });
+
+        it('returns an error if the id paramater is not provided', () => {
+            return Repository.deleteAvatar()
+                .catch(error => {
+                    expect(error).to.exist;
+                    expect(error.message).to.contain('avatar id is required');
+                });
+        });
+    });
 });

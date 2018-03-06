@@ -33,7 +33,11 @@ export function deleteAvatar(id) {
     }
     return Avatar.findById(id).exec()
         .then(avatar => {
-            return avatar.remove();
+            if (avatar) {
+                return avatar.remove();
+            } else {
+                return Promise.reject(new Error(`avatar does not exist with id ${id}`));
+            }
         })
         .catch(err => {
             return Promise.reject(err);
