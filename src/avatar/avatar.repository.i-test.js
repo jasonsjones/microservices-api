@@ -94,4 +94,16 @@ describe('Avatar repository integration tests', () => {
                 });
         });
     });
+
+    context('getAvatars()', () => {
+        it('gets all the avatars', () => {
+            return Repository.getAvatars()
+                .then(response => {
+                    expect(response).to.be.an('array');
+                    expect(response.length).to.equal(2);
+                    expectAvatarShape(response[0]);
+                    expectAvatarShape(response[1]);
+                });
+        });
+    });
 });
