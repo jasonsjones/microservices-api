@@ -1,18 +1,10 @@
 import fs from 'fs';
 import { expect } from 'chai';
-import debug from 'debug';
 
 import * as Repository from './avatar.repository';
-import { dbConnection } from '../utils/dbTestUtils';
+import { dbConnection, dropAvatarCollection } from '../utils/dbTestUtils';
 
-const log = debug('db:integration-test');
 const assetPath = `${__dirname}/../../assets`;
-
-const dropAvatarCollection = () => {
-    dbConnection.dropCollection('avatars', () => {
-        log('dropped avatars collection');
-    });
-};
 
 const expectAvatarShape = response => {
     expect(response).to.have.property('_id');
@@ -26,7 +18,7 @@ describe('Avatar repository integration tests', () => {
     let defatultAvatarId, customAvatarId;
 
     after(() => {
-        dropAvatarCollection();
+        dropAvatarCollection(dbConnection);
     });
 
     context('uploadDefaultAvatar()', () => {
