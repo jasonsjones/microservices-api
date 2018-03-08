@@ -101,7 +101,7 @@ export function uploadAvatar(req) {
             error: new Error('request parameter is required')
         });
     }
-    return AvatarRepository.uploadAvatar(req.file)
+    return AvatarRepository.uploadAvatar(req.file, req.params.userId)
         .then(avatar => {
             return {
                 success: true,

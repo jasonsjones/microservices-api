@@ -253,6 +253,9 @@ describe('Avatar controller', () => {
                     mimetype: 'image/png',
                     size: 62079,
                     path: __dirname + '/../../assets/male3.png'
+                },
+                params: {
+                    userId: "59c44d83f2943200228467b3",
                 }
             };
         });
@@ -264,7 +267,7 @@ describe('Avatar controller', () => {
 
         it('returns the avatar in payload when successfully uploaded', () => {
             const avatar = Repository.makeAvatarModel(req.file, mockAvatars[1].user, false);
-            stub.withArgs(req.file)
+            stub.withArgs(req.file, req.params.userId)
                 .resolves(avatar);
 
             return Controller.uploadAvatar(req).then(response => {
@@ -276,7 +279,7 @@ describe('Avatar controller', () => {
         });
 
         it('sends a success false and message when error occurs', () => {
-            stub.withArgs(req.file)
+            stub.withArgs(req.file, req.params.userId)
                 .rejects(new Error('Oops, something went wrong uploading the image...'));
 
             return Controller.uploadAvatar(req).catch(response => {
