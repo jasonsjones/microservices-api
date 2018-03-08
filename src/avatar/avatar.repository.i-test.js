@@ -66,6 +66,7 @@ describe('Avatar repository integration tests', () => {
                     expect(response.defaultImg).to.be.false;
                 });
         });
+
         it('returns an error if the avatar file is not provided', () => {
             const userId = "59c44d83f2943200228467b1";
             return Repository.uploadAvatar(null, userId, false)
@@ -74,6 +75,7 @@ describe('Avatar repository integration tests', () => {
                     expect(error.message).to.contain('file is required');
                 });
         });
+
         it('returns an error if the userId is not provided', () => {
             const avatarFile = `${assetPath}/male3.png`;
             const avatar = {
@@ -107,6 +109,7 @@ describe('Avatar repository integration tests', () => {
             return Repository.getAvatar(customAvatarId)
                 .then(response => {
                     expectAvatarShape(response);
+                    expect(response._id).to.eql(customAvatarId);
                     expect(response.defaultImg).to.be.false;
                 });
         });
@@ -115,6 +118,7 @@ describe('Avatar repository integration tests', () => {
             return Repository.getAvatar(defatultAvatarId)
                 .then(response => {
                     expectAvatarShape(response);
+                    expect(response._id).to.eql(defatultAvatarId);
                     expect(response.defaultImg).to.be.true;
                 });
         });
@@ -142,6 +146,7 @@ describe('Avatar repository integration tests', () => {
             return Repository.getDefaultAvatar(0)
                 .then(response => {
                     expectAvatarShape(response);
+                    expect(response._id).to.eql(defatultAvatarId);
                     expect(response.defaultImg).to.be.true;
                 });
         });
@@ -169,6 +174,7 @@ describe('Avatar repository integration tests', () => {
             return Repository.deleteAvatar(customAvatarId)
                 .then(response => {
                     expectAvatarShape(response);
+                    expect(response._id).to.eql(customAvatarId);
                     expect(response.defaultImg).to.be.false;
                 });
         });
@@ -177,6 +183,7 @@ describe('Avatar repository integration tests', () => {
             return Repository.deleteAvatar(defatultAvatarId)
                 .then(response => {
                     expectAvatarShape(response);
+                    expect(response._id).to.eql(defatultAvatarId);
                     expect(response.defaultImg).to.be.true;
                 });
         });
