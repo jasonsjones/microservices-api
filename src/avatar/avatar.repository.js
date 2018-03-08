@@ -18,7 +18,7 @@ export function getDefaultAvatar(idx) {
     }
     return Avatar.find({defaultImg: true}).exec()
         .then(defaults => {
-            if (idx > -1 && idx < defaults.length) {
+            if (defaults && idx > -1 && idx < defaults.length) {
                 return defaults[idx];
             } else {
                 return Promise.reject(new Error(`default avatar with index: ${idx} does not exist`));
