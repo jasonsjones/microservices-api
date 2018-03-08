@@ -30,10 +30,14 @@ export function getAvatar(req) {
     }
     return AvatarRepository.getAvatar(req.params.id)
         .then(avatar => {
-            return {
-                contentType: avatar.contentType,
-                payload: avatar.data
-            };
+            if (avatar) {
+                return {
+                    contentType: avatar.contentType,
+                    payload: avatar.data
+                };
+            } else {
+                return Promise.reject(new Error(`unable to find avatar with id ${req.params.id}`));
+            }
         })
         .catch(err => {
             return Promise.reject({

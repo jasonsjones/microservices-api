@@ -136,6 +136,20 @@ describe('Avatar controller', () => {
                 expectErrorResponse(response);
             });
         });
+
+        it('rejects with error when avatar id is not provided', () => {
+            const badId = "59c44d83f2943200228467b9";
+            stub.withArgs(badId)
+                .resolves(null);
+
+            req.params = {
+                id : badId
+            };
+
+            return Controller.getAvatar(req).catch(response => {
+                expectErrorResponse(response);
+            });
+        });
     });
 
     describe('getDefaultAvatar()', () => {
