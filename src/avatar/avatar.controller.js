@@ -5,6 +5,7 @@ export function getAvatars() {
         .then(avatars => {
             return {
                 success: true,
+                message: 'avatars fetch successful',
                 payload: {
                     avatars
                 }
