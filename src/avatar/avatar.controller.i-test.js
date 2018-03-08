@@ -98,4 +98,19 @@ describe('Avatar controller integration tests', () => {
                 });
         });
     });
+
+    context('getAvatars()', () => {
+        it('returns a json payload with all the avatars', () => {
+            return Controller.getAvatars()
+                .then(response => {
+                    expect(response).to.have.property('success');
+                    expect(response).to.have.property('message');
+                    expect(response).to.have.property('payload');
+                    expect(response.payload).to.have.property('avatars');
+                    expect(response.payload.avatars).to.be.an('array');
+                    expect(response.payload.avatars).to.have.lengthOf(2);
+                    expect(response.success).to.be.true;
+                });
+        });
+    });
 });
