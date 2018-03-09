@@ -118,7 +118,7 @@ describe('Avatar controller integration tests', () => {
     });
 
     context('getAvatar()', () => {
-        it('returns a json payload when given the id in req.params.id', () => {
+        it('returns a json payload with given the id in req.params.id', () => {
             let req = {
                 params: {
                     id: customAvatarId
@@ -157,6 +157,58 @@ describe('Avatar controller integration tests', () => {
             };
 
             return Controller.getAvatar(req)
+                .catch(response => {
+                    expect(response).to.have.property('success');
+                    expect(response).to.have.property('message');
+                    expect(response).to.have.property('error');
+                    expect(response.success).to.be.false;
+                    expect(response.message).to.contain('request parameter is required');
+                    expect(response.error instanceof Error).to.be.true;
+                });
+        });
+    });
+
+    context('getDefaultAvatar()', () => {
+        it('returns a json payload with the given index', () => {
+            let req = {
+                params: {
+                    index: 0
+                }
+            };
+
+            return Controller.getDefaultAvatar(req)
+                .then(response => {
+                    expect(response).to.have.property('contentType');
+                    expect(response).to.have.property('payload');
+                });
+        });
+
+        it('returns error payload if the index provided does not exist', () => {
+            let req = {
+                params: {
+                    index: 3
+                }
+            };
+
+            return Controller.getDefaultAvatar(req)
+                .catch(response => {
+                    expect(response).to.have.property('success');
+                    expect(response).to.have.property('message');
+                    expect(response).to.have.property('error');
+                    expect(response.success).to.be.false;
+                    expect(response.message).to.contain('does not exist');
+                    expect(response.error instanceof Error).to.be.true;
+                });
+        });
+
+        it('returns error payload if default avatar index is not provided', () => {
+            let req = {
+                params: {
+                    index: undefined
+                }
+            };
+
+            return Controller.getDefaultAvatar(req)
                 .catch(response => {
                     expect(response).to.have.property('success');
                     expect(response).to.have.property('message');
