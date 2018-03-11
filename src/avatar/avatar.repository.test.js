@@ -220,6 +220,22 @@ describe('Avatar Repository', () => {
             });
         });
 
+        it('with invalid avatar resovles with error', () => {
+            const invalidId = "59c44d85f2943400228467b4";
+            AvatarMock = sinon.mock(Avatar);
+            AvatarMock.expects('findById').withArgs(invalidId)
+                .chain('exec')
+                .resolves(null);
+
+            const promise = AvatarRepository.deleteAvatar(invalidId);
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(err => {
+                expect(err).to.exist;
+                expect(err).to.be.an('Error');
+            });
+        });
+
         it('rejects with error if the id param is not provided', () => {
             const promise = AvatarRepository.deleteAvatar();
             expect(promise).to.be.a('Promise');

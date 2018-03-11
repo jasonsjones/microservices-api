@@ -10,15 +10,9 @@ const log = debug('db:collections');
 
 export const dbConnection = db(config);
 
-export const dropCollections = (connection) => {
-    let collections = Object.keys(connection.collections);
-    collections.forEach((coll) => {
-        connection.dropCollection(coll, (err) => {
-            if (err) {
-                throw err;
-            }
-            log(`***** dropped collection ${coll}`);
-        });
+export const dropAvatarCollection = (connection) => {
+    connection.dropCollection('avatars', () => {
+        log('dropping \'avatars\' collection');
     });
 };
 

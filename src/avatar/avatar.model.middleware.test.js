@@ -76,7 +76,7 @@ describe('Avatar model middleware', () => {
             UserMock = sinon.mock(User);
             UserMock.expects('findById').withArgs(avatar.user)
                 .chain('exec')
-                .resolves(stub());
+                .resolves(user);
 
             expect(user.avatar).not.to.be.null;
             expect(user.avatarUrl).not.to.equal(expectedAvatarUrl);
