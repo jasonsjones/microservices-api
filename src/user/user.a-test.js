@@ -7,7 +7,7 @@ import { dbConnection } from '../utils/dbTestUtils';
 
 const log = debug('db:integration-test');
 
-describe('User integration tests', () => {
+describe('User acceptance tests', () => {
 
     afterEach(() => {
         dbConnection.dropCollection('users', () => {

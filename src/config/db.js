@@ -6,7 +6,7 @@ const log = debug('db:connection');
 export default (config) => {
     log('setting up mongodb...');
     mongoose.Promise = global.Promise;
-    mongoose.connect(config.dbUrl, { useMongoClient: true });
+    mongoose.connect(config.dbUrl);
     let db = mongoose.connection;
 
     db.once('open', function () {

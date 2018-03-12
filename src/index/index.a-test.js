@@ -3,7 +3,7 @@ import request from 'supertest';
 
 import app from '../config/app';
 
-describe('Index integration tests', () => {
+describe('Index acceptance tests', () => {
 
     it('GET /api', () => {
         return request(app)
