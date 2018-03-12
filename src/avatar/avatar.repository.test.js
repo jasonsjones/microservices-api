@@ -220,6 +220,22 @@ describe('Avatar Repository', () => {
             });
         });
 
+        it('with invalid avatar resovles with error', () => {
+            const invalidId = "59c44d85f2943400228467b4";
+            AvatarMock = sinon.mock(Avatar);
+            AvatarMock.expects('findById').withArgs(invalidId)
+                .chain('exec')
+                .resolves(null);
+
+            const promise = AvatarRepository.deleteAvatar(invalidId);
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(err => {
+                expect(err).to.exist;
+                expect(err).to.be.an('Error');
+            });
+        });
+
         it('rejects with error if the id param is not provided', () => {
             const promise = AvatarRepository.deleteAvatar();
             expect(promise).to.be.a('Promise');
@@ -269,7 +285,7 @@ describe('Avatar Repository', () => {
     });
 
     describe('uploadAvatar()', () => {
-        let file, userId, stub, spy;
+        let file, userId, stub;
         beforeEach(() => {
             file = {
                 originalName: 'default.png',
@@ -279,20 +295,17 @@ describe('Avatar Repository', () => {
             };
             userId = mockAvatars[1].user;
             stub = sinon.stub(Avatar.prototype, 'save');
-            spy = sinon.spy(AvatarRepository, 'makeAvatarModel');
         });
 
         afterEach(() => {
             file = null;
             userId = '';
             stub.restore();
-            spy.restore();
         });
 
         it('generates the avatar model and saves to db', () => {
             const avatar = AvatarRepository.makeAvatarModel(file, userId, false, false);
             stub.resolves(avatar);
-            spy.reset();
 
             return AvatarRepository.uploadAvatar(file, userId, false)
                 .then(response => {
@@ -304,9 +317,6 @@ describe('Avatar Repository', () => {
                     expect(response).to.have.property('defaultImg');
                     expect(response).to.have.property('data');
                     expect(response.user.toString()).to.equal(mockAvatars[1].user);
-
-                    expect(spy.calledOnce).to.be.true;
-                    expect(spy.firstCall.args.length).to.equal(3);
                 });
         });
 
@@ -320,7 +330,6 @@ describe('Avatar Repository', () => {
             };
             const avatar = AvatarRepository.makeAvatarModel(copyiedAvatar, userId, false, false);
             stub.resolves(avatar);
-            spy.reset();
 
             return AvatarRepository.uploadAvatar(copyiedAvatar, userId)
                 .then(response => {
@@ -332,9 +341,6 @@ describe('Avatar Repository', () => {
                     expect(response).to.have.property('defaultImg');
                     expect(response).to.have.property('data');
                     expect(response.user.toString()).to.equal(mockAvatars[1].user);
-
-                    expect(spy.calledOnce).to.be.true;
-                    expect(spy.firstCall.args.length).to.equal(3);
                     expect(fs.existsSync(copyiedAvatar.path)).to.be.false;
                 });
         });
@@ -345,8 +351,6 @@ describe('Avatar Repository', () => {
             return AvatarRepository.uploadAvatar(file, userId, false)
                 .then(() => { })
                 .catch(err => {
-                    expect(spy.calledOnce).to.be.true;
-                    expect(spy.firstCall.args.length).to.equal(3);
                     expect(err).to.exist;
                 });
         });
@@ -371,7 +375,7 @@ describe('Avatar Repository', () => {
     });
 
     describe('uploadDefaultAvatar()', () => {
-        let file, stub, spy;
+        let file, stub;
         beforeEach(() => {
             file = {
                 originalName: 'default.png',
@@ -380,19 +384,16 @@ describe('Avatar Repository', () => {
                 path: __dirname + '/../../assets/sfdc_default_avatar.png'
             };
             stub = sinon.stub(Avatar.prototype, 'save');
-            spy = sinon.spy(AvatarRepository, 'makeAvatarModel');
         });
 
         afterEach(() => {
             file = null;
             stub.restore();
-            spy.restore();
         });
 
         it('generates a default avatar model and saves to db', () => {
             const avatar = AvatarRepository.makeAvatarModel(file, null, false, true);
             stub.resolves(avatar);
-            spy.reset();
             return AvatarRepository.uploadDefaultAvatar(file, false)
                 .then(response => {
                     expect(response).to.exist;
@@ -403,9 +404,6 @@ describe('Avatar Repository', () => {
                     expect(response).to.have.property('defaultImg');
                     expect(response).to.have.property('data');
                     expect(response.user).to.be.undefined;
-
-                    expect(spy.calledOnce).to.be.true;
-                    expect(spy.firstCall.args.length).to.equal(4);
                 });
         });
 
@@ -415,8 +413,6 @@ describe('Avatar Repository', () => {
             return AvatarRepository.uploadDefaultAvatar(file, false)
                 .then(() => { })
                 .catch(err => {
-                    expect(spy.calledOnce).to.be.true;
-                    expect(spy.firstCall.args.length).to.equal(4);
                     expect(err).to.exist;
                 });
         });

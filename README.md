@@ -37,3 +37,19 @@ __________
 ## Endpoints
 
 _TODO_ write up all the endpoints with a brief description of each
+
+__________
+## Testing
+As mentioned above, much of the focus of this project has been on testing.  There is a large number of unit tests, integration test, and acceptance test.
+
+### Unit tests
+In an effort to stay aligned with unit testing best practices, all external dependencies for the _unit(s)_ under test are mocked or stubbed out to ensure no unintended side effects are occurring during interactions with any other code.  This ensures the expectations are asserting the right claims as to the state of the code under test.
+
+Since the unit test suite runs in isolation, meaning that it mocks or stubs out all external dependencies, including the database, to run the _unit test_ suite, just need to run
+
+```
+yarn test:unit
+```
+This will run the _unit test_ suite in `watch` mode, so to exit, they need to be stopped with `CTRL-C`
+
+_TODO_ document how to run the _integration_ and _acceptance_ test suites
