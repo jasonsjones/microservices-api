@@ -5,7 +5,7 @@
   "main": "index.js",
   "nyc": {
     "exclude": [
-      "src/**/*.test.js",
+      "src/**/*test.js",
       "src/**/*.routes.js",
       "src/utils/*.js",
       "src/config",
@@ -25,16 +25,16 @@
     "lt": "lt --port 3000 --subdomain sandboxapi",
     "lint": "eslint webpack.config.js src/**/*.js src/*.js",
     "test:unit": "DEBUG=test nodemon --exec 'nyc mocha --exit --reporter landing src/utils/testSetup.js src/**/*.test.js --require babel-register'",
-    "test:acceptance": "nodemon --exec 'mocha --exit src/utils/dbTestSetup.js src/**/*.a-test.js --require babel-register'",
-    "test:integration": "nodemon --exec 'mocha --exit src/utils/dbTestSetup.js src/**/*.i-test.js --require babel-register'",
+    "_test:acceptance": "nodemon --exec 'mocha --exit src/utils/dbTestSetup.js src/**/*.a-test.js --require babel-register'",
+    "_test:integration": "nodemon --exec 'mocha --exit src/utils/dbTestSetup.js src/**/*.i-test.js --require babel-register'",
+    "_test:a-i": "nodemon --exec 'mocha --exit src/utils/dbTestSetup.js src/**/*.*-test.js --require babel-register'",
+    "_test:all": "nyc mocha --exit src/utils/dbTestSetup.js src/**/*.*test.js --require babel-register",
     "up:dev": "docker-compose up node-server",
     "up:test-acceptance": "docker-compose up node-test",
-    "up:test-integration": "docker-compose run --rm node-test yarn test:integration",
-    "down": "docker-compose down",
-    "logs:all": "docker-compose logs -f",
-    "logs:test": "docker-compose logs -f node-test",
-    "logs:server": "docker-compose logs -f node-server",
-    "logs:db": "docker-compose logs -f mongo"
+    "up:test-integration": "docker-compose run --rm node-test yarn _test:integration",
+    "up:test-a-i": "docker-compose run --rm node-test yarn _test:a-i",
+    "up:test-all": "docker-compose run --rm node-test yarn _test:all",
+    "down": "docker-compose down"
   },
   "repository": {
     "type": "git",
