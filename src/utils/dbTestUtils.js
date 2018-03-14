@@ -10,6 +10,12 @@ const log = debug('db:collections');
 
 export const dbConnection = db(config);
 
+export const dropCollection = (connection, collectionName) => {
+    connection.dropCollection(collectionName, () => {
+        log(`dropping '${collectionName}' collection`);
+    });
+};
+
 export const dropAvatarCollection = (connection) => {
     connection.dropCollection('avatars', () => {
         log('dropping \'avatars\' collection');
