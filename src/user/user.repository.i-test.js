@@ -111,7 +111,7 @@ describe('User repository integration tests', () => {
         });
     });
 
-    context('getUser() & getUsers() integration tests', () => {
+    context('getUser() & getUsers() related tests', () => {
         let barryId, oliverId;
         const assetPath = `${__dirname}/../../assets`;
         const avatarFile = `${assetPath}/male3.png`;
@@ -198,6 +198,39 @@ describe('User repository integration tests', () => {
                     .catch(error => {
                         expect(error).to.exist;
                         expect(error.message).to.contain('user id is required');
+                    });
+            });
+        });
+
+        context('updateUser()', () => {
+            it('returns the updated user with the given id', () => {
+                const updatedData = {
+                    name: 'The Flash',
+                    email: 'flash@starlabs.com'
+                };
+
+                return Repository.updateUser(barryId, updatedData)
+                    .then(response => {
+                        expectUserShape(response);
+                        expect(response.name).to.equal(updatedData.name);
+                        expect(response.email).to.equal(updatedData.email);
+                        expect(response.createdAt).not.to.equal(response.updatedAt);
+                    });
+            });
+
+            it('returns an error if a user id is not provided', () => {
+                return Repository.updateUser()
+                    .catch(error => {
+                        expect(error).to.exist;
+                        expect(error.message).to.contain('user id is required');
+                    });
+            });
+
+            it('returns an error if a user data is not provided', () => {
+                return Repository.updateUser(barryId)
+                    .catch(error => {
+                        expect(error).to.exist;
+                        expect(error.message).to.contain('userData is required');
                     });
             });
         });
