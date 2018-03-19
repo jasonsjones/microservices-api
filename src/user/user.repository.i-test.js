@@ -35,6 +35,10 @@ describe('User repository integration tests', () => {
     });
 
     context('signUpUser()', () => {
+        after(() => {
+            dropCollection(dbConnection, 'users');
+        });
+
         it('saves a new user to the db', () => {
             const newUser = {
                 name: 'Barry Allen',
@@ -103,6 +107,63 @@ describe('User repository integration tests', () => {
                 .catch(error => {
                     expect(error).to.exist;
                     expect(error.message).to.contain('avatar file is required');
+                });
+        });
+    });
+
+    context('getUsers()', () => {
+        let oliverId;
+        before(() => {
+            return Repository.signUpUser(users[0])
+                .then(() => Repository.signUpUser(users[1]))
+                .then(user => oliverId = user._id);
+        });
+
+        after(() => {
+            dropCollection(dbConnection, 'users');
+            dropCollection(dbConnection, 'avatars');
+        });
+
+        it('returns an array of all the users', () => {
+            return Repository.getUsers()
+                .then(response => {
+                    expect(response).to.be.an('array');
+                    expect(response).to.have.lengthOf(2);
+                    expectUserShape(response[0]);
+                    expectUserShape(response[1]);
+                });
+        });
+
+        it('returns an array of user based on the query condition', () => {
+            return Repository.getUsers({name: "Oliver Queen"})
+                .then(response => {
+                    expect(response).to.be.an('array');
+                    expect(response).to.have.lengthOf(1);
+                    expectUserShape(response[0]);
+                    expect(response[0].name).to.equal("Oliver Queen");
+                });
+        });
+
+        it('returns an array of users with the avatar model populated', () => {
+            const assetPath = `${__dirname}/../../assets`;
+            const avatarFile = `${assetPath}/male3.png`;
+            const avatar = {
+                originalName: 'male3.png',
+                mimetype: 'image/png',
+                size: fs.statSync(avatarFile).size,
+                path: avatarFile
+            };
+
+            return Repository.uploadUserAvatar(oliverId, avatar, false)
+                .then(() => Repository.getUsers({name: "Oliver Queen"}, true))
+                .then(response => {
+                    expect(response).to.be.an('array');
+                    expect(response).to.have.lengthOf(1);
+                    expectUserShape(response[0]);
+                    expect(response[0].name).to.equal("Oliver Queen");
+                    expect(response[0].avatar).to.exist;
+                    expect(response[0].avatar).to.be.an('object');
+                    expect(response[0].avatar.defaultImg).to.be.false;
                 });
         });
     });
