@@ -12,7 +12,7 @@ const users = [
     },
     {
         name: 'Oliver Queen',
-        email: 'arrow@qc.com',
+        email: 'oliver@qc.com',
         password: '123456'
     }
 ];
@@ -111,7 +111,7 @@ describe('User repository integration tests', () => {
         });
     });
 
-    context('getUser() & getUsers() related tests', () => {
+    context('user fetching and updating related tests', () => {
         let barryId, oliverId;
         const assetPath = `${__dirname}/../../assets`;
         const avatarFile = `${assetPath}/male3.png`;
@@ -202,6 +202,34 @@ describe('User repository integration tests', () => {
             });
         });
 
+        context('lookupUserByEmail()', () => {
+            it('returns the user with the given email', () => {
+                return Repository.lookupUserByEmail(users[0].email)
+                    .then(response => {
+                        expectUserShape(response);
+                        expect(response.name).to.equal('Barry Allen');
+                    });
+            });
+
+            it('returns the user with the given email and avatar populated if requested', () => {
+                return Repository.lookupUserByEmail(users[1].email, true)
+                    .then(response => {
+                        expectUserShape(response);
+                        expect(response.name).to.equal('Oliver Queen');
+                        expect(response.avatar).to.be.an('object');
+                        expect(response.avatar.defaultImg).to.be.false;
+                    });
+            });
+
+            it('returns an error if a user email is not provided', () => {
+                return Repository.lookupUserByEmail()
+                    .catch(error => {
+                        expect(error).to.exist;
+                        expect(error.message).to.contain('email is required');
+                    });
+            });
+        });
+
         context('updateUser()', () => {
             it('returns the updated user with the given id', () => {
                 const updatedData = {
@@ -234,5 +262,6 @@ describe('User repository integration tests', () => {
                     });
             });
         });
+
     });
 });
