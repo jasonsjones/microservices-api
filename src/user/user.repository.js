@@ -31,18 +31,15 @@ export function lookupUserByEmail(email, inclAvatar = false) {
     if (!email) {
         return Promise.reject(new Error('email is required'));
     }
-    return new Promise((resolve, reject) => {
-        let query;
-        if (inclAvatar) {
-            query = User.findOne({email: email}).populate('avatar', '-data');
-        } else {
-            query = User.findOne({email: email});
-        }
 
-        query.exec()
-            .then(user => resolve(user))
-            .catch(err => reject(err));
-    });
+    let query;
+    if (inclAvatar) {
+        query = User.findOne({email: email}).populate('avatar', '-data');
+    } else {
+        query = User.findOne({email: email});
+    }
+
+    return query.exec();
 }
 
 export function deleteUser(id) {
