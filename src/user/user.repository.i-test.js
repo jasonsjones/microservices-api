@@ -112,7 +112,7 @@ describe('User repository integration tests', () => {
     });
 
     context('user fetching and updating related tests', () => {
-        let barryId, oliverId;
+        let barryId, oliverId, barryHashedPwd;
         const assetPath = `${__dirname}/../../assets`;
         const avatarFile = `${assetPath}/male3.png`;
         const avatar = {
@@ -126,6 +126,7 @@ describe('User repository integration tests', () => {
             return Repository.signUpUser(users[0])
                 .then(user => {
                     barryId = user._id;
+                    barryHashedPwd = user.password;
                     return Repository.signUpUser(users[1]);
                 })
                 .then(user => {
@@ -228,6 +229,81 @@ describe('User repository integration tests', () => {
                         expect(error.message).to.contain('email is required');
                     });
             });
+        });
+
+        context('changePassword()', () => {
+            it('returns the user after changing the password', () => {
+                const userData = {
+                    email: 'barry@starlabs.com',
+                    currentPassword: users[0].password,
+                    newPassword: 'test1234'
+                };
+                return Repository.changePassword(userData)
+                    .then(response => {
+                        expectUserShape(response);
+                        expect(response.password).not.to.equal(barryHashedPwd);
+                    });
+            });
+
+            it('returns an error if the user authentication fails', () => {
+                const userData = {
+                    email: 'barry@starlabs.com',
+                    currentPassword: 'wrongpassword',
+                    newPassword: 'test1234'
+                };
+                return Repository.changePassword(userData)
+                    .catch(error => {
+                        expect(error).to.exist;
+                        expect(error.message).to.contain('user unauthorized to change password');
+                    });
+            });
+
+            it('returns an error if a user data is not provided', () => {
+                return Repository.changePassword()
+                    .catch(error => {
+                        expect(error).to.exist;
+                        expect(error.message).to.contain('user data is required');
+                    });
+            });
+
+            it('returns an error if user email is not provided', () => {
+                const userData = {
+                    currentPassword: users[1].password,
+                    newPassword: 'test1234'
+                };
+                return Repository.changePassword(userData)
+                    .catch(error => {
+                        expect(error).to.exist;
+                        expect(error.message).to.contain('user email is required');
+                    });
+            });
+
+            it('returns an error if current password is not provided', () => {
+                const userData = {
+                    email: 'barry@starlabs.com',
+                    newPassword: 'test1234'
+                };
+
+                return Repository.changePassword(userData)
+                    .catch(error => {
+                        expect(error).to.exist;
+                        expect(error.message).to.contain('user current password is required');
+                    });
+            });
+
+            it('returns an error if new password is not provided', () => {
+                const userData = {
+                    email: 'barry@starlabs.com',
+                    currentPassword: users[0].password,
+                };
+
+                return Repository.changePassword(userData)
+                    .catch(error => {
+                        expect(error).to.exist;
+                        expect(error.message).to.contain('user new password is required');
+                    });
+            });
+
         });
 
         context('updateUser()', () => {
