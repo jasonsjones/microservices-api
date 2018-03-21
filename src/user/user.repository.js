@@ -107,11 +107,19 @@ export function changePassword(userData) {
 
     const { email, currentPassword, newPassword } = userData;
 
-    if (!email || !currentPassword || !newPassword) {
+    if (!email) {
         return Promise.reject(new Error('user email is required'));
     }
 
-    return this.lookupUserByEmail(email, false)
+    if (!currentPassword) {
+        return Promise.reject(new Error('user current password is required'));
+    }
+
+    if (!newPassword) {
+        return Promise.reject(new Error('user new password is required'));
+    }
+
+    return lookupUserByEmail(email, false)
         .then(user => {
             if (user.verifyPassword(currentPassword)) {
                 user.password = newPassword;
