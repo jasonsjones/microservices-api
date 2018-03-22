@@ -339,5 +339,23 @@ describe('User repository integration tests', () => {
             });
         });
 
+        context('deleteUser()', () => {
+            it('returns the deleted user with the given id', () => {
+                return Repository.deleteUser(oliverId)
+                    .then(response => {
+                        expectUserShape(response);
+                        expect(response.name).to.equal(users[1].name);
+                        expect(response.email).to.equal(users[1].email);
+                    });
+            });
+
+            it('returns an error if a user id is not provided', () => {
+                return Repository.deleteUser()
+                    .catch(error => {
+                        expect(error).to.exist;
+                        expect(error.message).to.contain('user id is required');
+                    });
+            });
+        });
     });
 });
