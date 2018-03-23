@@ -339,6 +339,25 @@ describe('User repository integration tests', () => {
             });
         });
 
+        context('unlinkSFDCAccount', () => {
+            it('returns an error if a user is not provided', () => {
+                return Repository.unlinkSFDCAccount()
+                    .catch(error => {
+                        expect(error).to.exist;
+                        expect(error.message).to.contain('unable to unlink');
+                    });
+            });
+
+            it('returns an error if the user does not have a SFDC profile', () => {
+                return Repository.getUser(barryId)
+                    .then(user => Repository.unlinkSFDCAccount(user))
+                    .catch(error => {
+                        expect(error).to.exist;
+                        expect(error.message).to.contain('unable to unlink');
+                    });
+            });
+        });
+
         context('deleteUser()', () => {
             it('returns the deleted user with the given id', () => {
                 return Repository.deleteUser(oliverId)
