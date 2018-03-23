@@ -140,8 +140,13 @@ export function signUpUser(userData) {
 
 export const unlinkSFDCAccount = (user) => {
     if (!user) {
-        return Promise.reject(new Error('User not provided; unable to unlink'));
+        return Promise.reject(new Error('user not provided; unable to unlink'));
     }
+
+    if (!user.sfdc) {
+        return Promise.reject(new Error('user does not have sfdc profile; unable to unlink'));
+    }
+
     user.sfdc.accessToken = null;
     user.sfdc.refreshToken = null;
     user.sfdc.profile = {};
