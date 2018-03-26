@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { expect } from 'chai';
 
 import * as Controller from './user.controller';
@@ -27,6 +28,15 @@ const expectUserShape = res => {
     expect(res).to.have.property('updatedAt');
 };
 
+const expectClientJSONUserShape = res => {
+    expect(res).to.have.property('id');
+    expect(res).to.have.property('name');
+    expect(res).to.have.property('email');
+    expect(res).to.have.property('roles');
+    expect(res).to.have.property('avatarUrl');
+    expect(res).to.have.property('hasSFDCProfile');
+};
+
 const expectErrorResponse = (errorResponse, errMsg) => {
     expect(errorResponse).to.have.property('success');
     expect(errorResponse).to.have.property('message');
@@ -37,11 +47,12 @@ const expectErrorResponse = (errorResponse, errMsg) => {
 };
 
 describe('User controller integration tests', () => {
-    after(() => {
-        dropCollection(dbConnection, 'users');
-    });
 
     context('signUpUser()', () => {
+        after(() => {
+            dropCollection(dbConnection, 'users');
+        });
+
         it('returns error payload if the user data is not provided', () => {
             return Controller.signupUser()
                 .catch(error => {
@@ -59,6 +70,92 @@ describe('User controller integration tests', () => {
                     expect(response).to.have.property('message');
                     expect(response.success).to.be.true;
                     expectUserShape(response.payload.user);
+                });
+        });
+    });
+
+    context('uploadUserAvatar()', () => {
+        let barryId;
+        before(() => {
+            let req = {
+                body: users[0]
+            };
+            return Controller.signupUser(req)
+                .then(response => {
+                    barryId = response.payload.user._id;
+                });
+        });
+
+        after(() => {
+            dropCollection(dbConnection, 'users');
+            dropCollection(dbConnection, 'avatars');
+        });
+
+        it('returns error payload if the request is not provided', () => {
+            return Controller.uploadUserAvatar()
+                .catch(error => {
+                    expectErrorResponse(error, 'request parameter is required');
+                });
+        });
+
+        it('returns error payload if the request is not provided', () => {
+            let req = {
+                params: {
+                    userid: barryId
+                }
+            };
+            return Controller.uploadUserAvatar(req)
+                .catch(error => {
+                    expectErrorResponse(error, 'avatar file is required');
+                });
+        });
+
+        it('returns error payload if the request is not provided', () => {
+            const assetPath = `${__dirname}/../../assets`;
+            const copyAvatarFilePath = `${assetPath}/duplicate_avatar.png`;
+            const customAvatarFile = `${assetPath}/male3.png`;
+            fs.copyFileSync(customAvatarFile, copyAvatarFilePath);
+
+            const avatar = {
+                originalName: 'duplicate_avatar.png',
+                mimetype: 'image/png',
+                size: fs.statSync(copyAvatarFilePath).size,
+                path: copyAvatarFilePath
+            };
+            let req = {
+                file: avatar
+            };
+            return Controller.uploadUserAvatar(req)
+                .catch(error => {
+                    expectErrorResponse(error, 'user id is required');
+                });
+        });
+
+        it('uploads a custom user avatar', () => {
+            const assetPath = `${__dirname}/../../assets`;
+            const copyAvatarFilePath = `${assetPath}/duplicate_avatar.png`;
+            const customAvatarFile = `${assetPath}/male3.png`;
+            fs.copyFileSync(customAvatarFile, copyAvatarFilePath);
+
+            const avatar = {
+                originalName: 'duplicate_avatar.png',
+                mimetype: 'image/png',
+                size: fs.statSync(copyAvatarFilePath).size,
+                path: copyAvatarFilePath
+            };
+            let req = {
+                file: avatar,
+                params: {
+                    userid: barryId
+                }
+            };
+            return Controller.uploadUserAvatar(req)
+                .then(response => {
+                    expect(response).to.have.property('success');
+                    expect(response).to.have.property('message');
+                    expect(response.success).to.be.true;
+                    expectClientJSONUserShape(response.payload.user);
+                    expect(response.payload.user.avatarUrl).not.to.contain('default');
                 });
         });
     });

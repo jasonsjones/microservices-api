@@ -103,13 +103,30 @@ export function deleteUser(req) {
 }
 
 export function uploadUserAvatar(req) {
-    if (!req || !req.params || !req.params.userid || !req.file) {
+    if (!req) {
         return Promise.reject({
             success: false,
             message: 'request parameter is required',
             error: new Error('request parameter is required')
         });
     }
+
+    if (!req.params || !req.params.userid) {
+        return Promise.reject({
+            success: false,
+            message: 'user id is required',
+            error: new Error('user id is required')
+        });
+    }
+
+    if (!req.file) {
+        return Promise.reject({
+            success: false,
+            message: 'avatar file is required',
+            error: new Error('avatar file is required')
+        });
+    }
+
     return UserRepository.uploadUserAvatar(req.params.userid, req.file)
         .then(user => {
             return {

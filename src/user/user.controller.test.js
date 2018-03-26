@@ -418,6 +418,33 @@ describe('User controller', () => {
                 expectErrorResponse(response);
             });
         });
+
+        it('rejects with error if user id is not provided', () => {
+            req.file = {
+                originalName: 'male3.png',
+                mimetype: 'image/png',
+                size: 62079,
+                path: __dirname + '/../../../assets/male3.png'
+            };
+            const promise = Controller.uploadUserAvatar(req);
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if avatar file is not provided', () => {
+            req.params = {
+                userid: mockUsers[1]._id
+            };
+            const promise = Controller.uploadUserAvatar(req);
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
     });
 
     describe('signUpUser()', () => {
