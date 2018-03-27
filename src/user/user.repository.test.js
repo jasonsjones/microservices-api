@@ -566,10 +566,6 @@ describe('User repository', () => {
                 expect(user.sfdc.refreshToken).to.equal(null);
                 expect(user.sfdc.profile).to.be.empty;
                 stub.restore();
-            })
-            .catch(err => {
-                console.log(err);
-                stub.restore();
             });
         });
 
