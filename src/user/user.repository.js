@@ -143,7 +143,8 @@ export const unlinkSFDCAccount = (user) => {
         return Promise.reject(new Error('user not provided; unable to unlink'));
     }
 
-    if (!user.sfdc) {
+    const id = user.sfdc['id'];
+    if (id === undefined || id === null) {
         return Promise.reject(new Error('user does not have sfdc profile; unable to unlink'));
     }
 

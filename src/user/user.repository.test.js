@@ -542,7 +542,7 @@ describe('User repository', () => {
 
     describe('unlinkSFDCAccount()', () => {
         it('resovles to the user with an unlinked sfdc account', () => {
-            let rawUserData = mockUsers[2];
+            let rawUserData = Object.assign({}, mockUsers[2]);
             rawUserData.sfdc = {
                 id: '003D000004534cda',
                 accessToken: 'thisisareallylongtokenreturnedfromsfdcserver',
@@ -566,11 +566,28 @@ describe('User repository', () => {
                 expect(user.sfdc.refreshToken).to.equal(null);
                 expect(user.sfdc.profile).to.be.empty;
                 stub.restore();
+            })
+            .catch(err => {
+                console.log(err);
+                stub.restore();
             });
         });
 
         it('rejects with error if the user is not provided', () => {
             const promise = Repository.unlinkSFDCAccount();
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(err => {
+                expect(err).to.exist;
+                expect(err).to.be.an('Error');
+            });
+        });
+
+        it('rejects with error if the user does not have existing sfdc profile', () => {
+            let rawUserData = Object.assign({}, mockUsers[0]);
+            rawUserData.sfdc = null;
+            let user = new User(rawUserData);
+            const promise = Repository.unlinkSFDCAccount(user);
             expect(promise).to.be.a('Promise');
 
             return promise.catch(err => {
