@@ -159,4 +159,28 @@ describe('User controller integration tests', () => {
                 });
         });
     });
+
+    context('getUsers()', () => {
+        before(() => {
+            return Controller.signupUser({body: users[0]})
+                .then(() => Controller.signupUser({body: users[1]}));
+        });
+
+        after(() => {
+            dropCollection(dbConnection, 'users');
+        });
+
+        it('returns all the users', () => {
+            return Controller.getUsers()
+                .then(response => {
+                    expect(response).to.have.property('success');
+                    expect(response).to.have.property('message');
+                    expect(response).to.have.property('payload');
+                    expect(response.success).to.be.true;
+                    expect(response.payload.users).to.be.an('array');
+                    expectUserShape(response.payload.users[0]);
+                    expectUserShape(response.payload.users[1]);
+                });
+        });
+    });
 });

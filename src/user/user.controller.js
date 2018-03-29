@@ -5,6 +5,7 @@ export function getUsers() {
         .then(users => {
             return {
                 success: true,
+                message: 'fetched all the users',
                 payload: {
                     users
                 }
@@ -13,7 +14,7 @@ export function getUsers() {
         .catch(err => {
             return Promise.reject({
                 success: false,
-                message: `error getting users: ${err.message}`,
+                message: `error fetching users: ${err.message}`,
                 error: err
             });
         });
