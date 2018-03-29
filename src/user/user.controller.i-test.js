@@ -17,6 +17,21 @@ const users = [
     }
 ];
 
+const getCopyOfAvatar = () => {
+    const assetPath = `${__dirname}/../../assets`;
+    const copyAvatarFilePath = `${assetPath}/duplicate_avatar.png`;
+    const customAvatarFile = `${assetPath}/male3.png`;
+    fs.copyFileSync(customAvatarFile, copyAvatarFilePath);
+
+    const avatar = {
+        originalName: 'duplicate_avatar.png',
+        mimetype: 'image/png',
+        size: fs.statSync(copyAvatarFilePath).size,
+        path: copyAvatarFilePath
+    };
+    return avatar;
+};
+
 const expectUserShape = res => {
     expect(res).to.have.property('_id');
     expect(res).to.have.property('name');
@@ -46,7 +61,7 @@ const expectErrorResponse = (errorResponse, errMsg) => {
     expect(errorResponse.error instanceof Error).to.be.true;
 };
 
-describe('User controller integration tests', () => {
+describe.only('User controller integration tests', () => {
 
     context('signUpUser()', () => {
         after(() => {
@@ -77,10 +92,7 @@ describe('User controller integration tests', () => {
     context('uploadUserAvatar()', () => {
         let barryId;
         before(() => {
-            let req = {
-                body: users[0]
-            };
-            return Controller.signupUser(req)
+            return Controller.signupUser({body: users[0]})
                 .then(response => {
                     barryId = response.payload.user._id;
                 });
@@ -98,10 +110,10 @@ describe('User controller integration tests', () => {
                 });
         });
 
-        it('returns error payload if the request is not provided', () => {
+        it('returns error payload if the avatar is not provided', () => {
             let req = {
                 params: {
-                    userid: barryId
+                    id: barryId
                 }
             };
             return Controller.uploadUserAvatar(req)
@@ -110,18 +122,9 @@ describe('User controller integration tests', () => {
                 });
         });
 
-        it('returns error payload if the request is not provided', () => {
-            const assetPath = `${__dirname}/../../assets`;
-            const copyAvatarFilePath = `${assetPath}/duplicate_avatar.png`;
-            const customAvatarFile = `${assetPath}/male3.png`;
-            fs.copyFileSync(customAvatarFile, copyAvatarFilePath);
+        it('returns error payload if the user id is not provided', () => {
+            const avatar = getCopyOfAvatar();
 
-            const avatar = {
-                originalName: 'duplicate_avatar.png',
-                mimetype: 'image/png',
-                size: fs.statSync(copyAvatarFilePath).size,
-                path: copyAvatarFilePath
-            };
             let req = {
                 file: avatar
             };
@@ -132,21 +135,12 @@ describe('User controller integration tests', () => {
         });
 
         it('uploads a custom user avatar', () => {
-            const assetPath = `${__dirname}/../../assets`;
-            const copyAvatarFilePath = `${assetPath}/duplicate_avatar.png`;
-            const customAvatarFile = `${assetPath}/male3.png`;
-            fs.copyFileSync(customAvatarFile, copyAvatarFilePath);
+            const avatar = getCopyOfAvatar();
 
-            const avatar = {
-                originalName: 'duplicate_avatar.png',
-                mimetype: 'image/png',
-                size: fs.statSync(copyAvatarFilePath).size,
-                path: copyAvatarFilePath
-            };
             let req = {
                 file: avatar,
                 params: {
-                    userid: barryId
+                    id: barryId
                 }
             };
             return Controller.uploadUserAvatar(req)
@@ -160,27 +154,76 @@ describe('User controller integration tests', () => {
         });
     });
 
-    context('getUsers()', () => {
+    context('user fetching and mutating related tests', () => {
+        let barryId;
         before(() => {
             return Controller.signupUser({body: users[0]})
-                .then(() => Controller.signupUser({body: users[1]}));
+                .then(response => {
+                    barryId = response.payload.user._id;
+                    Controller.signupUser({body: users[1]});
+                });
         });
 
         after(() => {
             dropCollection(dbConnection, 'users');
+            dropCollection(dbConnection, 'avatars');
         });
 
-        it('returns all the users', () => {
-            return Controller.getUsers()
-                .then(response => {
-                    expect(response).to.have.property('success');
-                    expect(response).to.have.property('message');
-                    expect(response).to.have.property('payload');
-                    expect(response.success).to.be.true;
-                    expect(response.payload.users).to.be.an('array');
-                    expectUserShape(response.payload.users[0]);
-                    expectUserShape(response.payload.users[1]);
-                });
+        context('getUsers()', () => {
+            it('returns all the users', () => {
+                return Controller.getUsers()
+                    .then(response => {
+                        expect(response).to.have.property('success');
+                        expect(response).to.have.property('message');
+                        expect(response).to.have.property('payload');
+                        expect(response.success).to.be.true;
+                        expect(response.payload.users).to.be.an('array');
+                        expectUserShape(response.payload.users[0]);
+                        expectUserShape(response.payload.users[1]);
+                    });
+            });
+        });
+
+        context('getUser()', () => {
+            it('returns a payload with the user of the given id', () => {
+                return Controller.getUser({params: {id: barryId}})
+                    .then(response => {
+                        expect(response).to.have.property('success');
+                        expect(response).to.have.property('message');
+                        expect(response).to.have.property('payload');
+                        expect(response.success).to.be.true;
+                    });
+            });
+
+            it('returns a payload with the user and includes the avatar model', () => {
+                const avatar = getCopyOfAvatar();
+                const req = {
+                    params: {
+                        id: barryId
+                    },
+                    file: avatar,
+                    query: {
+                        includeAvatar: "true"
+                    }
+                };
+                return Controller.uploadUserAvatar(req)
+                    .then(() => Controller.getUser(req))
+                    .then(response => {
+                        expectUserShape(response.payload.user);
+                        expect(response.payload.user.avatar).to.exist;
+                        expect(response.payload.user.avatar).to.be.an('object');
+                        expect(response.payload.user.avatar).to.have.property('_id');
+                        expect(response.payload.user.avatar).to.have.property('contentType');
+                        expect(response.payload.user.avatar).to.have.property('defaultImg');
+                    });
+            });
+
+            it('returns error payload if the request is not provided', () => {
+                return Controller.getUser()
+                    .catch(error => {
+                        expectErrorResponse(error, 'request parameter is required');
+                    });
+            });
         });
     });
 });

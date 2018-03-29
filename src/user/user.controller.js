@@ -21,6 +21,8 @@ export function getUsers() {
 }
 
 export function getUser(req) {
+    let includeAvatar = false;
+
     if (!req || !req.params || !req.params.id) {
         return Promise.reject({
             success: false,
@@ -28,10 +30,16 @@ export function getUser(req) {
             error: new Error('request parameter is required')
         });
     }
-    return UserRepository.getUser(req.params.id)
+
+    if (req.query && req.query.includeAvatar === "true") {
+        includeAvatar = true;
+    }
+
+    return UserRepository.getUser(req.params.id, includeAvatar)
         .then(user => {
             return {
                 success: true,
+                message: 'fetched the user',
                 payload: {
                     user
                 }
@@ -112,7 +120,7 @@ export function uploadUserAvatar(req) {
         });
     }
 
-    if (!req.params || !req.params.userid) {
+    if (!req.params || !req.params.id) {
         return Promise.reject({
             success: false,
             message: 'user id is required',
@@ -128,7 +136,7 @@ export function uploadUserAvatar(req) {
         });
     }
 
-    return UserRepository.uploadUserAvatar(req.params.userid, req.file)
+    return UserRepository.uploadUserAvatar(req.params.id, req.file)
         .then(user => {
             return {
                 success: true,
