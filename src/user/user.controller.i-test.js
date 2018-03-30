@@ -61,7 +61,7 @@ const expectErrorResponse = (errorResponse, errMsg) => {
     expect(errorResponse.error instanceof Error).to.be.true;
 };
 
-describe.only('User controller integration tests', () => {
+describe('User controller integration tests', () => {
 
     context('signUpUser()', () => {
         after(() => {
@@ -222,6 +222,61 @@ describe.only('User controller integration tests', () => {
                 return Controller.getUser()
                     .catch(error => {
                         expectErrorResponse(error, 'request parameter is required');
+                    });
+            });
+        });
+
+        context('updateUser()', () => {
+            it('updates the user with the provided data', () => {
+                const req = {
+                    params: {
+                        id: barryId
+                    },
+                    body: {
+                        name: 'The Flash',
+                        email: 'flash@starlabs.com'
+                    }
+                };
+                return Controller.updateUser(req)
+                    .then(response => {
+                        expect(response).to.have.property('success');
+                        expect(response).to.have.property('message');
+                        expect(response).to.have.property('payload');
+                        expect(response.success).to.be.true;
+                        expectClientJSONUserShape(response.payload.user);
+                        expect(response.payload.user.name).to.not.equal(users[0].name);
+                        expect(response.payload.user.email).to.not.equal(users[0].email);
+                    });
+            });
+
+            it('returns an error if the request parameter is not provided', () => {
+                return Controller.updateUser()
+                    .catch(error => {
+                        expectErrorResponse(error, 'request parameter is required');
+                    });
+            });
+
+            it('returns an error if the user id is not provided', () => {
+                const req = {
+                    body: {
+                        name: 'The Flash'
+                    }
+                };
+                return Controller.updateUser(req)
+                    .catch(error => {
+                        expectErrorResponse(error, 'user id is required');
+                    });
+            });
+
+            it('returns an error if the new user data is not provided', () => {
+                const req = {
+                    params: {
+                        id: barryId
+                    }
+                };
+                return Controller.updateUser(req)
+                    .catch(error => {
+                        expectErrorResponse(error, 'user data is required');
                     });
             });
         });

@@ -55,13 +55,30 @@ export function getUser(req) {
 }
 
 export function updateUser(req) {
-    if (!req || !req.params || !req.params.id || !req.body) {
+    if (!req) {
         return Promise.reject({
             success: false,
             message: 'request parameter is required',
             error: new Error('request parameter is required')
         });
     }
+
+    if (!req.params || !req.params.id) {
+        return Promise.reject({
+            success: false,
+            message: 'user id is required',
+            error: new Error('user id is required')
+        });
+    }
+
+    if (!req.body) {
+        return Promise.reject({
+            success: false,
+            message: 'user data is required',
+            error: new Error('user data is required')
+        });
+    }
+
     return UserRepository.updateUser(req.params.id, req.body)
         .then(user => {
             return {

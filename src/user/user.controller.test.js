@@ -164,7 +164,32 @@ describe('User controller', () => {
             });
         });
 
-        it('rejects with error if req parameter is not provided', () => {
+        it('rejects with error if the user id is not provided', () => {
+            req.body = {
+                email: 'thearrow@qc.com',
+                name: 'the arrow'
+            };
+            const promise = Controller.updateUser(req);
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if the updated user data is not provided', () => {
+            req.params = {
+                id: mockUsers[0]._id
+            };
+            const promise = Controller.updateUser(req);
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if the user id is not provided', () => {
             const promise = Controller.updateUser();
             expect(promise).to.be.a('Promise');
 
