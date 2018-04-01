@@ -280,6 +280,24 @@ describe('User controller integration tests', () => {
             });
         });
 
+        context('unlinkSFDCAccount()', () => {
+            it('returns an error if the user does not have a linked SFDC profile', () => {
+                let req = {
+                    params: {
+                        id: barryId
+                    }
+                };
+                return Controller.getUser(req)
+                    .then(response => {
+                        req.user = response.payload.user;
+                        return Controller.unlinkSFDCAccount(req);
+                    })
+                    .then(response => {
+                        expectErrorResponse(response, 'error unlinking the user');
+                    });
+            });
+        });
+
         context('updateUser()', () => {
             it('updates the user with the provided data', () => {
                 const req = {
