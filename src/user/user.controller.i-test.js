@@ -61,7 +61,7 @@ const expectErrorResponse = (errorResponse, errMsg) => {
     expect(errorResponse.error instanceof Error).to.be.true;
 };
 
-describe.only('User controller integration tests', () => {
+describe('User controller integration tests', () => {
 
     context('signUpUser()', () => {
         after(() => {
@@ -150,6 +150,60 @@ describe.only('User controller integration tests', () => {
                     expect(response.success).to.be.true;
                     expectClientJSONUserShape(response.payload.user);
                     expect(response.payload.user.avatarUrl).not.to.contain('default');
+                });
+        });
+    });
+
+    context('changePassword()', () => {
+        let barryId;
+        before(() => {
+            return Controller.signupUser({body: users[0]})
+                .then(response => {
+                    barryId = response.payload.user._id;
+                    Controller.signupUser({body: users[1]});
+                });
+        });
+
+        after(() => {
+            dropCollection(dbConnection, 'users');
+        });
+
+        it('changes the user\'s password', () => {
+            const req = {
+                params: {
+                    id: barryId
+                },
+                body: {
+                    email: 'barry@starlabs.com',
+                    currentPassword: '123456',
+                    newPassword: 'password'
+                }
+            };
+
+            return Controller.changePassword(req)
+                .then(response => {
+                    expect(response).to.have.property('success');
+                    expect(response).to.have.property('message');
+                    expect(response.success).to.be.true;
+                });
+        });
+
+        it('returns an error if the request parameter is not provided', () => {
+            return Controller.changePassword()
+                .catch(error => {
+                    expectErrorResponse(error, 'request parameter is required');
+                });
+        });
+
+        it('returns an error if the required user data is not provided', () => {
+            const req = {
+                params: {
+                    id: barryId
+                }
+            };
+            return Controller.changePassword(req)
+                .catch(error => {
+                    expectErrorResponse(error, 'request body is required');
                 });
         });
     });
@@ -280,59 +334,33 @@ describe.only('User controller integration tests', () => {
                     });
             });
         });
-    });
 
-    context('changePassword()', () => {
-        let barryId;
-        before(() => {
-            return Controller.signupUser({body: users[0]})
-                .then(response => {
-                    barryId = response.payload.user._id;
-                    Controller.signupUser({body: users[1]});
-                });
-        });
+        context('deleteUser()', () => {
+            it('returns error payload if the request is not provided', () => {
+                return Controller.deleteUser()
+                    .catch(error => {
+                        expectErrorResponse(error, 'request parameter is required');
+                    });
+            });
 
-        after(() => {
-            dropCollection(dbConnection, 'users');
-        });
+            it('returns the a payload with the user that was just deleted', () => {
+                const req = {
+                    params: {
+                        id: barryId
+                    }
+                };
+                return Controller.deleteUser(req)
+                    .then(response => {
+                        expect(response).to.have.property('success');
+                        expect(response).to.have.property('message');
+                        expect(response).to.have.property('payload');
+                        expect(response.success).to.be.true;
+                        expectUserShape(response.payload.user);
+                        expect(response.payload.user._id).to.eql(barryId);
+                    });
+            });
 
-        it('changes the user\'s password', () => {
-            const req = {
-                params: {
-                    id: barryId
-                },
-                body: {
-                    email: 'barry@starlabs.com',
-                    currentPassword: '123456',
-                    newPassword: 'password'
-                }
-            };
-
-            return Controller.changePassword(req)
-                .then(response => {
-                    expect(response).to.have.property('success');
-                    expect(response).to.have.property('message');
-                    expect(response.success).to.be.true;
-                });
-        });
-
-        it('returns an error if the request parameter is not provided', () => {
-            return Controller.changePassword()
-                .catch(error => {
-                    expectErrorResponse(error, 'request parameter is required');
-                });
-        });
-
-        it('returns an error if the required user data is not provided', () => {
-            const req = {
-                params: {
-                    id: barryId
-                }
-            };
-            return Controller.changePassword(req)
-                .catch(error => {
-                    expectErrorResponse(error, 'request body is required');
-                });
         });
     });
+
 });
