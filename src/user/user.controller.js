@@ -5,6 +5,7 @@ export function getUsers() {
         .then(users => {
             return {
                 success: true,
+                message: 'fetched all the users',
                 payload: {
                     users
                 }
@@ -13,13 +14,15 @@ export function getUsers() {
         .catch(err => {
             return Promise.reject({
                 success: false,
-                message: `error getting users: ${err.message}`,
+                message: `error fetching users: ${err.message}`,
                 error: err
             });
         });
 }
 
 export function getUser(req) {
+    let includeAvatar = false;
+
     if (!req || !req.params || !req.params.id) {
         return Promise.reject({
             success: false,
@@ -27,10 +30,16 @@ export function getUser(req) {
             error: new Error('request parameter is required')
         });
     }
-    return UserRepository.getUser(req.params.id)
+
+    if (req.query && req.query.includeAvatar === "true") {
+        includeAvatar = true;
+    }
+
+    return UserRepository.getUser(req.params.id, includeAvatar)
         .then(user => {
             return {
                 success: true,
+                message: 'fetched the user',
                 payload: {
                     user
                 }
@@ -46,13 +55,30 @@ export function getUser(req) {
 }
 
 export function updateUser(req) {
-    if (!req || !req.params || !req.params.id || !req.body) {
+    if (!req) {
         return Promise.reject({
             success: false,
             message: 'request parameter is required',
             error: new Error('request parameter is required')
         });
     }
+
+    if (!req.params || !req.params.id) {
+        return Promise.reject({
+            success: false,
+            message: 'user id is required',
+            error: new Error('user id is required')
+        });
+    }
+
+    if (!req.body) {
+        return Promise.reject({
+            success: false,
+            message: 'user data is required',
+            error: new Error('user data is required')
+        });
+    }
+
     return UserRepository.updateUser(req.params.id, req.body)
         .then(user => {
             return {
@@ -103,14 +129,31 @@ export function deleteUser(req) {
 }
 
 export function uploadUserAvatar(req) {
-    if (!req || !req.params || !req.params.userid || !req.file) {
+    if (!req) {
         return Promise.reject({
             success: false,
             message: 'request parameter is required',
             error: new Error('request parameter is required')
         });
     }
-    return UserRepository.uploadUserAvatar(req.params.userid, req.file)
+
+    if (!req.params || !req.params.id) {
+        return Promise.reject({
+            success: false,
+            message: 'user id is required',
+            error: new Error('user id is required')
+        });
+    }
+
+    if (!req.file) {
+        return Promise.reject({
+            success: false,
+            message: 'avatar file is required',
+            error: new Error('avatar file is required')
+        });
+    }
+
+    return UserRepository.uploadUserAvatar(req.params.id, req.file)
         .then(user => {
             return {
                 success: true,
