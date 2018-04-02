@@ -31,18 +31,15 @@ export function lookupUserByEmail(email, inclAvatar = false) {
     if (!email) {
         return Promise.reject(new Error('email is required'));
     }
-    return new Promise((resolve, reject) => {
-        let query;
-        if (inclAvatar) {
-            query = User.findOne({email: email}).populate('avatar', '-data');
-        } else {
-            query = User.findOne({email: email});
-        }
 
-        query.exec()
-            .then(user => resolve(user))
-            .catch(err => reject(err));
-    });
+    let query;
+    if (inclAvatar) {
+        query = User.findOne({email: email}).populate('avatar', '-data');
+    } else {
+        query = User.findOne({email: email});
+    }
+
+    return query.exec();
 }
 
 export function deleteUser(id) {
@@ -110,11 +107,19 @@ export function changePassword(userData) {
 
     const { email, currentPassword, newPassword } = userData;
 
-    if (!email || !currentPassword || !newPassword) {
+    if (!email) {
         return Promise.reject(new Error('user email is required'));
     }
 
-    return this.lookupUserByEmail(email, false)
+    if (!currentPassword) {
+        return Promise.reject(new Error('user current password is required'));
+    }
+
+    if (!newPassword) {
+        return Promise.reject(new Error('user new password is required'));
+    }
+
+    return lookupUserByEmail(email, false)
         .then(user => {
             if (user.verifyPassword(currentPassword)) {
                 user.password = newPassword;
@@ -135,8 +140,14 @@ export function signUpUser(userData) {
 
 export const unlinkSFDCAccount = (user) => {
     if (!user) {
-        return Promise.reject(new Error('User not provided; unable to unlink'));
+        return Promise.reject(new Error('user not provided; unable to unlink'));
     }
+
+    const id = user.sfdc['id'];
+    if (id === undefined || id === null) {
+        return Promise.reject(new Error('user does not have sfdc profile; unable to unlink'));
+    }
+
     user.sfdc.accessToken = null;
     user.sfdc.refreshToken = null;
     user.sfdc.profile = {};

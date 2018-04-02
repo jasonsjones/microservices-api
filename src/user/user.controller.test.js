@@ -5,49 +5,7 @@ import sinon from 'sinon';
 import * as Repository from './user.repository';
 import * as Controller from './user.controller';
 import User from './user.model';
-
-const mockUsers = [
-    {
-        _id: "59c44d83f2943200228467b3",
-        updatedAt: "2017-11-21T16:24:16.413Z",
-        createdAt: "2017-09-21T23:38:43.338Z",
-        name: "Roy Harper",
-        email: "roy@qc.com",
-        avatar: null,
-        password: "$2a$12$DyizVZatjn.zMHeOhQI5nuIX64417O2zuRKXe/Ae0f06bLupmZ/d6",
-        avatarUrl: "http://localhost:3000/api/avatar/default",
-        roles: [
-            "user"
-        ]
-    },
-    {
-        _id: "59c44d83f2943200228467b1",
-        updatedAt: "2017-09-21T23:38:45.575Z",
-        createdAt: "2017-09-21T23:38:43.337Z",
-        name: "Oliver Queen",
-        email: "oliver@qc.com",
-        password: "$2a$12$wwUJRxZdDzpZ5uK2u.7eNelWp6y4HT/WE/zzZ6e2L4VVvv/tJE2dK",
-        avatar: "59c44d85f2943200228467b4",
-        avatarUrl: "http://localhost:3000/api/avatar/59c44d85f2943200228467b4",
-        roles: [
-            "admin",
-            "user"
-        ]
-    },
-    {
-        _id: "59c6c317f9760b01a35c63b1",
-        updatedAt: "2017-11-16T17:56:35.118Z",
-        createdAt: "2017-09-23T20:24:55.748Z",
-        name: "Jason Jones",
-        email: "jsjones96@gmail.com",
-        password: "$2a$12$5GCSOcQgHZ1tJHaMiOvvXOcFCoOoZCmjkQfD9hd/vIrF/dm0zrXa2",
-        avatar: null,
-        avatarUrl: "http://localhost:3000/api/avatar/default",
-        roles: [
-            "user"
-        ]
-    }
-];
+import { mockUsers, mockUsersWithAvatar } from '../utils/userTestUtils';
 
 describe('User controller', () => {
     describe('getUsers()', () => {
@@ -108,6 +66,27 @@ describe('User controller', () => {
 
             return promise.then(response => {
                 expectUserResponse(response);
+            });
+        });
+
+        it('returns a promise that resolves to the requested user including the avatar model', () => {
+            stub.withArgs(mockUsers[1]._id, true).resolves(mockUsersWithAvatar[1]);
+            req.params = {
+                id: mockUsers[1]._id
+            };
+            req.query = {
+                includeAvatar: 'true'
+            };
+            const promise = Controller.getUser(req);
+            expect(promise).to.be.a('Promise');
+
+            return promise.then(response => {
+                expectUserResponse(response);
+                expect(response.payload.user.avatar).to.exist;
+                expect(response.payload.user.avatar).to.be.an('object');
+                expect(response.payload.user.avatar).to.have.property('_id');
+                expect(response.payload.user.avatar).to.have.property('contentType');
+                expect(response.payload.user.avatar).to.have.property('defaultImg');
             });
         });
 
@@ -185,7 +164,32 @@ describe('User controller', () => {
             });
         });
 
-        it('rejects with error if req parameter is not provided', () => {
+        it('rejects with error if the user id is not provided', () => {
+            req.body = {
+                email: 'thearrow@qc.com',
+                name: 'the arrow'
+            };
+            const promise = Controller.updateUser(req);
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if the updated user data is not provided', () => {
+            req.params = {
+                id: mockUsers[0]._id
+            };
+            const promise = Controller.updateUser(req);
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if the user id is not provided', () => {
             const promise = Controller.updateUser();
             expect(promise).to.be.a('Promise');
 
@@ -378,7 +382,7 @@ describe('User controller', () => {
                 path: __dirname + '/../../../assets/male3.png'
             };
             req.params = {
-                userid: mockUsers[1]._id
+                id: mockUsers[1]._id
             };
             stub.resolves(new User(mockUsers[1]));
 
@@ -398,7 +402,7 @@ describe('User controller', () => {
                 path: __dirname + '/../../../assets/male3.png'
             };
             req.params = {
-                userid: mockUsers[1]._id
+                id: mockUsers[1]._id
             };
             stub.rejects(new Error('Oops, something went wrong uploading the avatar'));
 
@@ -412,6 +416,33 @@ describe('User controller', () => {
 
         it('rejects with error if req parameter is not provided', () => {
             const promise = Controller.uploadUserAvatar();
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if user id is not provided', () => {
+            req.file = {
+                originalName: 'male3.png',
+                mimetype: 'image/png',
+                size: 62079,
+                path: __dirname + '/../../../assets/male3.png'
+            };
+            const promise = Controller.uploadUserAvatar(req);
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if avatar file is not provided', () => {
+            req.params = {
+                id: mockUsers[1]._id
+            };
+            const promise = Controller.uploadUserAvatar(req);
             expect(promise).to.be.a('Promise');
 
             return promise.catch(response => {
