@@ -64,7 +64,7 @@ export default (app) => {
             });
     });
 
-    app.post('/api/user/:userid/avatar',
+    app.post('/api/user/:id/avatar',
         //   AuthController.verifyToken,
         //   AuthController.protectRouteByUser,
         upload.single('avatar'),
