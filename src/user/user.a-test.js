@@ -6,13 +6,13 @@ import { dbConnection, dropCollection } from '../utils/dbTestUtils';
 
 describe('User acceptance tests', () => {
 
-    after(() => {
-        dropCollection(dbConnection, 'users');
-        dropCollection(dbConnection, 'avatars');
-    });
-
     context('signs up a new user and uploads a custom avatar', () => {
         let oliverId;
+        after(() => {
+            dropCollection(dbConnection, 'users');
+            dropCollection(dbConnection, 'avatars');
+        });
+
         it('POST /api/signup', () => {
             return request(app)
                 .post('/api/signup')
@@ -69,6 +69,55 @@ describe('User acceptance tests', () => {
                     expect(res.body.payload.user).to.have.property('email');
                     expect(res.body.payload.user).to.have.property('avatarUrl');
                     expect(res.body.payload.user.avatarUrl).not.to.contain('default');
+                });
+        });
+    });
+
+    context('updates user data', () => {
+        let barryId;
+        const barry ={
+            'name': 'Barry Allen',
+            'email': 'barry@starlabs.com',
+            'password': '123456'
+        };
+
+        before(() => {
+            return request(app)
+                .post('/api/signup')
+                .send(barry)
+                .expect(200)
+                .then(res => {
+                    barryId = res.body.payload.user._id;
+                });
+
+        });
+
+        after(() => {
+            dropCollection(dbConnection, 'users');
+        });
+
+        it('PUT /api/user/:id', () => {
+            const updatedUserData = {
+                'name': 'The Flash',
+                'email': 'flash@starlabs.com'
+            };
+
+            return request(app)
+                .put(`/api/user/${barryId}`)
+                .send(updatedUserData)
+                .expect(200)
+                .then(res => {
+                    expect(res).to.be.an('Object');
+                    expect(res.body).to.have.property('success');
+                    expect(res.body).to.have.property('message');
+                    expect(res.body).to.have.property('payload');
+                    expect(res.body.payload).to.have.property('user');
+                    expect(res.body.success).to.be.true;
+                    expect(res.body.payload.user).to.have.property('id');
+                    expect(res.body.payload.user).to.have.property('name');
+                    expect(res.body.payload.user).to.have.property('email');
+                    expect(res.body.payload.user.name).to.equal(updatedUserData.name);
+                    expect(res.body.payload.user.email).to.equal(updatedUserData.email);
                 });
         });
     });
