@@ -4,6 +4,13 @@ import request from 'supertest';
 import app from '../config/app';
 import { dbConnection, dropCollection } from '../utils/dbTestUtils';
 
+const expectJSONShape = json => {
+    expect(json).to.be.an('Object');
+    expect(json).to.have.property('success');
+    expect(json).to.have.property('message');
+    expect(json).to.have.property('payload');
+};
+
 describe('User acceptance tests', () => {
 
     context('signs up a new user and uploads a custom avatar', () => {
@@ -210,7 +217,35 @@ describe('User acceptance tests', () => {
     });
 
     context('deletes a user', () => {
-        it('DELETE /api/user/:id');
+        let barryId;
+        const barry ={
+            'name': 'Barry Allen',
+            'email': 'barry@starlabs.com',
+            'password': '123456'
+        };
+
+        before(() => {
+            return request(app)
+                .post('/api/signup')
+                .send(barry)
+                .expect(200)
+                .then(res => {
+                    barryId = res.body.payload.user._id;
+                });
+        });
+
+        after(() => {
+            dropCollection(dbConnection, 'users');
+        });
+
+        it('DELETE /api/user/:id', () => {
+            return request(app)
+                .delete(`/api/user/${barryId}`)
+                .expect(200)
+                .then(res => {
+                    expectJSONShape(res.body);
+                });
+        });
     });
 
     context('changes a user\'s password', () => {
