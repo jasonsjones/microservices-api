@@ -239,11 +239,25 @@ describe('User acceptance tests', () => {
         });
 
         it('DELETE /api/user/:id', () => {
+            const url = `/api/user/${barryId}`;
+
             return request(app)
-                .delete(`/api/user/${barryId}`)
+                .delete(url)
                 .expect(200)
                 .then(res => {
                     expectJSONShape(res.body);
+                    expect(res.body.success).to.be.true;
+                    expect(res.body.payload).to.be.an("Object");
+                    expect(res.body.payload.user.name).to.equal(barry.name);
+                    return request(app)
+                        .get(url)
+                        .expect(200);
+                })
+                .then(res => {
+                    expectJSONShape(res.body);
+                    expect(res.body.success).to.be.true;
+                    expect(res.body.payload).to.be.an("Object");
+                    expect(res.body.payload.user).to.equal(null);
                 });
         });
     });
