@@ -30,10 +30,7 @@ describe('User acceptance tests', () => {
                 })
                 .expect(200)
                 .then(res => {
-                    expect(res).to.be.an('Object');
-                    expect(res.body).to.have.property('success');
-                    expect(res.body).to.have.property('message');
-                    expect(res.body).to.have.property('payload');
+                    expectJSONShape(res.body);
                     expect(res.body.payload).to.have.property('user');
                     expect(res.body.success).to.be.true;
                     oliverId = res.body.payload.user._id;
@@ -46,10 +43,7 @@ describe('User acceptance tests', () => {
                 .attach('avatar', `${__dirname}/../../assets/male3.png`)
                 .expect(200)
                 .then(res => {
-                    expect(res).to.be.an('Object');
-                    expect(res.body).to.have.property('success');
-                    expect(res.body).to.have.property('message');
-                    expect(res.body).to.have.property('payload');
+                    expectJSONShape(res.body);
                     expect(res.body.payload).to.have.property('user');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.user).to.have.property('id');
@@ -65,10 +59,7 @@ describe('User acceptance tests', () => {
                 .get(`/api/user/${oliverId}`)
                 .expect(200)
                 .then(res => {
-                    expect(res).to.be.an('Object');
-                    expect(res.body).to.have.property('success');
-                    expect(res.body).to.have.property('message');
-                    expect(res.body).to.have.property('payload');
+                    expectJSONShape(res.body);
                     expect(res.body.payload).to.have.property('user');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.user).to.have.property('_id');
@@ -118,10 +109,7 @@ describe('User acceptance tests', () => {
                 .get('/api/users')
                 .expect(200)
                 .then(res => {
-                    expect(res).to.be.an('Object');
-                    expect(res.body).to.have.property('success');
-                    expect(res.body).to.have.property('message');
-                    expect(res.body).to.have.property('payload');
+                    expectJSONShape(res.body);
                     expect(res.body.payload).to.have.property('users');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.users).to.be.an('Array');
@@ -134,10 +122,7 @@ describe('User acceptance tests', () => {
                 .get(`/api/user/${barryId}`)
                 .expect(200)
                 .then(res => {
-                    expect(res).to.be.an('Object');
-                    expect(res.body).to.have.property('success');
-                    expect(res.body).to.have.property('message');
-                    expect(res.body).to.have.property('payload');
+                    expectJSONShape(res.body);
                     expect(res.body.payload).to.have.property('user');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.user).to.have.property('_id');
@@ -153,10 +138,7 @@ describe('User acceptance tests', () => {
                 .get(`/api/user/${oliverId}`)
                 .expect(200)
                 .then(res => {
-                    expect(res).to.be.an('Object');
-                    expect(res.body).to.have.property('success');
-                    expect(res.body).to.have.property('message');
-                    expect(res.body).to.have.property('payload');
+                    expectJSONShape(res.body);
                     expect(res.body.payload).to.have.property('user');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.user).to.have.property('_id');
@@ -201,10 +183,7 @@ describe('User acceptance tests', () => {
                 .send(updatedUserData)
                 .expect(200)
                 .then(res => {
-                    expect(res).to.be.an('Object');
-                    expect(res.body).to.have.property('success');
-                    expect(res.body).to.have.property('message');
-                    expect(res.body).to.have.property('payload');
+                    expectJSONShape(res.body);
                     expect(res.body.payload).to.have.property('user');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.user).to.have.property('id');
