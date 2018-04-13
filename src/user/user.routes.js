@@ -16,7 +16,8 @@ export default (app) => {
                     res.status(500);
                     res.json(err);
                 });
-        });
+        }
+    );
 
     app.get('/api/user/:id', (req, res) => {
         UserController.getUser(req)
@@ -64,7 +65,7 @@ export default (app) => {
             });
     });
 
-    app.post('/api/user/:userid/avatar',
+    app.post('/api/user/:id/avatar',
         //   AuthController.verifyToken,
         //   AuthController.protectRouteByUser,
         upload.single('avatar'),
