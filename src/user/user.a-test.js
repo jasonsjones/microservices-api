@@ -242,6 +242,40 @@ describe('User acceptance tests', () => {
     });
 
     context('changes a user\'s password', () => {
-        it('POST /api/user/changepassword');
+        const barry ={
+            'name': 'Barry Allen',
+            'email': 'barry@starlabs.com',
+            'password': '123456'
+        };
+
+        before(() => {
+            return request(app)
+                .post('/api/signup')
+                .send(barry)
+                .expect(200);
+        });
+
+        after(() => {
+            dropCollection(dbConnection, 'users');
+        });
+
+        it('POST /api/user/changepassword', () => {
+            const payload = {
+                email: barry.email,
+                currentPassword: barry.password,
+                newPassword: 'test1234'
+            };
+            return request(app)
+                .post('/api/user/changepassword')
+                .send(payload)
+                .expect(200)
+                .then(res => {
+                    expect(res.body).to.be.an('Object');
+                    expect(res.body).to.have.property('success');
+                    expect(res.body).to.have.property('message');
+                    expect(res.body.success).to.be.true;
+                    expect(res.body.message).to.contain('user password changed');
+                });
+        });
     });
 });
