@@ -48,6 +48,30 @@ describe.only('Avatar acceptence tests', () => {
                     expect(res.body.success).to.be.false;
                 });
         });
+
+        it('GET /api/avatars', () => {
+            return request(app)
+                .post(`/api/avatar/default`)
+                .attach('avatar', `${__dirname}/../../assets/default_avatar.png`)
+                .expect(200)
+                .then(res => {
+                    expectJSONShape(res.body);
+                    expect(res.body.success).to.be.true;
+                    expectAvatarShape(res.body.payload, true);
+                    expect(res.body.payload.defaultImg).to.be.true;
+                    return request(app)
+                        .get('/api/avatars')
+                        .expect(200);
+                })
+                .then(res => {
+                    expectJSONShape(res.body);
+                    expect(res.body.success).to.be.true;
+                    expect(res.body.payload.avatars).to.be.an('array');
+                    expectAvatarShape(res.body.payload.avatars[0], false);
+                    expectAvatarShape(res.body.payload.avatars[1], false);
+                });
+
+        })
     });
 
     context('gets and deletes a user\'s custom avatar', () => {
