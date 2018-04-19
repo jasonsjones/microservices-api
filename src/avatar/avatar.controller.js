@@ -66,7 +66,7 @@ export function getDefaultAvatar(req) {
         .catch(err => {
             return Promise.reject({
                 success: false,
-                message: 'error retrieving avatar. ' + err,
+                message: 'error retrieving avatar. ' + err.message,
                 error: err
             });
         });
