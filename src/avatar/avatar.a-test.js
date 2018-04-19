@@ -6,7 +6,7 @@ import { expectAvatarShape } from '../utils/avatarTestUtils';
 import { expectJSONShape } from '../utils/testUtils';
 import { dbConnection, dropCollection } from '../utils/dbTestUtils';
 
-describe.only('Avatar acceptence tests', () => {
+describe('Avatar acceptence tests', () => {
 
     context('uploads and gets a default avatar image', () => {
         after(() => {
