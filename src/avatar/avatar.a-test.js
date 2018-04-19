@@ -13,7 +13,7 @@ describe.only('Avatar acceptence tests', () => {
             dropCollection(dbConnection, 'avatars');
         });
 
-        it('POST /api/avatar/default', () => {
+        it('upload default user avatar', () => {
             return request(app)
                 .post(`/api/avatar/default`)
                 .attach('avatar', `${__dirname}/../../assets/sfdc_default_avatar.png`)
@@ -26,7 +26,7 @@ describe.only('Avatar acceptence tests', () => {
                 });
         });
 
-        it('GET /api/avatar/default/:index', () => {
+        it('get the first default avatar', () => {
             return request(app)
                 .get('/api/avatar/default/0')
                 .expect(200)
@@ -36,7 +36,7 @@ describe.only('Avatar acceptence tests', () => {
                 });
         });
 
-        it('GET /api/avatar/default/:index', () => {
+        it('verify error if requesting a default avatar that does not exist', () => {
             return request(app)
                 .get('/api/avatar/default/1')
                 .expect(500)
@@ -70,12 +70,11 @@ describe.only('Avatar acceptence tests', () => {
                     expectAvatarShape(res.body.payload.avatars[0], false);
                     expectAvatarShape(res.body.payload.avatars[1], false);
                 });
-
-        })
+        });
     });
 
     context('gets and deletes a user\'s custom avatar', () => {
-        let avatarId;
+        let avatarId, userId;
 
         before(() => {
             dropCollection(dbConnection, 'users');
@@ -89,7 +88,7 @@ describe.only('Avatar acceptence tests', () => {
                 })
                 .expect(200)
                 .then(res => {
-                    const userId = res.body.payload.user._id;
+                    userId = res.body.payload.user._id;
                     return request(app)
                         .post(`/api/user/${userId}/avatar`)
                         .attach('avatar', `${__dirname}/../../assets/male3.png`)
@@ -106,7 +105,7 @@ describe.only('Avatar acceptence tests', () => {
             dropCollection(dbConnection, 'users');
         });
 
-        it('GET /api/avatar/:id', () => {
+        it('get custom avatar', () => {
             return request(app)
                 .get(`/api/avatar/${avatarId}`)
                 .expect(200)
@@ -116,7 +115,7 @@ describe.only('Avatar acceptence tests', () => {
                 });
         });
 
-        it('DELETE /api/avatar/:id', () => {
+        it('delete custom avatar', () => {
             return request(app)
                 .delete(`/api/avatar/${avatarId}`)
                 .expect(200)
@@ -125,6 +124,18 @@ describe.only('Avatar acceptence tests', () => {
                     expect(res.body.success).to.be.true;
                     expectAvatarShape(res.body.payload, true);
                     expect(res.body.payload._id).to.equal(avatarId);
+                });
+        });
+
+        it('verify user\'s avatar is reset to default', () => {
+            return request(app)
+                .get(`/api/user/${userId}`)
+                .expect(200)
+                .then(res => {
+                    const { avatarUrl, avatar } = res.body.payload.user;
+                    expectJSONShape(res.body, 'user');
+                    expect(avatarUrl).contains('default');
+                    expect(avatar).to.equal(null);
                 });
         });
     });
