@@ -48,7 +48,7 @@ const getResource = (endpoint) => {
 
 const seedAvatarImage = (imgPath) => {
     return request(`${baseUrl}`)
-        .post('/api/avatar/default')
+        .post('/api/avatars/default')
         .attach('avatar', imgPath);
 };
 

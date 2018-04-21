@@ -19,7 +19,7 @@ export default (app) => {
         }
     );
 
-    app.get('/api/user/:id', (req, res) => {
+    app.get('/api/users/:id', (req, res) => {
         UserController.getUser(req)
             .then(response => res.json(response))
             .catch(err => {
@@ -28,7 +28,7 @@ export default (app) => {
             });
     });
 
-    app.put('/api/user/:id', (req, res) => {
+    app.put('/api/users/:id', (req, res) => {
         UserController.updateUser(req)
             .then(response => res.json(response))
             .catch(err => {
@@ -38,7 +38,7 @@ export default (app) => {
 
     });
 
-    app.delete('/api/user/:id', (req, res) => {
+    app.delete('/api/users/:id', (req, res) => {
         UserController.deleteUser(req)
             .then(response => res.json(response))
             .catch(err => {
@@ -65,7 +65,7 @@ export default (app) => {
             });
     });
 
-    app.post('/api/user/:id/avatar',
+    app.post('/api/users/:id/avatar',
         //   AuthController.verifyToken,
         //   AuthController.protectRouteByUser,
         upload.single('avatar'),
@@ -80,7 +80,7 @@ export default (app) => {
         }
     );
 
-    app.post('/api/user/changepassword',
+    app.post('/api/users/changepassword',
         (req, res) => {
             UserController.changePassword(req)
                 .then(response => res.json(response))
