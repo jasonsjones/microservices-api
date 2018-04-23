@@ -15,7 +15,7 @@ describe('Avatar acceptence tests', () => {
 
         it('upload default user avatar', () => {
             return request(app)
-                .post(`/api/avatar/default`)
+                .post(`/api/avatars/default`)
                 .attach('avatar', `${__dirname}/../../assets/sfdc_default_avatar.png`)
                 .expect(200)
                 .then(res => {
@@ -28,7 +28,7 @@ describe('Avatar acceptence tests', () => {
 
         it('get the first default avatar', () => {
             return request(app)
-                .get('/api/avatar/default/0')
+                .get('/api/avatars/default/0')
                 .expect(200)
                 .then(res => {
                     expect(res.body).to.exist;
@@ -38,7 +38,7 @@ describe('Avatar acceptence tests', () => {
 
         it('verify error if requesting a default avatar that does not exist', () => {
             return request(app)
-                .get('/api/avatar/default/1')
+                .get('/api/avatars/default/1')
                 .expect(500)
                 .then(res => {
                     expect(res.body).to.be.an('object');
@@ -51,7 +51,7 @@ describe('Avatar acceptence tests', () => {
 
         it('GET /api/avatars', () => {
             return request(app)
-                .post(`/api/avatar/default`)
+                .post(`/api/avatars/default`)
                 .attach('avatar', `${__dirname}/../../assets/default_avatar.png`)
                 .expect(200)
                 .then(res => {
@@ -90,7 +90,7 @@ describe('Avatar acceptence tests', () => {
                 .then(res => {
                     userId = res.body.payload.user._id;
                     return request(app)
-                        .post(`/api/user/${userId}/avatar`)
+                        .post(`/api/users/${userId}/avatar`)
                         .attach('avatar', `${__dirname}/../../assets/male3.png`)
                         .expect(200)
                         .then(res => {
@@ -107,7 +107,7 @@ describe('Avatar acceptence tests', () => {
 
         it('get custom avatar', () => {
             return request(app)
-                .get(`/api/avatar/${avatarId}`)
+                .get(`/api/avatars/${avatarId}`)
                 .expect(200)
                 .then(res => {
                     expect(res.body).to.exist;
@@ -117,7 +117,7 @@ describe('Avatar acceptence tests', () => {
 
         it('delete custom avatar', () => {
             return request(app)
-                .delete(`/api/avatar/${avatarId}`)
+                .delete(`/api/avatars/${avatarId}`)
                 .expect(200)
                 .then(res => {
                     expectJSONShape(res.body);
@@ -129,7 +129,7 @@ describe('Avatar acceptence tests', () => {
 
         it('verify user\'s avatar is reset to default', () => {
             return request(app)
-                .get(`/api/user/${userId}`)
+                .get(`/api/users/${userId}`)
                 .expect(200)
                 .then(res => {
                     const { avatarUrl, avatar } = res.body.payload.user;

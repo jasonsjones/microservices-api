@@ -15,7 +15,7 @@ export default (app) => {
                 });
         });
 
-    app.route('/api/avatar/:id')
+    app.route('/api/avatars/:id')
         .get((req, res) => {
             AvatarController.getAvatar(req)
                 .then(response => {
@@ -37,7 +37,7 @@ export default (app) => {
                 });
         });
 
-    app.route('/api/avatar/default/:index')
+    app.route('/api/avatars/default/:index')
         .get((req, res) => {
             AvatarController.getDefaultAvatar(req)
                 .then(response => {
@@ -51,7 +51,7 @@ export default (app) => {
                 });
         });
 
-    app.route('/api/avatar/default')
+    app.route('/api/avatars/default')
         .post(upload.single('avatar'), (req, res) => {
             AvatarController.uploadDefaultAvatar(req)
                 .then(response => res.json(response))

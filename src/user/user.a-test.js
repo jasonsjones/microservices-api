@@ -37,9 +37,9 @@ describe('User acceptance tests', () => {
                 });
         });
 
-        it('POST /api/user/:userid/avatar', () => {
+        it('POST /api/users/:userid/avatar', () => {
             return request(app)
-                .post(`/api/user/${oliverId}/avatar`)
+                .post(`/api/users/${oliverId}/avatar`)
                 .attach('avatar', `${__dirname}/../../assets/male3.png`)
                 .expect(200)
                 .then(res => {
@@ -54,9 +54,9 @@ describe('User acceptance tests', () => {
                 });
         });
 
-        it('GET /api/user/:id', () => {
+        it('GET /api/users/:id', () => {
             return request(app)
-                .get(`/api/user/${oliverId}`)
+                .get(`/api/users/${oliverId}`)
                 .expect(200)
                 .then(res => {
                     expectJSONShape(res.body);
@@ -117,9 +117,9 @@ describe('User acceptance tests', () => {
                 });
         });
 
-        it('GET /api/user/:id -- Barry', () => {
+        it('GET /api/users/:id -- Barry', () => {
             return request(app)
-                .get(`/api/user/${barryId}`)
+                .get(`/api/users/${barryId}`)
                 .expect(200)
                 .then(res => {
                     expectJSONShape(res.body);
@@ -133,9 +133,9 @@ describe('User acceptance tests', () => {
                 });
         });
 
-        it('GET /api/user/:id -- Oliver', () => {
+        it('GET /api/users/:id -- Oliver', () => {
             return request(app)
-                .get(`/api/user/${oliverId}`)
+                .get(`/api/users/${oliverId}`)
                 .expect(200)
                 .then(res => {
                     expectJSONShape(res.body);
@@ -172,14 +172,14 @@ describe('User acceptance tests', () => {
             dropCollection(dbConnection, 'users');
         });
 
-        it('PUT /api/user/:id', () => {
+        it('PUT /api/users/:id', () => {
             const updatedUserData = {
                 'name': 'The Flash',
                 'email': 'flash@starlabs.com'
             };
 
             return request(app)
-                .put(`/api/user/${barryId}`)
+                .put(`/api/users/${barryId}`)
                 .send(updatedUserData)
                 .expect(200)
                 .then(res => {
@@ -217,8 +217,8 @@ describe('User acceptance tests', () => {
             dropCollection(dbConnection, 'users');
         });
 
-        it('DELETE /api/user/:id', () => {
-            const url = `/api/user/${barryId}`;
+        it('DELETE /api/users/:id', () => {
+            const url = `/api/users/${barryId}`;
 
             return request(app)
                 .delete(url)
@@ -259,14 +259,14 @@ describe('User acceptance tests', () => {
             dropCollection(dbConnection, 'users');
         });
 
-        it('POST /api/user/changepassword', () => {
+        it('POST /api/users/changepassword', () => {
             const payload = {
                 email: barry.email,
                 currentPassword: barry.password,
                 newPassword: 'test1234'
             };
             return request(app)
-                .post('/api/user/changepassword')
+                .post('/api/users/changepassword')
                 .send(payload)
                 .expect(200)
                 .then(res => {
