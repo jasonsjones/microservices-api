@@ -1,5 +1,4 @@
-export default (app) => {
-
+export default app => {
     app.get('/api', (req, res) => {
         res.json({
             message: 'Welcome to the sandbox API!',
@@ -8,6 +7,6 @@ export default (app) => {
     });
 
     app.get('/*', (req, res) => {
-        res.render('index', {title: 'Sandbox API'});
+        res.render('index', { title: 'Sandbox API' });
     });
 };
