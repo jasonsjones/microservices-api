@@ -19,7 +19,8 @@ describe('User repository', () => {
 
     describe('getUsers()', () => {
         it('resolves to an array of users', () => {
-            UserMock.expects('find').withArgs({})
+            UserMock.expects('find')
+                .withArgs({})
                 .chain('exec')
                 .resolves(mockUsers);
 
@@ -34,8 +35,10 @@ describe('User repository', () => {
         });
 
         it('resolves to an array of users with avatars populated', () => {
-            UserMock.expects('find').withArgs({})
-                .chain('populate').withArgs('avatar', '-data')
+            UserMock.expects('find')
+                .withArgs({})
+                .chain('populate')
+                .withArgs('avatar', '-data')
                 .chain('exec')
                 .resolves(mockUsersWithAvatar);
 
@@ -51,11 +54,12 @@ describe('User repository', () => {
 
         it('resolves to an array of QC users', () => {
             const qcRegex = new RegExp('@qc.com', 'i');
-            UserMock.expects('find').withArgs({email: qcRegex})
+            UserMock.expects('find')
+                .withArgs({ email: qcRegex })
                 .chain('exec')
                 .resolves([mockUsers[0], mockUsers[1]]);
 
-            const promise = Repository.getUsers({email: qcRegex});
+            const promise = Repository.getUsers({ email: qcRegex });
             expect(promise).to.be.a('Promise');
 
             return promise.then(users => {
@@ -65,7 +69,8 @@ describe('User repository', () => {
         });
 
         it('rejects with error if something went wrong', () => {
-            UserMock.expects('find').withArgs({})
+            UserMock.expects('find')
+                .withArgs({})
                 .chain('exec')
                 .rejects(new Error('Oops, something went wrong...'));
 
@@ -82,7 +87,8 @@ describe('User repository', () => {
     describe('getUser()', () => {
         it('resolves to a user with the given id', () => {
             const userId = mockUsers[0]._id;
-            UserMock.expects('findById').withArgs(userId)
+            UserMock.expects('findById')
+                .withArgs(userId)
                 .chain('exec')
                 .resolves(mockUsers[0]);
 
@@ -96,7 +102,8 @@ describe('User repository', () => {
 
         it('resolves to a user with the avatar model included', () => {
             const userId = mockUsersWithAvatar[0]._id;
-            UserMock.expects('findById').withArgs(userId)
+            UserMock.expects('findById')
+                .withArgs(userId)
                 .chain('exec')
                 .resolves(mockUsersWithAvatar[0]);
 
@@ -110,7 +117,8 @@ describe('User repository', () => {
 
         it('rejects with error if something went wrong', () => {
             const userId = mockUsers[0]._id;
-            UserMock.expects('findById').withArgs(userId)
+            UserMock.expects('findById')
+                .withArgs(userId)
                 .chain('exec')
                 .rejects(new Error('Oops, something went wrong...'));
 
@@ -137,7 +145,8 @@ describe('User repository', () => {
     describe('lookupUserByEmail()', () => {
         it('resolves to a user with the given email', () => {
             const email = mockUsers[0].email;
-            UserMock.expects('findOne').withArgs({email: email})
+            UserMock.expects('findOne')
+                .withArgs({ email: email })
                 .chain('exec')
                 .resolves(mockUsers[0]);
 
@@ -151,7 +160,8 @@ describe('User repository', () => {
 
         it('resolves to a user with the avatar model included', () => {
             const email = mockUsersWithAvatar[0].email;
-            UserMock.expects('findOne').withArgs({email: email})
+            UserMock.expects('findOne')
+                .withArgs({ email: email })
                 .chain('exec')
                 .resolves(mockUsersWithAvatar[0]);
 
@@ -165,7 +175,8 @@ describe('User repository', () => {
 
         it('rejects with error if something went wrong', () => {
             const email = mockUsers[0].email;
-            UserMock.expects('findOne').withArgs({email: email})
+            UserMock.expects('findOne')
+                .withArgs({ email: email })
                 .chain('exec')
                 .rejects(new Error('Oops, something went wrong...'));
 
@@ -191,7 +202,8 @@ describe('User repository', () => {
 
     describe('deleteUser()', () => {
         it('resovles to the deleted user when successful', () => {
-            UserMock.expects('findByIdAndRemove').withArgs(mockUsers[1]._id)
+            UserMock.expects('findByIdAndRemove')
+                .withArgs(mockUsers[1]._id)
                 .chain('exec')
                 .resolves(mockUsers[1]);
 
@@ -203,7 +215,8 @@ describe('User repository', () => {
         });
 
         it('rejects with error if something goes wrong', () => {
-            UserMock.expects('findByIdAndRemove').withArgs(mockUsers[1]._id)
+            UserMock.expects('findByIdAndRemove')
+                .withArgs(mockUsers[1]._id)
                 .chain('exec')
                 .rejects(new Error('Oops, something went wrong deleting the user'));
 
@@ -230,12 +243,10 @@ describe('User repository', () => {
         let newUser;
         beforeEach(() => {
             newUser = {
-                name: "Roy Harper",
-                email: "roy@qc.com",
+                name: 'Roy Harper',
+                email: 'roy@qc.com',
                 password: 'arsenal',
-                roles: [
-                    "user"
-                ]
+                roles: ['user']
             };
         });
 
@@ -284,12 +295,13 @@ describe('User repository', () => {
     describe('updateUser()', () => {
         it('resolves with user.save()', () => {
             const updatedData = {
-                name: "Roy (red hood) Harper",
-                email: "arsenal@qc.com"
+                name: 'Roy (red hood) Harper',
+                email: 'arsenal@qc.com'
             };
             const stub = sinon.stub(User.prototype, 'save');
             stub.resolves(new User(Object.assign(mockUsers[0], updatedData)));
-            UserMock.expects('findById').withArgs(mockUsers[0]._id)
+            UserMock.expects('findById')
+                .withArgs(mockUsers[0]._id)
                 .chain('exec')
                 .resolves(stub());
             const promise = Repository.updateUser(mockUsers[0]._id, updatedData);
@@ -304,10 +316,11 @@ describe('User repository', () => {
 
         it('rejects with error if something goes wrong', () => {
             const updatedData = {
-                name: "Roy (red hood) Harper",
-                email: "arsenal@qc.com"
+                name: 'Roy (red hood) Harper',
+                email: 'arsenal@qc.com'
             };
-            UserMock.expects('findById').withArgs(mockUsers[0]._id)
+            UserMock.expects('findById')
+                .withArgs(mockUsers[0]._id)
                 .chain('exec')
                 .rejects(new Error('Oops...something went wrong finding the user to update'));
             const promise = Repository.updateUser(mockUsers[0]._id, updatedData);
@@ -316,13 +329,12 @@ describe('User repository', () => {
                 expect(err).to.exist;
                 expect(err).to.be.an('Error');
             });
-
         });
 
         it('rejects with error if the id param is not provided', () => {
             const updatedData = {
-                name: "Roy (red hood) Harper",
-                email: "arsenal@qc.com"
+                name: 'Roy (red hood) Harper',
+                email: 'arsenal@qc.com'
             };
             const promise = Repository.updateUser(null, updatedData);
             expect(promise).to.be.a('Promise');
@@ -369,7 +381,8 @@ describe('User repository', () => {
             avatarStub.resolves(new Avatar(mockUsersWithAvatar[1].avatar));
             userStub.resolves(new User(mockUsers[1]));
 
-            UserMock.expects('findById').withArgs(userId)
+            UserMock.expects('findById')
+                .withArgs(userId)
                 .chain('exec')
                 .resolves(new User(mockUsers[1]));
 
@@ -385,7 +398,8 @@ describe('User repository', () => {
             avatarStub.rejects(new Error('Oops, problem saving the avatar...'));
             userStub.resolves(new User(mockUsers[1]));
 
-            UserMock.expects('findById').withArgs(userId)
+            UserMock.expects('findById')
+                .withArgs(userId)
                 .chain('exec')
                 .resolves(new User(mockUsers[1]));
 
@@ -402,7 +416,8 @@ describe('User repository', () => {
             avatarStub.resolves(new Avatar(mockUsersWithAvatar[1].avatar));
             userStub.rejects(new Error('Oops, something went wropng saving the user'));
 
-            UserMock.expects('findById').withArgs(userId)
+            UserMock.expects('findById')
+                .withArgs(userId)
                 .chain('exec')
                 .resolves(new User(mockUsers[1]));
 
@@ -444,8 +459,8 @@ describe('User repository', () => {
                 accessToken: 'thisisareallylongtokenreturnedfromsfdcserver',
                 refreshToken: null,
                 profile: {
-                    'display_name': 'Jason Jones',
-                    'user_id': '003D000004534cda'
+                    display_name: 'Jason Jones',
+                    user_id: '003D000004534cda'
                 }
             };
             let user = new User(rawUserData);
@@ -498,8 +513,8 @@ describe('User repository', () => {
                 accessToken: 'thisisareallylongtokenreturnedfromsfdcserver',
                 refreshToken: null,
                 profile: {
-                    'display_name': 'Jason Jones',
-                    'user_id': '003D000004534cda'
+                    display_name: 'Jason Jones',
+                    user_id: '003D000004534cda'
                 }
             };
 
@@ -527,8 +542,10 @@ describe('User repository', () => {
         });
 
         it('rejects with Error if the user email is not provided', () => {
-            const promise = Repository.changePassword({currentPassword: 'password',
-                newPassword: 'newPassword'});
+            const promise = Repository.changePassword({
+                currentPassword: 'password',
+                newPassword: 'newPassword'
+            });
             expect(promise).to.be.a('Promise');
 
             return promise.catch(err => {
@@ -538,8 +555,10 @@ describe('User repository', () => {
         });
 
         it('rejects with Error if the current password is not provided', () => {
-            const promise = Repository.changePassword({email: 'oliver@qc.com',
-                newPassword: 'newPassword'});
+            const promise = Repository.changePassword({
+                email: 'oliver@qc.com',
+                newPassword: 'newPassword'
+            });
             expect(promise).to.be.a('Promise');
 
             return promise.catch(err => {
@@ -549,8 +568,10 @@ describe('User repository', () => {
         });
 
         it('rejects with Error if the new password is not provided', () => {
-            const promise = Repository.changePassword({email: 'oliver@qc.com',
-                currentPassword: 'password'});
+            const promise = Repository.changePassword({
+                email: 'oliver@qc.com',
+                currentPassword: 'password'
+            });
             expect(promise).to.be.a('Promise');
 
             return promise.catch(err => {
@@ -565,7 +586,8 @@ describe('User repository', () => {
                 currentPassword: 'isWrong',
                 newPassword: 'doesnotmatter'
             };
-            UserMock.expects('findOne').withArgs({email: userData.email})
+            UserMock.expects('findOne')
+                .withArgs({ email: userData.email })
                 .chain('exec')
                 .resolves(new User(mockUsers[1]));
             const userStub = sinon.stub(User.prototype, 'verifyPassword').returns(false);
@@ -585,13 +607,12 @@ describe('User repository', () => {
                 currentPassword: 'thearrow',
                 newPassword: 'iamaqueen'
             };
-            UserMock.expects('findOne').withArgs({email: userData.email})
+            UserMock.expects('findOne')
+                .withArgs({ email: userData.email })
                 .chain('exec')
                 .resolves(returnedUser);
             const userStub = sinon.stub(User.prototype, 'verifyPassword').returns(true);
-            const userSaveStub = sinon.stub(User.prototype, 'save').resolves(
-                returnedUser
-            );
+            const userSaveStub = sinon.stub(User.prototype, 'save').resolves(returnedUser);
             const promise = Repository.changePassword(userData);
             expect(promise).to.be.a('Promise');
             return promise.then(user => {

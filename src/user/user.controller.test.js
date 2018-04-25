@@ -1,4 +1,3 @@
-
 import { expect } from 'chai';
 import sinon from 'sinon';
 
@@ -518,8 +517,8 @@ describe('User controller', () => {
                 accessToken: 'thisisareallylongtokenreturnedfromsfdcserver',
                 refreshToken: null,
                 profile: {
-                    'display_name': 'Jason Jones',
-                    'user_id': '003D000004534cda'
+                    display_name: 'Jason Jones',
+                    user_id: '003D000004534cda'
                 }
             };
         });
