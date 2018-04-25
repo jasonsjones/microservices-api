@@ -10,9 +10,9 @@ describe.only('Authentication acceptance tests', () => {
         return request(app)
             .post('/api/signup')
             .send({
-                'name': 'Oliver Queen',
-                'email': 'oliver@qc.com',
-                'password': '123456'
+                name: 'Oliver Queen',
+                email: 'oliver@qc.com',
+                password: '123456'
             })
             .expect(200);
     });
@@ -25,8 +25,8 @@ describe.only('Authentication acceptance tests', () => {
         return request(app)
             .post('/api/login')
             .send({
-                'email': 'oliver@qc.com',
-                'password': '654321'
+                email: 'oliver@qc.com',
+                password: '654321'
             })
             .expect(401)
             .then(res => {
@@ -43,8 +43,8 @@ describe.only('Authentication acceptance tests', () => {
         return request(app)
             .post('/api/login')
             .send({
-                'email': 'oliver@qc.com',
-                'password': '123456'
+                email: 'oliver@qc.com',
+                password: '123456'
             })
             .expect(200)
             .then(res => {

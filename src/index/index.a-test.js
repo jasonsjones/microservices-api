@@ -4,7 +4,6 @@ import request from 'supertest';
 import app from '../config/app';
 
 describe('Index acceptance tests', () => {
-
     it('GET /api', () => {
         return request(app)
             .get('/api')

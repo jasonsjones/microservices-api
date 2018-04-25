@@ -16,12 +16,15 @@ export function getDefaultAvatar(idx) {
     if (idx === undefined) {
         return Promise.reject(new Error('default avatar index is required'));
     }
-    return Avatar.find({defaultImg: true}).exec()
+    return Avatar.find({ defaultImg: true })
+        .exec()
         .then(defaults => {
             if (defaults && idx > -1 && idx < defaults.length) {
                 return defaults[idx];
             } else {
-                return Promise.reject(new Error(`default avatar with index: ${idx} does not exist`));
+                return Promise.reject(
+                    new Error(`default avatar with index: ${idx} does not exist`)
+                );
             }
         })
         .catch(err => Promise.reject(err));
@@ -31,7 +34,8 @@ export function deleteAvatar(id) {
     if (!id) {
         return Promise.reject(new Error('avatar id is required'));
     }
-    return Avatar.findById(id).exec()
+    return Avatar.findById(id)
+        .exec()
         .then(avatar => {
             if (avatar) {
                 return avatar.remove();

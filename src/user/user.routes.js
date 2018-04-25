@@ -2,11 +2,11 @@ import multer from 'multer';
 import * as UserController from './user.controller';
 // import * as AuthController from '../common/auth.controller';
 
-export default (app) => {
+export default app => {
+    const upload = multer({ dest: './uploads/' });
 
-    const upload = multer({dest: './uploads/'});
-
-    app.get('/api/users',
+    app.get(
+        '/api/users',
         //  AuthController.verifyToken,
         //  AuthController.adminRoute,
         (req, res) => {
@@ -35,7 +35,6 @@ export default (app) => {
                 res.status(500);
                 res.json(err);
             });
-
     });
 
     app.delete('/api/users/:id', (req, res) => {
@@ -65,7 +64,8 @@ export default (app) => {
             });
     });
 
-    app.post('/api/users/:id/avatar',
+    app.post(
+        '/api/users/:id/avatar',
         //   AuthController.verifyToken,
         //   AuthController.protectRouteByUser,
         upload.single('avatar'),
@@ -80,13 +80,12 @@ export default (app) => {
         }
     );
 
-    app.post('/api/users/changepassword',
-        (req, res) => {
-            UserController.changePassword(req)
-                .then(response => res.json(response))
-                .catch(err => {
-                    res.status(500);
-                    res.json(err);
-                });
-        });
+    app.post('/api/users/changepassword', (req, res) => {
+        UserController.changePassword(req)
+            .then(response => res.json(response))
+            .catch(err => {
+                res.status(500);
+                res.json(err);
+            });
+    });
 };

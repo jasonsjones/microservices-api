@@ -4,7 +4,7 @@ import Config from './config/config';
 import db from './config/db';
 
 const log = debug('app');
-const env = process.env.NODE_ENV || "development";
+const env = process.env.NODE_ENV || 'development';
 const config = Config[env];
 db(config);
 

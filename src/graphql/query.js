@@ -1,8 +1,4 @@
-import {
-    GraphQLObjectType,
-    GraphQLString,
-    GraphQLList,
-} from 'graphql';
+import { GraphQLObjectType, GraphQLString, GraphQLList } from 'graphql';
 
 import UserType from './types/userType';
 import AvatarType from './types/avatarType';
@@ -18,7 +14,7 @@ export default new GraphQLObjectType({
         user: {
             type: UserType,
             args: {
-                id: {type: GraphQLString}
+                id: { type: GraphQLString }
             },
             resolve: (parentValue, args) => userRepository.getUser(args.id)
         },

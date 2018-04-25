@@ -31,7 +31,7 @@ export function getUser(req) {
         });
     }
 
-    if (req.query && req.query.includeAvatar === "true") {
+    if (req.query && req.query.includeAvatar === 'true') {
         includeAvatar = true;
     }
 
@@ -199,7 +199,7 @@ export function signupUser(req) {
         });
 }
 
-export const unlinkSFDCAccount = (req) => {
+export const unlinkSFDCAccount = req => {
     if (!req || !req.user) {
         return Promise.reject({
             success: false,

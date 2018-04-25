@@ -12,7 +12,6 @@ const expectJSONShape = json => {
 };
 
 describe('User acceptance tests', () => {
-
     context('signs up a new user and uploads a custom avatar', () => {
         let oliverId;
         after(() => {
@@ -24,9 +23,9 @@ describe('User acceptance tests', () => {
             return request(app)
                 .post('/api/signup')
                 .send({
-                    'name': 'Oliver Queen',
-                    'email': 'oliver@qc.com',
-                    'password': '123456'
+                    name: 'Oliver Queen',
+                    email: 'oliver@qc.com',
+                    password: '123456'
                 })
                 .expect(200)
                 .then(res => {
@@ -73,16 +72,16 @@ describe('User acceptance tests', () => {
 
     context('gets all users and individual users by id', () => {
         let barryId, oliverId;
-        const barry ={
-            'name': 'Barry Allen',
-            'email': 'barry@starlabs.com',
-            'password': '123456'
+        const barry = {
+            name: 'Barry Allen',
+            email: 'barry@starlabs.com',
+            password: '123456'
         };
 
-        const oliver ={
-            'name': 'Oliver Queen',
-            'email': 'oliver@qc.com',
-            'password': '123456'
+        const oliver = {
+            name: 'Oliver Queen',
+            email: 'oliver@qc.com',
+            password: '123456'
         };
 
         before(() => {
@@ -97,7 +96,7 @@ describe('User acceptance tests', () => {
                         .send(oliver)
                         .expect(200);
                 })
-                .then(res => oliverId = res.body.payload.user._id);
+                .then(res => (oliverId = res.body.payload.user._id));
         });
 
         after(() => {
@@ -152,10 +151,10 @@ describe('User acceptance tests', () => {
 
     context('updates user data', () => {
         let barryId;
-        const barry ={
-            'name': 'Barry Allen',
-            'email': 'barry@starlabs.com',
-            'password': '123456'
+        const barry = {
+            name: 'Barry Allen',
+            email: 'barry@starlabs.com',
+            password: '123456'
         };
 
         before(() => {
@@ -174,8 +173,8 @@ describe('User acceptance tests', () => {
 
         it('PUT /api/users/:id', () => {
             const updatedUserData = {
-                'name': 'The Flash',
-                'email': 'flash@starlabs.com'
+                name: 'The Flash',
+                email: 'flash@starlabs.com'
             };
 
             return request(app)
@@ -197,10 +196,10 @@ describe('User acceptance tests', () => {
 
     context('deletes a user', () => {
         let barryId;
-        const barry ={
-            'name': 'Barry Allen',
-            'email': 'barry@starlabs.com',
-            'password': '123456'
+        const barry = {
+            name: 'Barry Allen',
+            email: 'barry@starlabs.com',
+            password: '123456'
         };
 
         before(() => {
@@ -226,7 +225,7 @@ describe('User acceptance tests', () => {
                 .then(res => {
                     expectJSONShape(res.body);
                     expect(res.body.success).to.be.true;
-                    expect(res.body.payload).to.be.an("Object");
+                    expect(res.body.payload).to.be.an('Object');
                     expect(res.body.payload.user.name).to.equal(barry.name);
                     return request(app)
                         .get(url)
@@ -235,17 +234,17 @@ describe('User acceptance tests', () => {
                 .then(res => {
                     expectJSONShape(res.body);
                     expect(res.body.success).to.be.true;
-                    expect(res.body.payload).to.be.an("Object");
+                    expect(res.body.payload).to.be.an('Object');
                     expect(res.body.payload.user).to.equal(null);
                 });
         });
     });
 
-    context('changes a user\'s password', () => {
-        const barry ={
-            'name': 'Barry Allen',
-            'email': 'barry@starlabs.com',
-            'password': '123456'
+    context("changes a user's password", () => {
+        const barry = {
+            name: 'Barry Allen',
+            email: 'barry@starlabs.com',
+            password: '123456'
         };
 
         before(() => {

@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import Config from '../config/config';
 import User from '../user/user.model';
 
-const env = process.env.NODE_ENV || /* istanbul ignore next */ "development";
+const env = process.env.NODE_ENV || /* istanbul ignore next */ 'development';
 const config = Config[env];
 
 export function verifyToken(req) {
@@ -60,7 +60,8 @@ export function adminRoute(req) {
                 message: 'Token has not yet been verified'
             });
         }
-        User.findById(req.decoded.sub).exec()
+        User.findById(req.decoded.sub)
+            .exec()
             .then(user => {
                 if (user.isAdmin()) {
                     resolve({
@@ -74,10 +75,12 @@ export function adminRoute(req) {
                     });
                 }
             })
-            .catch(err => reject({
-                success: false,
-                message: err.message,
-                error: err
-            }));
+            .catch(err =>
+                reject({
+                    success: false,
+                    message: err.message,
+                    error: err
+                })
+            );
     });
 }

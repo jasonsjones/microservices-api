@@ -2,7 +2,7 @@ import User from '../user/user.model';
 import LocalStrategy from './strategies/local';
 import ForceDotComStrategy from './strategies/sfdc';
 
-export default (passport) => {
+export default passport => {
     passport.serializeUser((user, done) => {
         done(null, user._id);
     });

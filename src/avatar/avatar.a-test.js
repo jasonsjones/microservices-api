@@ -7,7 +7,6 @@ import { expectJSONShape } from '../utils/testUtils';
 import { dbConnection, dropCollection } from '../utils/dbTestUtils';
 
 describe('Avatar acceptence tests', () => {
-
     context('uploads and gets a default avatar image', () => {
         after(() => {
             dropCollection(dbConnection, 'avatars');
@@ -73,7 +72,7 @@ describe('Avatar acceptence tests', () => {
         });
     });
 
-    context('gets and deletes a user\'s custom avatar', () => {
+    context("gets and deletes a user's custom avatar", () => {
         let avatarId, userId;
 
         before(() => {
@@ -82,9 +81,9 @@ describe('Avatar acceptence tests', () => {
             return request(app)
                 .post('/api/signup')
                 .send({
-                    'name': 'Oliver Queen',
-                    'email': 'oliver@qc.com',
-                    'password': '123456'
+                    name: 'Oliver Queen',
+                    email: 'oliver@qc.com',
+                    password: '123456'
                 })
                 .expect(200)
                 .then(res => {
@@ -127,7 +126,7 @@ describe('Avatar acceptence tests', () => {
                 });
         });
 
-        it('verify user\'s avatar is reset to default', () => {
+        it("verify user's avatar is reset to default", () => {
             return request(app)
                 .get(`/api/users/${userId}`)
                 .expect(200)

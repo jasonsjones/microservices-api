@@ -3,19 +3,22 @@ import * as middleware from './avatar.model.middleware';
 
 const Schema = mongoose.Schema;
 
-const avatarSchema = new Schema({
-    contentType: {type:String, required: true},
-    data: {type: Buffer, required: true},
-    fileSize: {type: Number},
-    user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: function () {
-            return !this.defaultImg;
-        }
+const avatarSchema = new Schema(
+    {
+        contentType: { type: String, required: true },
+        data: { type: Buffer, required: true },
+        fileSize: { type: Number },
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: function() {
+                return !this.defaultImg;
+            }
+        },
+        defaultImg: { type: Boolean, default: false }
     },
-    defaultImg: {type: Boolean, default: false}
-}, {timestamps: true});
+    { timestamps: true }
+);
 
 avatarSchema.post('remove', middleware.removeAvatarRefFromUser);
 
