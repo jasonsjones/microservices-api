@@ -1,7 +1,4 @@
-import {
-    GraphQLObjectType,
-    GraphQLString,
-} from 'graphql';
+import { GraphQLObjectType, GraphQLString } from 'graphql';
 
 import UserType from './types/userType';
 import User from '../user/user.model';
@@ -13,9 +10,9 @@ export default new GraphQLObjectType({
         signup: {
             type: UserType,
             args: {
-                name: {type: GraphQLString},
-                email: {type: GraphQLString},
-                password: {type: GraphQLString}
+                name: { type: GraphQLString },
+                email: { type: GraphQLString },
+                password: { type: GraphQLString }
             },
             resolve: (parentValue, args) => {
                 let newUser = new User({
@@ -29,7 +26,7 @@ export default new GraphQLObjectType({
         deleteUser: {
             type: UserType,
             args: {
-                id: {type: GraphQLString}
+                id: { type: GraphQLString }
             },
             resolve: (parent, args) => {
                 return User.findByIdAndRemove(args.id).exec();
