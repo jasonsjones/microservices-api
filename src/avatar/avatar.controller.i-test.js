@@ -43,13 +43,12 @@ describe('Avatar controller integration tests', () => {
                 file: avatar
             };
 
-            return Controller.uploadDefaultAvatar(req)
-                .then(response => {
-                    expect(response).to.have.property('success');
-                    expect(response).to.have.property('message');
-                    expect(response).to.have.property('payload');
-                    expect(response.success).to.be.true;
-                });
+            return Controller.uploadDefaultAvatar(req).then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response).to.have.property('payload');
+                expect(response.success).to.be.true;
+            });
         });
 
         it('returns error payload if avatar file is not provided', () => {
@@ -57,10 +56,9 @@ describe('Avatar controller integration tests', () => {
                 file: null
             };
 
-            return Controller.uploadDefaultAvatar(req)
-                .catch(response => {
-                    expectErrorResponse(response, 'request parameter is required');
-                });
+            return Controller.uploadDefaultAvatar(req).catch(response => {
+                expectErrorResponse(response, 'request parameter is required');
+            });
         });
     });
 
@@ -74,43 +72,40 @@ describe('Avatar controller integration tests', () => {
             let req = {
                 file: avatar,
                 params: {
-                    userId: "59c44d83f2943200228467b3",
+                    userId: '59c44d83f2943200228467b3'
                 }
             };
 
-            return Controller.uploadAvatar(req)
-                .then(response => {
-                    customAvatarId = response.payload._id;
-                    expect(response).to.have.property('success');
-                    expect(response).to.have.property('message');
-                    expect(response).to.have.property('payload');
-                    expect(response.success).to.be.true;
-                });
+            return Controller.uploadAvatar(req).then(response => {
+                customAvatarId = response.payload._id;
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response).to.have.property('payload');
+                expect(response.success).to.be.true;
+            });
         });
 
         it('returns error payload if avatar file is not provided', () => {
             let req = {
                 file: null
             };
-            return Controller.uploadAvatar(req)
-                .catch(response => {
-                    expectErrorResponse(response, 'request parameter is required');
-                });
+            return Controller.uploadAvatar(req).catch(response => {
+                expectErrorResponse(response, 'request parameter is required');
+            });
         });
     });
 
     context('getAvatars()', () => {
         it('returns a json payload with all the avatars', () => {
-            return Controller.getAvatars()
-                .then(response => {
-                    expect(response).to.have.property('success');
-                    expect(response).to.have.property('message');
-                    expect(response).to.have.property('payload');
-                    expect(response.payload).to.have.property('avatars');
-                    expect(response.payload.avatars).to.be.an('array');
-                    expect(response.payload.avatars).to.have.lengthOf(2);
-                    expect(response.success).to.be.true;
-                });
+            return Controller.getAvatars().then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response).to.have.property('payload');
+                expect(response.payload).to.have.property('avatars');
+                expect(response.payload.avatars).to.be.an('array');
+                expect(response.payload.avatars).to.have.lengthOf(2);
+                expect(response.success).to.be.true;
+            });
         });
     });
 
@@ -121,23 +116,21 @@ describe('Avatar controller integration tests', () => {
                     id: customAvatarId
                 }
             };
-            return Controller.getAvatar(req)
-                .then(response => {
-                    expect(response).to.have.property('contentType');
-                    expect(response).to.have.property('payload');
-                });
+            return Controller.getAvatar(req).then(response => {
+                expect(response).to.have.property('contentType');
+                expect(response).to.have.property('payload');
+            });
         });
 
         it('returns error payload if avatar is not found with id', () => {
             let req = {
                 params: {
-                    id: "59c44d83f2943200228467b0" // this does not exist
+                    id: '59c44d83f2943200228467b0' // this does not exist
                 }
             };
-            return Controller.getAvatar(req)
-                .catch(response => {
-                    expectErrorResponse(response, 'unable to find avatar');
-                });
+            return Controller.getAvatar(req).catch(response => {
+                expectErrorResponse(response, 'unable to find avatar');
+            });
         });
 
         it('returns error payload if avatar id is not provided', () => {
@@ -146,10 +139,9 @@ describe('Avatar controller integration tests', () => {
                     id: null
                 }
             };
-            return Controller.getAvatar(req)
-                .catch(response => {
-                    expectErrorResponse(response, 'request parameter is required');
-                });
+            return Controller.getAvatar(req).catch(response => {
+                expectErrorResponse(response, 'request parameter is required');
+            });
         });
     });
 
@@ -160,11 +152,10 @@ describe('Avatar controller integration tests', () => {
                     index: 0
                 }
             };
-            return Controller.getDefaultAvatar(req)
-                .then(response => {
-                    expect(response).to.have.property('contentType');
-                    expect(response).to.have.property('payload');
-                });
+            return Controller.getDefaultAvatar(req).then(response => {
+                expect(response).to.have.property('contentType');
+                expect(response).to.have.property('payload');
+            });
         });
 
         it('returns error payload if the index provided does not exist', () => {
@@ -173,10 +164,9 @@ describe('Avatar controller integration tests', () => {
                     index: 3
                 }
             };
-            return Controller.getDefaultAvatar(req)
-                .catch(response => {
-                    expectErrorResponse(response, 'does not exist');
-                });
+            return Controller.getDefaultAvatar(req).catch(response => {
+                expectErrorResponse(response, 'does not exist');
+            });
         });
 
         it('returns error payload if default avatar index is not provided', () => {
@@ -185,10 +175,9 @@ describe('Avatar controller integration tests', () => {
                     index: undefined
                 }
             };
-            return Controller.getDefaultAvatar(req)
-                .catch(response => {
-                    expectErrorResponse(response, 'request parameter is required');
-                });
+            return Controller.getDefaultAvatar(req).catch(response => {
+                expectErrorResponse(response, 'request parameter is required');
+            });
         });
     });
 
@@ -199,14 +188,13 @@ describe('Avatar controller integration tests', () => {
                     id: customAvatarId
                 }
             };
-            return Controller.deleteAvatar(req)
-                .then(response => {
-                    expect(response).to.have.property('success');
-                    expect(response).to.have.property('message');
-                    expect(response).to.have.property('payload');
-                    expect(response.success).to.be.true;
-                    expect(response.payload._id).to.eql(customAvatarId);
-                });
+            return Controller.deleteAvatar(req).then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response).to.have.property('payload');
+                expect(response.success).to.be.true;
+                expect(response.payload._id).to.eql(customAvatarId);
+            });
         });
 
         it('returns error payload if avatar id is not provided', () => {
@@ -215,10 +203,9 @@ describe('Avatar controller integration tests', () => {
                     id: null
                 }
             };
-            return Controller.deleteAvatar(req)
-                .catch(response => {
-                    expectErrorResponse(response, 'request parameter is required');
-                });
+            return Controller.deleteAvatar(req).catch(response => {
+                expectErrorResponse(response, 'request parameter is required');
+            });
         });
     });
 });

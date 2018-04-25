@@ -70,7 +70,6 @@ export function getDefaultAvatar(req) {
                 error: err
             });
         });
-
 }
 
 export function deleteAvatar(req) {
@@ -86,7 +85,7 @@ export function deleteAvatar(req) {
             return {
                 success: true,
                 message: 'avatar successfully deleted.',
-                payload:  avatar
+                payload: avatar
             };
         })
         .catch(err => {
@@ -146,5 +145,4 @@ export function uploadDefaultAvatar(req) {
                 error: err
             });
         });
-
 }

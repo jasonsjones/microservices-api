@@ -1,21 +1,20 @@
 import multer from 'multer';
 import * as AvatarController from './avatar.controller';
 
-export default (app) => {
+export default app => {
+    const upload = multer({ dest: './uploads/' });
 
-    const upload = multer({dest: './uploads/'});
+    app.route('/api/avatars').get((req, res) => {
+        AvatarController.getAvatars()
+            .then(response => res.json(response))
+            .catch(err => {
+                res.status(500);
+                res.json(err);
+            });
+    });
 
-    app.route('/api/avatars')
-        .get((req, res) => {
-            AvatarController.getAvatars()
-                .then(response => res.json(response))
-                .catch(err => {
-                    res.status(500);
-                    res.json(err);
-                });
-        });
-
-    app.route('/api/avatars/:id')
+    app
+        .route('/api/avatars/:id')
         .get((req, res) => {
             AvatarController.getAvatar(req)
                 .then(response => {
@@ -37,27 +36,25 @@ export default (app) => {
                 });
         });
 
-    app.route('/api/avatars/default/:index')
-        .get((req, res) => {
-            AvatarController.getDefaultAvatar(req)
-                .then(response => {
-                    res.contentType(response.contentType);
-                    res.write(response.payload);
-                    res.end();
-                })
-                .catch(err => {
-                    res.status(500);
-                    res.json(err);
-                });
-        });
+    app.route('/api/avatars/default/:index').get((req, res) => {
+        AvatarController.getDefaultAvatar(req)
+            .then(response => {
+                res.contentType(response.contentType);
+                res.write(response.payload);
+                res.end();
+            })
+            .catch(err => {
+                res.status(500);
+                res.json(err);
+            });
+    });
 
-    app.route('/api/avatars/default')
-        .post(upload.single('avatar'), (req, res) => {
-            AvatarController.uploadDefaultAvatar(req)
-                .then(response => res.json(response))
-                .catch(err => {
-                    res.status(500);
-                    res.json(err);
-                });
-        });
+    app.route('/api/avatars/default').post(upload.single('avatar'), (req, res) => {
+        AvatarController.uploadDefaultAvatar(req)
+            .then(response => res.json(response))
+            .catch(err => {
+                res.status(500);
+                res.json(err);
+            });
+    });
 };

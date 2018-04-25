@@ -8,39 +8,39 @@ import * as AvatarRepository from './avatar.repository';
 
 const mockAvatars = [
     {
-        "_id": "59c44d83f2943200228467b0",
-        "contentType": "image/png",
-        "fileSize": 5012,
-        "defaultImg": true,
-        "user": undefined
+        _id: '59c44d83f2943200228467b0',
+        contentType: 'image/png',
+        fileSize: 5012,
+        defaultImg: true,
+        user: undefined
     },
     {
-        "_id": "59c44d85f2943200228467b4",
-        "contentType": "image/png",
-        "fileSize": 62079,
-        "defaultImg": false,
-        "user": "59c44d83f2943200228467b1"
+        _id: '59c44d85f2943200228467b4',
+        contentType: 'image/png',
+        fileSize: 62079,
+        defaultImg: false,
+        user: '59c44d83f2943200228467b1'
     },
     {
-        "_id": "59c44d9d0e584d00425c1722",
-        "contentType": "image/png",
-        "fileSize": 71955,
-        "defaultImg": false,
-        "user": "59c44d83f2943200228467b2"
+        _id: '59c44d9d0e584d00425c1722',
+        contentType: 'image/png',
+        fileSize: 71955,
+        defaultImg: false,
+        user: '59c44d83f2943200228467b2'
     },
     {
-        "_id": "59c44dc50e584d00425c1723",
-        "contentType": "image/png",
-        "fileSize": 138317,
-        "defaultImg": false,
-        "user": "59c44d83f2943200228467b3"
+        _id: '59c44dc50e584d00425c1723',
+        contentType: 'image/png',
+        fileSize: 138317,
+        defaultImg: false,
+        user: '59c44d83f2943200228467b3'
     },
     {
-        "_id": "59e4062a4c3bc800574e895f",
-        "contentType": "image/png",
-        "fileSize": 117632,
-        "defaultImg": false,
-        "user": "59c6c317f9760b01a35c63b1"
+        _id: '59e4062a4c3bc800574e895f',
+        contentType: 'image/png',
+        fileSize: 117632,
+        defaultImg: false,
+        user: '59c6c317f9760b01a35c63b1'
     }
 ];
 
@@ -53,7 +53,8 @@ describe('Avatar Repository', () => {
     describe('getAvatars()', () => {
         it('resolves to an array of avatars', () => {
             AvatarMock = sinon.mock(Avatar);
-            AvatarMock.expects('find').withArgs({})
+            AvatarMock.expects('find')
+                .withArgs({})
                 .chain('exec')
                 .resolves(mockAvatars);
 
@@ -68,7 +69,8 @@ describe('Avatar Repository', () => {
 
         it('rejects with an error if something went wrong', () => {
             AvatarMock = sinon.mock(Avatar);
-            AvatarMock.expects('find').withArgs({})
+            AvatarMock.expects('find')
+                .withArgs({})
                 .chain('exec')
                 .rejects(new Error('Oops, something went wrong...'));
 
@@ -85,7 +87,8 @@ describe('Avatar Repository', () => {
     describe('getAvatar()', () => {
         it('with avatar id resolves to the avatar with that id', () => {
             AvatarMock = sinon.mock(Avatar);
-            AvatarMock.expects('findById').withArgs(mockAvatars[1]._id)
+            AvatarMock.expects('findById')
+                .withArgs(mockAvatars[1]._id)
                 .chain('exec')
                 .resolves(mockAvatars[1]);
             const promise = AvatarRepository.getAvatar(mockAvatars[1]._id);
@@ -104,7 +107,8 @@ describe('Avatar Repository', () => {
 
         it('with avatar id rejects with error if something goes wrong with the lookup', () => {
             AvatarMock = sinon.mock(Avatar);
-            AvatarMock.expects('findById').withArgs(mockAvatars[3]._id)
+            AvatarMock.expects('findById')
+                .withArgs(mockAvatars[3]._id)
                 .chain('exec')
                 .rejects(new Error('Oops, something went wrong getting image'));
             const promise = AvatarRepository.getAvatar(mockAvatars[3]._id);
@@ -128,7 +132,8 @@ describe('Avatar Repository', () => {
     describe('getDefaultAvatar()', () => {
         it('with index resolves to the default image', () => {
             AvatarMock = sinon.mock(Avatar);
-            AvatarMock.expects('find').withArgs({defaultImg: true})
+            AvatarMock.expects('find')
+                .withArgs({ defaultImg: true })
                 .chain('exec')
                 .resolves([mockAvatars[0]]);
 
@@ -147,7 +152,8 @@ describe('Avatar Repository', () => {
 
         it('rejects with error if the index is out of bounds', () => {
             AvatarMock = sinon.mock(Avatar);
-            AvatarMock.expects('find').withArgs({defaultImg: true})
+            AvatarMock.expects('find')
+                .withArgs({ defaultImg: true })
                 .chain('exec')
                 .resolves([mockAvatars[0]]);
 
@@ -161,7 +167,8 @@ describe('Avatar Repository', () => {
 
         it('rejects with error if the index is not provided', () => {
             AvatarMock = sinon.mock(Avatar);
-            AvatarMock.expects('find').withArgs({defaultImg: true})
+            AvatarMock.expects('find')
+                .withArgs({ defaultImg: true })
                 .chain('exec')
                 .resolves([mockAvatars[0]]);
 
@@ -175,7 +182,8 @@ describe('Avatar Repository', () => {
 
         it('rejects with error if something goes wrong getting the default avatars from the db', () => {
             AvatarMock = sinon.mock(Avatar);
-            AvatarMock.expects('find').withArgs({defaultImg: true})
+            AvatarMock.expects('find')
+                .withArgs({ defaultImg: true })
                 .chain('exec')
                 .rejects(new Error('Oops, something went wrong getting default image'));
 
@@ -191,7 +199,8 @@ describe('Avatar Repository', () => {
     describe('deleteAvatar()', () => {
         it('with avatar id rejects with error if something goes wrong with the lookup', () => {
             AvatarMock = sinon.mock(Avatar);
-            AvatarMock.expects('findById').withArgs(mockAvatars[3]._id)
+            AvatarMock.expects('findById')
+                .withArgs(mockAvatars[3]._id)
                 .chain('exec')
                 .rejects(new Error('Oops, something went wrong getting image'));
             const promise = AvatarRepository.deleteAvatar(mockAvatars[3]._id);
@@ -207,7 +216,8 @@ describe('Avatar Repository', () => {
             stub.resolves(new Avatar(mockAvatars[3]));
 
             AvatarMock = sinon.mock(Avatar);
-            AvatarMock.expects('findById').withArgs(mockAvatars[3]._id)
+            AvatarMock.expects('findById')
+                .withArgs(mockAvatars[3]._id)
                 .chain('exec')
                 .resolves(stub());
 
@@ -221,9 +231,10 @@ describe('Avatar Repository', () => {
         });
 
         it('with invalid avatar resovles with error', () => {
-            const invalidId = "59c44d85f2943400228467b4";
+            const invalidId = '59c44d85f2943400228467b4';
             AvatarMock = sinon.mock(Avatar);
-            AvatarMock.expects('findById').withArgs(invalidId)
+            AvatarMock.expects('findById')
+                .withArgs(invalidId)
                 .chain('exec')
                 .resolves(null);
 
@@ -254,7 +265,12 @@ describe('Avatar Repository', () => {
                 size: 62079,
                 path: __dirname + '/../../assets/male3.png'
             };
-            const avatar = AvatarRepository.makeAvatarModel(file, mockAvatars[1].user, false, false);
+            const avatar = AvatarRepository.makeAvatarModel(
+                file,
+                mockAvatars[1].user,
+                false,
+                false
+            );
             expect(avatar).to.exist;
             expect(avatar).to.have.property('_id');
             expect(avatar).to.have.property('user');
@@ -307,17 +323,16 @@ describe('Avatar Repository', () => {
             const avatar = AvatarRepository.makeAvatarModel(file, userId, false, false);
             stub.resolves(avatar);
 
-            return AvatarRepository.uploadAvatar(file, userId, false)
-                .then(response => {
-                    expect(response).to.exist;
-                    expect(response).to.have.property('_id');
-                    expect(response).to.have.property('user');
-                    expect(response).to.have.property('fileSize');
-                    expect(response).to.have.property('contentType');
-                    expect(response).to.have.property('defaultImg');
-                    expect(response).to.have.property('data');
-                    expect(response.user.toString()).to.equal(mockAvatars[1].user);
-                });
+            return AvatarRepository.uploadAvatar(file, userId, false).then(response => {
+                expect(response).to.exist;
+                expect(response).to.have.property('_id');
+                expect(response).to.have.property('user');
+                expect(response).to.have.property('fileSize');
+                expect(response).to.have.property('contentType');
+                expect(response).to.have.property('defaultImg');
+                expect(response).to.have.property('data');
+                expect(response.user.toString()).to.equal(mockAvatars[1].user);
+            });
         });
 
         it('generates the avatar model and saves to db then deletes the file for fs', () => {
@@ -331,25 +346,24 @@ describe('Avatar Repository', () => {
             const avatar = AvatarRepository.makeAvatarModel(copyiedAvatar, userId, false, false);
             stub.resolves(avatar);
 
-            return AvatarRepository.uploadAvatar(copyiedAvatar, userId)
-                .then(response => {
-                    expect(response).to.exist;
-                    expect(response).to.have.property('_id');
-                    expect(response).to.have.property('user');
-                    expect(response).to.have.property('fileSize');
-                    expect(response).to.have.property('contentType');
-                    expect(response).to.have.property('defaultImg');
-                    expect(response).to.have.property('data');
-                    expect(response.user.toString()).to.equal(mockAvatars[1].user);
-                    expect(fs.existsSync(copyiedAvatar.path)).to.be.false;
-                });
+            return AvatarRepository.uploadAvatar(copyiedAvatar, userId).then(response => {
+                expect(response).to.exist;
+                expect(response).to.have.property('_id');
+                expect(response).to.have.property('user');
+                expect(response).to.have.property('fileSize');
+                expect(response).to.have.property('contentType');
+                expect(response).to.have.property('defaultImg');
+                expect(response).to.have.property('data');
+                expect(response.user.toString()).to.equal(mockAvatars[1].user);
+                expect(fs.existsSync(copyiedAvatar.path)).to.be.false;
+            });
         });
 
         it('catches an error if the avatar is unable to be saved to db', () => {
             stub.rejects(new Error('Oops, unable to save avatar to db'));
 
             return AvatarRepository.uploadAvatar(file, userId, false)
-                .then(() => { })
+                .then(() => {})
                 .catch(err => {
                     expect(err).to.exist;
                 });
@@ -394,24 +408,23 @@ describe('Avatar Repository', () => {
         it('generates a default avatar model and saves to db', () => {
             const avatar = AvatarRepository.makeAvatarModel(file, null, false, true);
             stub.resolves(avatar);
-            return AvatarRepository.uploadDefaultAvatar(file, false)
-                .then(response => {
-                    expect(response).to.exist;
-                    expect(response).to.have.property('_id');
-                    expect(response).to.have.property('user');
-                    expect(response).to.have.property('fileSize');
-                    expect(response).to.have.property('contentType');
-                    expect(response).to.have.property('defaultImg');
-                    expect(response).to.have.property('data');
-                    expect(response.user).to.be.undefined;
-                });
+            return AvatarRepository.uploadDefaultAvatar(file, false).then(response => {
+                expect(response).to.exist;
+                expect(response).to.have.property('_id');
+                expect(response).to.have.property('user');
+                expect(response).to.have.property('fileSize');
+                expect(response).to.have.property('contentType');
+                expect(response).to.have.property('defaultImg');
+                expect(response).to.have.property('data');
+                expect(response.user).to.be.undefined;
+            });
         });
 
         it('catches an error if the avatar is unable to be saved to db', () => {
             stub.rejects(new Error('Oops, unable to save avatar to db'));
 
             return AvatarRepository.uploadDefaultAvatar(file, false)
-                .then(() => { })
+                .then(() => {})
                 .catch(err => {
                     expect(err).to.exist;
                 });
