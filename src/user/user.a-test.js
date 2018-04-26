@@ -3,13 +3,7 @@ import request from 'supertest';
 
 import app from '../config/app';
 import { dbConnection, dropCollection } from '../utils/dbTestUtils';
-
-const expectJSONShape = json => {
-    expect(json).to.be.an('Object');
-    expect(json).to.have.property('success');
-    expect(json).to.have.property('message');
-    expect(json).to.have.property('payload');
-};
+import { expectJSONShape } from '../utils/testUtils';
 
 describe('User acceptance tests', () => {
     context('signs up a new user and uploads a custom avatar', () => {
@@ -29,8 +23,7 @@ describe('User acceptance tests', () => {
                 })
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body);
-                    expect(res.body.payload).to.have.property('user');
+                    expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
                     oliverId = res.body.payload.user._id;
                 });
@@ -42,8 +35,7 @@ describe('User acceptance tests', () => {
                 .attach('avatar', `${__dirname}/../../assets/male3.png`)
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body);
-                    expect(res.body.payload).to.have.property('user');
+                    expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.user).to.have.property('id');
                     expect(res.body.payload.user).to.have.property('name');
@@ -58,8 +50,7 @@ describe('User acceptance tests', () => {
                 .get(`/api/users/${oliverId}`)
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body);
-                    expect(res.body.payload).to.have.property('user');
+                    expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.user).to.have.property('_id');
                     expect(res.body.payload.user).to.have.property('name');
@@ -108,8 +99,7 @@ describe('User acceptance tests', () => {
                 .get('/api/users')
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body);
-                    expect(res.body.payload).to.have.property('users');
+                    expectJSONShape(res.body, 'users');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.users).to.be.an('Array');
                     expect(res.body.payload.users.length).to.equal(2);
@@ -121,8 +111,7 @@ describe('User acceptance tests', () => {
                 .get(`/api/users/${barryId}`)
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body);
-                    expect(res.body.payload).to.have.property('user');
+                    expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.user).to.have.property('_id');
                     expect(res.body.payload.user).to.have.property('name');
@@ -137,8 +126,7 @@ describe('User acceptance tests', () => {
                 .get(`/api/users/${oliverId}`)
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body);
-                    expect(res.body.payload).to.have.property('user');
+                    expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.user).to.have.property('_id');
                     expect(res.body.payload.user).to.have.property('name');
@@ -182,8 +170,7 @@ describe('User acceptance tests', () => {
                 .send(updatedUserData)
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body);
-                    expect(res.body.payload).to.have.property('user');
+                    expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.user).to.have.property('id');
                     expect(res.body.payload.user).to.have.property('name');
@@ -223,7 +210,7 @@ describe('User acceptance tests', () => {
                 .delete(url)
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body);
+                    expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload).to.be.an('Object');
                     expect(res.body.payload.user.name).to.equal(barry.name);

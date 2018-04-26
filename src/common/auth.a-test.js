@@ -5,7 +5,7 @@ import app from '../config/app';
 import { dbConnection, dropCollection } from '../utils/dbTestUtils';
 import { expectJSONShape } from '../utils/testUtils';
 
-describe.only('Authentication acceptance tests', () => {
+describe('Authentication acceptance tests', () => {
     before(() => {
         return request(app)
             .post('/api/signup')
