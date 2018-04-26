@@ -16,9 +16,9 @@ export const dropCollection = (connection, collectionName) => {
     });
 };
 
-export const dropAvatarCollection = (connection) => {
+export const dropAvatarCollection = connection => {
     connection.dropCollection('avatars', () => {
-        log('dropping \'avatars\' collection');
+        log("dropping 'avatars' collection");
     });
 };
 
@@ -30,7 +30,7 @@ export const addDefaultAvatar = () => {
             throw err;
         }
         const defaultAvatar = new Avatar({
-            contentType: "image/png",
+            contentType: 'image/png',
             fileSize: fs.statSync(avatarFile).size,
             data: data,
             defaultImg: true

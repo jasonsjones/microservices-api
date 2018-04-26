@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import request from 'supertest';
 import Config from '../config/config';
 
-const env = process.env.NODE_ENV || "development";
+const env = process.env.NODE_ENV || 'development';
 const config = Config[env];
 
 const log = debug('db:seed');
@@ -13,88 +13,84 @@ const assetPath = `${__dirname}/../../assets`;
 const defaultAvatarFile = `${assetPath}/sfdc_default_avatar.png`;
 const initialUsers = [
     {
-        name: "Oliver Queen",
-        email: "oliver@qc.com",
-        roles: ["admin", "user"],
-        password: "arrow"
+        name: 'Oliver Queen',
+        email: 'oliver@qc.com',
+        roles: ['admin', 'user'],
+        password: 'arrow'
     },
     {
-        name: "John Diggle",
-        email: "dig@qc.com",
-        password: "spartan"
+        name: 'John Diggle',
+        email: 'dig@qc.com',
+        password: 'spartan'
     },
     {
-        name: "Felicity Smoak",
-        email: "felicity@qc.com",
-        roles: ["admin", "user"],
-        password: "felicity"
+        name: 'Felicity Smoak',
+        email: 'felicity@qc.com',
+        roles: ['admin', 'user'],
+        password: 'felicity'
     },
     {
-        name: "Roy Harper",
-        email: "roy@qc.com",
-        password: "arsenal"
+        name: 'Roy Harper',
+        email: 'roy@qc.com',
+        password: 'arsenal'
     },
     {
-        name: "Thea Queen",
-        email: "thea@qc.com",
-        password: "thea"
+        name: 'Thea Queen',
+        email: 'thea@qc.com',
+        password: 'thea'
     }
 ];
 
-const getResource = (endpoint) => {
-    return fetch(`${baseUrl}${endpoint}`)
-        .then(response => response.json());
+const getResource = endpoint => {
+    return fetch(`${baseUrl}${endpoint}`).then(response => response.json());
 };
 
-const seedAvatarImage = (imgPath) => {
+const seedAvatarImage = imgPath => {
     return request(`${baseUrl}`)
         .post('/api/avatars/default')
         .attach('avatar', imgPath);
 };
 
-const seedUser = (userData) => {
+const seedUser = userData => {
     return fetch(`${baseUrl}/api/signup`, {
         method: 'POST',
         body: JSON.stringify(userData),
         headers: {
             'content-type': 'application/json'
         }
-    })
-        .then(response => response.json());
+    }).then(response => response.json());
 };
 
-const getDefaultAvatars = (data) => {
+const getDefaultAvatars = data => {
     return data.payload.avatars.filter(image => image.defaultImg);
 };
 
 const seedDefaultAvatarAPI = () => {
-    return getResource('/api/avatars')
-        .then(data => {
-            if (data.success) {
-                const defaults = getDefaultAvatars(data);
-                if (defaults.length === 0) {
-                    log('adding default avatar...');
-                    return seedAvatarImage(defaultAvatarFile);
-                } else {
-                    log('default avatar(s) already in db');
-                    return Promise.resolve('avatar not required');
-                }
+    return getResource('/api/avatars').then(data => {
+        if (data.success) {
+            const defaults = getDefaultAvatars(data);
+            if (defaults.length === 0) {
+                log('adding default avatar...');
+                return seedAvatarImage(defaultAvatarFile);
+            } else {
+                log('default avatar(s) already in db');
+                return Promise.resolve('avatar not required');
             }
-        });
+        }
+    });
 };
 
 const seedDefaultUserAPI = () => {
-    return getResource('/api/users')
-        .then(data => {
-            if (data.success && data.payload.users.length === 0) {
-                log('adding user...');
-                // only seed oliver for now...
-                return seedUser(initialUsers[0]);
-            } else {
-                log('users already in db');
-                return Promise.resolve('users not required');
-            }
-        });
+    return getResource('/api/users').then(data => {
+        if (data.success && data.payload.users.length === 0) {
+            log('adding user...');
+            // only seed oliver for now...
+            return seedUser(initialUsers[0]);
+        } else {
+            log('users already in db');
+            return Promise.resolve('users not required');
+        }
+    });
 };
 
 export const seedData = () => {
