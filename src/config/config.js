@@ -17,6 +17,7 @@ const dockerDbUriTest = 'mongodb://mongo/sandboxapi-test';
 //                "?ssl=true&replicaSet=SandboxCluster-shard-0&authSource=admin"
 
 export default {
+    version: '0.2.2',
     development: {
         port,
         token_secret,
