@@ -21,7 +21,7 @@ describe('Authentication acceptance tests', () => {
         dropCollection(dbConnection, 'users');
     });
 
-    it('error if attempting to log in with incorrect password', () => {
+    it('returns error if attempting to log in with incorrect password', () => {
         return request(app)
             .post('/api/login')
             .send({

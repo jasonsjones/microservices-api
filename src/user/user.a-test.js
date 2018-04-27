@@ -6,14 +6,14 @@ import { dbConnection, dropCollection } from '../utils/dbTestUtils';
 import { expectJSONShape } from '../utils/testUtils';
 
 describe('User acceptance tests', () => {
-    context('signs up a new user and uploads a custom avatar', () => {
+    context('has routes to', () => {
         let oliverId;
         after(() => {
             dropCollection(dbConnection, 'users');
             dropCollection(dbConnection, 'avatars');
         });
 
-        it('POST /api/signup', () => {
+        it('signup a new user', () => {
             return request(app)
                 .post('/api/signup')
                 .send({
@@ -29,7 +29,7 @@ describe('User acceptance tests', () => {
                 });
         });
 
-        it('POST /api/users/:userid/avatar', () => {
+        it('upload custom avatar image for user', () => {
             return request(app)
                 .post(`/api/users/${oliverId}/avatar`)
                 .attach('avatar', `${__dirname}/../../assets/male3.png`)
@@ -45,7 +45,7 @@ describe('User acceptance tests', () => {
                 });
         });
 
-        it('GET /api/users/:id', () => {
+        it('verify the user has been added', () => {
             return request(app)
                 .get(`/api/users/${oliverId}`)
                 .expect(200)
@@ -61,7 +61,7 @@ describe('User acceptance tests', () => {
         });
     });
 
-    context('gets all users and individual users by id', () => {
+    context('has routes to', () => {
         let barryId, oliverId;
         const barry = {
             name: 'Barry Allen',
@@ -94,7 +94,7 @@ describe('User acceptance tests', () => {
             dropCollection(dbConnection, 'users');
         });
 
-        it('GET /api/users', () => {
+        it('get all the users', () => {
             return request(app)
                 .get('/api/users')
                 .expect(200)
@@ -106,7 +106,7 @@ describe('User acceptance tests', () => {
                 });
         });
 
-        it('GET /api/users/:id -- Barry', () => {
+        it('get barry user by id', () => {
             return request(app)
                 .get(`/api/users/${barryId}`)
                 .expect(200)
@@ -121,7 +121,7 @@ describe('User acceptance tests', () => {
                 });
         });
 
-        it('GET /api/users/:id -- Oliver', () => {
+        it('get oliver user by id', () => {
             return request(app)
                 .get(`/api/users/${oliverId}`)
                 .expect(200)
@@ -137,7 +137,7 @@ describe('User acceptance tests', () => {
         });
     });
 
-    context('updates user data', () => {
+    context('has route to', () => {
         let barryId;
         const barry = {
             name: 'Barry Allen',
@@ -159,7 +159,7 @@ describe('User acceptance tests', () => {
             dropCollection(dbConnection, 'users');
         });
 
-        it('PUT /api/users/:id', () => {
+        it('update user data', () => {
             const updatedUserData = {
                 name: 'The Flash',
                 email: 'flash@starlabs.com'
@@ -181,7 +181,7 @@ describe('User acceptance tests', () => {
         });
     });
 
-    context('deletes a user', () => {
+    context('has route to', () => {
         let barryId;
         const barry = {
             name: 'Barry Allen',
@@ -203,7 +203,7 @@ describe('User acceptance tests', () => {
             dropCollection(dbConnection, 'users');
         });
 
-        it('DELETE /api/users/:id', () => {
+        it('delete a user', () => {
             const url = `/api/users/${barryId}`;
 
             return request(app)
@@ -227,7 +227,7 @@ describe('User acceptance tests', () => {
         });
     });
 
-    context("changes a user's password", () => {
+    context('has route to', () => {
         const barry = {
             name: 'Barry Allen',
             email: 'barry@starlabs.com',
@@ -245,7 +245,7 @@ describe('User acceptance tests', () => {
             dropCollection(dbConnection, 'users');
         });
 
-        it('POST /api/users/changepassword', () => {
+        it("change a user's  password", () => {
             const payload = {
                 email: barry.email,
                 currentPassword: barry.password,

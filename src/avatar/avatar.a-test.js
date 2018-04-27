@@ -7,7 +7,7 @@ import { expectJSONShape } from '../utils/testUtils';
 import { dbConnection, dropCollection } from '../utils/dbTestUtils';
 
 describe('Avatar acceptence tests', () => {
-    context('uploads and gets a default avatar image', () => {
+    context('has routes to', () => {
         after(() => {
             dropCollection(dbConnection, 'avatars');
         });
@@ -48,7 +48,7 @@ describe('Avatar acceptence tests', () => {
                 });
         });
 
-        it('GET /api/avatars', () => {
+        it('get all the avatars', () => {
             return request(app)
                 .post(`/api/avatars/default`)
                 .attach('avatar', `${__dirname}/../../assets/default_avatar.png`)
@@ -72,7 +72,7 @@ describe('Avatar acceptence tests', () => {
         });
     });
 
-    context("gets and deletes a user's custom avatar", () => {
+    context("has routes to", () => {
         let avatarId, userId;
 
         before(() => {
@@ -104,7 +104,7 @@ describe('Avatar acceptence tests', () => {
             dropCollection(dbConnection, 'users');
         });
 
-        it('get custom avatar', () => {
+        it('get a custom avatar', () => {
             return request(app)
                 .get(`/api/avatars/${avatarId}`)
                 .expect(200)
@@ -114,7 +114,7 @@ describe('Avatar acceptence tests', () => {
                 });
         });
 
-        it('delete custom avatar', () => {
+        it('delete a custom avatar', () => {
             return request(app)
                 .delete(`/api/avatars/${avatarId}`)
                 .expect(200)

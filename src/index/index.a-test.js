@@ -4,7 +4,7 @@ import request from 'supertest';
 import app from '../config/app';
 
 describe('Index acceptance tests', () => {
-    it('GET /api', () => {
+    it('has route to get api information', () => {
         return request(app)
             .get('/api')
             .expect(200)
