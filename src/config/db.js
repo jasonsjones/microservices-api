@@ -3,13 +3,13 @@ import debug from 'debug';
 
 const log = debug('db:connection');
 
-export default (config) => {
+export default config => {
     log('setting up mongodb...');
     mongoose.Promise = global.Promise;
     mongoose.connect(config.dbUrl);
     let db = mongoose.connection;
 
-    db.once('open', function () {
+    db.once('open', () => {
         log(`Connected to ${config.dbUrl} in mongo container`);
     });
 

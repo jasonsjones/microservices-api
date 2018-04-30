@@ -1,6 +1,6 @@
 {
   "name": "microservices-api",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A sandbox API built on microservices",
   "main": "index.js",
   "nyc": {
@@ -19,7 +19,7 @@
   "scripts": {
     "predev": "npm run dbSeed",
     "dev": "nodemon src/server.js --inspect=0.0.0.0:5858 --watch src/ --exec babel-node",
-    "clean": "rm -rf .v8flags*",
+    "clean": "rm -rf .v8flags* uploads/*",
     "dbSeed": "babel-node src/utils/dbSeed.js",
     "security-check": "nsp check",
     "lt": "lt --port 3000 --subdomain sandboxapi",
@@ -81,12 +81,15 @@
     "chai": "^4.1.1",
     "debug": "^3.0.0",
     "eslint": "^4.18.0",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-prettier": "^2.6.0",
     "extract-text-webpack-plugin": "^3.0.0",
     "localtunnel": "^1.8.3",
     "mocha": "^5.0.0",
     "nodemon": "^1.11.0",
     "nsp": "^3.1.0",
     "nyc": "^11.3.0",
+    "prettier": "^1.12.1",
     "sinon": "4.4.3",
     "sinon-mongoose": "^2.0.2",
     "supertest": "^3.0.0"

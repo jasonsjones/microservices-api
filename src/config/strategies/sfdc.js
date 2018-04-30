@@ -14,7 +14,7 @@ const createNewUser = (token, refreshToken, userData) => {
         accessToken: token,
         refreshToken: refreshToken,
         profile: userData
-    }
+    };
     return newUser.save();
 };
 
@@ -44,14 +44,15 @@ const verifyCb = (req, token, refreshToken, profile, done) => {
     // if a user is not currently logged in
     if (!req.isAuthenticated()) {
         const { id } = profile;
-        User.findOne({'sfdc.id': id}).exec()
+        User.findOne({ 'sfdc.id': id })
+            .exec()
             .then(user => {
                 // check if the user is already in the db
                 if (user) {
                     // if there is a user id but no token (which means a user
                     // was linked at one point and then removed
                     if (!user.sfdc.accessToken) {
-                        console.log('***reconnecting the user account to sfdc profile')
+                        console.log('***reconnecting the user account to sfdc profile');
                         user.sfdc.accessToken = token;
                         user.sfdc.refreshToken = refreshToken;
                         user.sfdc.profile = profile;
@@ -59,7 +60,7 @@ const verifyCb = (req, token, refreshToken, profile, done) => {
                     } else {
                         return done(null, user);
                     }
-                // if not, create a new user and save in db
+                    // if not, create a new user and save in db
                 } else {
                     return createNewUser(token, refreshToken, profile);
                 }
@@ -83,6 +84,6 @@ const verifyCb = (req, token, refreshToken, profile, done) => {
             })
             .catch(err => done(err, null));
     }
-}
+};
 
 export default new ForceDotComStategy(opts, verifyCb);

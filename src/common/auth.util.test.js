@@ -7,14 +7,12 @@ import * as Util from './auth.utils';
 describe('Auth util', () => {
     let token;
     const user = {
-        _id: "59c44d83f2943200228467b3",
-        name: "Roy Harper",
-        email: "roy@qc.com",
-        password: "$2a$12$DyizVZatjn.zMHeOhQI5nuIX64417O2zuRKXe/Ae0f06bLupmZ/d6",
-        avatarUrl: "http://localhost:3000/api/avatar/default",
-        roles: [
-            "user"
-        ]
+        _id: '59c44d83f2943200228467b3',
+        name: 'Roy Harper',
+        email: 'roy@qc.com',
+        password: '$2a$12$DyizVZatjn.zMHeOhQI5nuIX64417O2zuRKXe/Ae0f06bLupmZ/d6',
+        avatarUrl: 'http://localhost:3000/api/avatar/default',
+        roles: ['user']
     };
 
     describe('generateToken()', () => {

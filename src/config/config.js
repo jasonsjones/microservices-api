@@ -10,7 +10,6 @@ const dockerDbUriTest = 'mongodb://mongo/sandboxapi-test';
 // const mLabDbUri = `mongodb://${process.env.MLAB_USER}:${process.env.DB_PASSWD}@ds119436.mlab.com:19436/sandboxapi`
 // const mLabDbUriTest = `mongodb://${process.env.MLAB_USER}:${process.env.DB_PASSWD}@ds135966.mlab.com:35966/sandboxapi-test`;
 
-
 // TODO: Need to start up another cluster to use the atlas Mongo SAAS solution.
 // const atlasUri = "mongodb://dbadmin:" + process.env.DB_PASSWD + "@sandboxcluster-shard-00-00-ks6uh.mongodb.net:27017,"+
 //                "sandboxcluster-shard-00-01-ks6uh.mongodb.net:27017," +
@@ -18,14 +17,15 @@ const dockerDbUriTest = 'mongodb://mongo/sandboxapi-test';
 //                "?ssl=true&replicaSet=SandboxCluster-shard-0&authSource=admin"
 
 export default {
-    'development': {
+    version: '0.2.3',
+    development: {
         port,
         token_secret,
         session_secret,
         baseUrl: 'http://localhost',
         dbUrl: dockerDbUri
     },
-    'test': {
+    test: {
         port,
         token_secret,
         session_secret,

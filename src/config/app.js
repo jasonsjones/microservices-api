@@ -16,7 +16,7 @@ import userRoute from '../user/user.routes';
 import indexRoute from '../index/index.routes';
 
 const log = debug('app');
-const env = process.env.NODE_ENV || "development";
+const env = process.env.NODE_ENV || 'development';
 log(`Running in ${env} mode`);
 const config = Config[env];
 
@@ -26,30 +26,35 @@ app.set('view engine', 'ejs');
 app.use(express.static('public'));
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 if (env === 'development') {
     app.use(morgan('dev'));
 }
 app.use(cors());
 
-app.use(session({
-    cookie: {
-        secure: false
-    },
-    secret: config.session_secret,
-    resave: false,
-    saveUninitialized: true
-}));
+app.use(
+    session({
+        cookie: {
+            secure: false
+        },
+        secret: config.session_secret,
+        resave: false,
+        saveUninitialized: true
+    })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
 passportConfig(passport);
 
-app.use('/graphql', graphqlHTTP({
-    schema,
-    pretty: true,
-    graphiql: true
-}));
+app.use(
+    '/graphql',
+    graphqlHTTP({
+        schema,
+        pretty: true,
+        graphiql: true
+    })
+);
 
 app.use((req, res, next) => {
     if (process.env.NODE_ENV !== 'test') {

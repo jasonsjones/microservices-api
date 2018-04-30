@@ -6,46 +6,46 @@ import * as middleware from './user.model.middleware';
 mongoose.Promise = global.Promise;
 
 describe('User model', () => {
-    it('is invalid if name is empty', (done) => {
+    it('is invalid if name is empty', done => {
         let user = new User({
             /* no name */
             email: 'oliver@qc.com',
             password: 'arrow'
         });
-        user.validate((err) => {
+        user.validate(err => {
             expect(err.errors.name).to.exist;
             expect(err.name).to.equal('ValidationError');
             done();
         });
     });
 
-    it('is invalid if email is empty', (done) => {
+    it('is invalid if email is empty', done => {
         let user = new User({
             name: 'Oliver Queen',
             /* no email */
             password: 'arrow'
         });
-        user.validate((err) => {
+        user.validate(err => {
             expect(err.errors.email).to.exist;
             expect(err.name).to.equal('ValidationError');
             done();
         });
     });
 
-    it('is invalid if password is empty', (done) => {
+    it('is invalid if password is empty', done => {
         let user = new User({
             name: 'Oliver Queen',
-            email: 'oliver@qc.com',
+            email: 'oliver@qc.com'
             /* no password */
         });
-        user.validate((err) => {
+        user.validate(err => {
             expect(err.errors.password).to.exist;
             expect(err.name).to.equal('ValidationError');
             done();
         });
     });
 
-    it('it is valid if password is missing but there is a sfdc id', (done) => {
+    it('it is valid if password is missing but there is a sfdc id', done => {
         let user = new User({
             name: 'Parker Harris',
             email: 'parker@salesforce.com',
@@ -54,11 +54,10 @@ describe('User model', () => {
                 id: '005360000021UcXAAU'
             }
         });
-        user.validate((err) => {
+        user.validate(err => {
             expect(err).to.not.exist;
             done();
         });
-
     });
 
     it('isAdmin() is true if user has an admin role', () => {
@@ -80,7 +79,7 @@ describe('User model', () => {
         expect(user.isAdmin()).to.be.false;
     });
 
-    it('verifies a correct password', (done) => {
+    it('verifies a correct password', done => {
         const ORIG_PWD = 'arrow';
         let user = new User({
             name: 'Oliver Queen',
@@ -98,7 +97,7 @@ describe('User model', () => {
         })();
     }).timeout(6000);
 
-    it('does not verify an incorrect password', (done) => {
+    it('does not verify an incorrect password', done => {
         const ORIG_PWD = 'arrow';
         let user = new User({
             name: 'Oliver Queen',
@@ -220,7 +219,7 @@ describe('User model', () => {
                 accessToken: 'eadec234aadadcefff44532.ksoeijse44.soeindijsiehahuhw1234',
                 refreshToken: null,
                 profile: {
-                    displayName: "Oliver Queen",
+                    displayName: 'Oliver Queen'
                 }
             }
         });
@@ -240,7 +239,7 @@ describe('User model', () => {
             name: 'Oliver Queen',
             email: 'oliver@qc.com',
             password: 'arrow',
-            roles: ['user', 'dev'],
+            roles: ['user', 'dev']
         });
         expect(user.hasCustomAvatar()).to.be.false;
     });
@@ -251,9 +250,8 @@ describe('User model', () => {
             email: 'oliver@qc.com',
             password: 'arrow',
             avatar: '5a4672606d106200aef2defb', // needs to be a valid mongo id
-            roles: ['user', 'dev'],
+            roles: ['user', 'dev']
         });
         expect(user.hasCustomAvatar()).to.be.true;
     });
 });
-

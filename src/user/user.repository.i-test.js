@@ -45,20 +45,18 @@ describe('User repository integration tests', () => {
                 email: 'barry@starlabs.com',
                 password: '123456'
             };
-            return Repository.signUpUser(newUser)
-                .then(response => {
-                    expectUserShape(response);
-                    // ensure the password is hashed
-                    expect(response.password).to.not.equal(newUser.password);
-                });
+            return Repository.signUpUser(newUser).then(response => {
+                expectUserShape(response);
+                // ensure the password is hashed
+                expect(response.password).to.not.equal(newUser.password);
+            });
         });
 
         it('returns an error if the user data is not provided', () => {
-            return Repository.signUpUser()
-                .catch(error => {
-                    expect(error).to.exist;
-                    expect(error.message).to.contain('user data is required');
-                });
+            return Repository.signUpUser().catch(error => {
+                expect(error).to.exist;
+                expect(error.message).to.contain('user data is required');
+            });
         });
     });
 
@@ -74,10 +72,9 @@ describe('User repository integration tests', () => {
 
         let userId;
         before(() => {
-            return Repository.signUpUser(users[1])
-                .then(response => {
-                    userId = response._id;
-                });
+            return Repository.signUpUser(users[1]).then(response => {
+                userId = response._id;
+            });
         });
 
         after(() => {
@@ -86,28 +83,25 @@ describe('User repository integration tests', () => {
         });
 
         it('uploads a custom avatar and associates with the user', () => {
-            return Repository.uploadUserAvatar(userId, avatar, false)
-                .then(response => {
-                    expectUserShape(response);
-                    expect(response.avatarUrl).to.not.contain('default');
-                    expect(response.avatar).to.exist;
-                });
+            return Repository.uploadUserAvatar(userId, avatar, false).then(response => {
+                expectUserShape(response);
+                expect(response.avatarUrl).to.not.contain('default');
+                expect(response.avatar).to.exist;
+            });
         });
 
         it('returns an error if a user id is not provided', () => {
-            return Repository.uploadUserAvatar(null, avatar, false)
-                .catch(error => {
-                    expect(error).to.exist;
-                    expect(error.message).to.contain('user id is required');
-                });
+            return Repository.uploadUserAvatar(null, avatar, false).catch(error => {
+                expect(error).to.exist;
+                expect(error.message).to.contain('user id is required');
+            });
         });
 
         it('returns an error if the avatar file is not provided', () => {
-            return Repository.uploadUserAvatar(userId, null, false)
-                .catch(error => {
-                    expect(error).to.exist;
-                    expect(error.message).to.contain('avatar file is required');
-                });
+            return Repository.uploadUserAvatar(userId, null, false).catch(error => {
+                expect(error).to.exist;
+                expect(error.message).to.contain('avatar file is required');
+            });
         });
     });
 
@@ -142,92 +136,83 @@ describe('User repository integration tests', () => {
 
         context('getUsers()', () => {
             it('returns an array of all the users', () => {
-                return Repository.getUsers()
-                    .then(response => {
-                        expect(response).to.be.an('array');
-                        expect(response).to.have.lengthOf(2);
-                        expectUserShape(response[0]);
-                        expectUserShape(response[1]);
-                    });
+                return Repository.getUsers().then(response => {
+                    expect(response).to.be.an('array');
+                    expect(response).to.have.lengthOf(2);
+                    expectUserShape(response[0]);
+                    expectUserShape(response[1]);
+                });
             });
 
             it('returns an array of user based on the query condition', () => {
-                return Repository.getUsers({name: "Oliver Queen"})
-                    .then(response => {
-                        expect(response).to.be.an('array');
-                        expect(response).to.have.lengthOf(1);
-                        expectUserShape(response[0]);
-                        expect(response[0].name).to.equal("Oliver Queen");
-                    });
+                return Repository.getUsers({ name: 'Oliver Queen' }).then(response => {
+                    expect(response).to.be.an('array');
+                    expect(response).to.have.lengthOf(1);
+                    expectUserShape(response[0]);
+                    expect(response[0].name).to.equal('Oliver Queen');
+                });
             });
 
             it('returns an array of users with the avatar model populated', () => {
-                return Repository.getUsers({name: 'Oliver Queen'}, true)
-                    .then(response => {
-                        expect(response).to.be.an('array');
-                        expect(response).to.have.lengthOf(1);
-                        expectUserShape(response[0]);
-                        expect(response[0].name).to.equal("Oliver Queen");
-                        expect(response[0].avatar).to.exist;
-                        expect(response[0].avatar).to.be.an('object');
-                        expect(response[0].avatar.defaultImg).to.be.false;
-                    });
+                return Repository.getUsers({ name: 'Oliver Queen' }, true).then(response => {
+                    expect(response).to.be.an('array');
+                    expect(response).to.have.lengthOf(1);
+                    expectUserShape(response[0]);
+                    expect(response[0].name).to.equal('Oliver Queen');
+                    expect(response[0].avatar).to.exist;
+                    expect(response[0].avatar).to.be.an('object');
+                    expect(response[0].avatar.defaultImg).to.be.false;
+                });
             });
         });
 
         context('getUser()', () => {
             it('returns the user with the given id', () => {
-                return Repository.getUser(barryId)
-                    .then(response => {
-                        expectUserShape(response);
-                        expect(response.name).to.equal('Barry Allen');
-                    });
+                return Repository.getUser(barryId).then(response => {
+                    expectUserShape(response);
+                    expect(response.name).to.equal('Barry Allen');
+                });
             });
 
             it('returns the user with the given id and avatar populated if requested', () => {
-                return Repository.getUser(oliverId, true)
-                    .then(response => {
-                        expectUserShape(response);
-                        expect(response.name).to.equal('Oliver Queen');
-                        expect(response.avatar).to.be.an('object');
-                        expect(response.avatar.defaultImg).to.be.false;
-                    });
+                return Repository.getUser(oliverId, true).then(response => {
+                    expectUserShape(response);
+                    expect(response.name).to.equal('Oliver Queen');
+                    expect(response.avatar).to.be.an('object');
+                    expect(response.avatar.defaultImg).to.be.false;
+                });
             });
 
             it('returns an error if a user id is not provided', () => {
-                return Repository.getUser()
-                    .catch(error => {
-                        expect(error).to.exist;
-                        expect(error.message).to.contain('user id is required');
-                    });
+                return Repository.getUser().catch(error => {
+                    expect(error).to.exist;
+                    expect(error.message).to.contain('user id is required');
+                });
             });
         });
 
         context('lookupUserByEmail()', () => {
             it('returns the user with the given email', () => {
-                return Repository.lookupUserByEmail(users[0].email)
-                    .then(response => {
-                        expectUserShape(response);
-                        expect(response.name).to.equal('Barry Allen');
-                    });
+                return Repository.lookupUserByEmail(users[0].email).then(response => {
+                    expectUserShape(response);
+                    expect(response.name).to.equal('Barry Allen');
+                });
             });
 
             it('returns the user with the given email and avatar populated if requested', () => {
-                return Repository.lookupUserByEmail(users[1].email, true)
-                    .then(response => {
-                        expectUserShape(response);
-                        expect(response.name).to.equal('Oliver Queen');
-                        expect(response.avatar).to.be.an('object');
-                        expect(response.avatar.defaultImg).to.be.false;
-                    });
+                return Repository.lookupUserByEmail(users[1].email, true).then(response => {
+                    expectUserShape(response);
+                    expect(response.name).to.equal('Oliver Queen');
+                    expect(response.avatar).to.be.an('object');
+                    expect(response.avatar.defaultImg).to.be.false;
+                });
             });
 
             it('returns an error if a user email is not provided', () => {
-                return Repository.lookupUserByEmail()
-                    .catch(error => {
-                        expect(error).to.exist;
-                        expect(error.message).to.contain('email is required');
-                    });
+                return Repository.lookupUserByEmail().catch(error => {
+                    expect(error).to.exist;
+                    expect(error.message).to.contain('email is required');
+                });
             });
         });
 
@@ -238,11 +223,10 @@ describe('User repository integration tests', () => {
                     currentPassword: users[0].password,
                     newPassword: 'test1234'
                 };
-                return Repository.changePassword(userData)
-                    .then(response => {
-                        expectUserShape(response);
-                        expect(response.password).not.to.equal(barryHashedPwd);
-                    });
+                return Repository.changePassword(userData).then(response => {
+                    expectUserShape(response);
+                    expect(response.password).not.to.equal(barryHashedPwd);
+                });
             });
 
             it('returns an error if the user authentication fails', () => {
@@ -251,19 +235,17 @@ describe('User repository integration tests', () => {
                     currentPassword: 'wrongpassword',
                     newPassword: 'test1234'
                 };
-                return Repository.changePassword(userData)
-                    .catch(error => {
-                        expect(error).to.exist;
-                        expect(error.message).to.contain('user unauthorized to change password');
-                    });
+                return Repository.changePassword(userData).catch(error => {
+                    expect(error).to.exist;
+                    expect(error.message).to.contain('user unauthorized to change password');
+                });
             });
 
             it('returns an error if a user data is not provided', () => {
-                return Repository.changePassword()
-                    .catch(error => {
-                        expect(error).to.exist;
-                        expect(error.message).to.contain('user data is required');
-                    });
+                return Repository.changePassword().catch(error => {
+                    expect(error).to.exist;
+                    expect(error.message).to.contain('user data is required');
+                });
             });
 
             it('returns an error if user email is not provided', () => {
@@ -271,11 +253,10 @@ describe('User repository integration tests', () => {
                     currentPassword: users[1].password,
                     newPassword: 'test1234'
                 };
-                return Repository.changePassword(userData)
-                    .catch(error => {
-                        expect(error).to.exist;
-                        expect(error.message).to.contain('user email is required');
-                    });
+                return Repository.changePassword(userData).catch(error => {
+                    expect(error).to.exist;
+                    expect(error.message).to.contain('user email is required');
+                });
             });
 
             it('returns an error if current password is not provided', () => {
@@ -284,26 +265,23 @@ describe('User repository integration tests', () => {
                     newPassword: 'test1234'
                 };
 
-                return Repository.changePassword(userData)
-                    .catch(error => {
-                        expect(error).to.exist;
-                        expect(error.message).to.contain('user current password is required');
-                    });
+                return Repository.changePassword(userData).catch(error => {
+                    expect(error).to.exist;
+                    expect(error.message).to.contain('user current password is required');
+                });
             });
 
             it('returns an error if new password is not provided', () => {
                 const userData = {
                     email: 'barry@starlabs.com',
-                    currentPassword: users[0].password,
+                    currentPassword: users[0].password
                 };
 
-                return Repository.changePassword(userData)
-                    .catch(error => {
-                        expect(error).to.exist;
-                        expect(error.message).to.contain('user new password is required');
-                    });
+                return Repository.changePassword(userData).catch(error => {
+                    expect(error).to.exist;
+                    expect(error.message).to.contain('user new password is required');
+                });
             });
-
         });
 
         context('updateUser()', () => {
@@ -313,39 +291,35 @@ describe('User repository integration tests', () => {
                     email: 'flash@starlabs.com'
                 };
 
-                return Repository.updateUser(barryId, updatedData)
-                    .then(response => {
-                        expectUserShape(response);
-                        expect(response.name).to.equal(updatedData.name);
-                        expect(response.email).to.equal(updatedData.email);
-                        expect(response.createdAt).not.to.equal(response.updatedAt);
-                    });
+                return Repository.updateUser(barryId, updatedData).then(response => {
+                    expectUserShape(response);
+                    expect(response.name).to.equal(updatedData.name);
+                    expect(response.email).to.equal(updatedData.email);
+                    expect(response.createdAt).not.to.equal(response.updatedAt);
+                });
             });
 
             it('returns an error if a user id is not provided', () => {
-                return Repository.updateUser()
-                    .catch(error => {
-                        expect(error).to.exist;
-                        expect(error.message).to.contain('user id is required');
-                    });
+                return Repository.updateUser().catch(error => {
+                    expect(error).to.exist;
+                    expect(error.message).to.contain('user id is required');
+                });
             });
 
             it('returns an error if a user data is not provided', () => {
-                return Repository.updateUser(barryId)
-                    .catch(error => {
-                        expect(error).to.exist;
-                        expect(error.message).to.contain('userData is required');
-                    });
+                return Repository.updateUser(barryId).catch(error => {
+                    expect(error).to.exist;
+                    expect(error.message).to.contain('userData is required');
+                });
             });
         });
 
         context('unlinkSFDCAccount', () => {
             it('returns an error if a user is not provided', () => {
-                return Repository.unlinkSFDCAccount()
-                    .catch(error => {
-                        expect(error).to.exist;
-                        expect(error.message).to.contain('unable to unlink');
-                    });
+                return Repository.unlinkSFDCAccount().catch(error => {
+                    expect(error).to.exist;
+                    expect(error.message).to.contain('unable to unlink');
+                });
             });
 
             it('returns an error if the user does not have a SFDC profile', () => {
@@ -360,20 +334,18 @@ describe('User repository integration tests', () => {
 
         context('deleteUser()', () => {
             it('returns the deleted user with the given id', () => {
-                return Repository.deleteUser(oliverId)
-                    .then(response => {
-                        expectUserShape(response);
-                        expect(response.name).to.equal(users[1].name);
-                        expect(response.email).to.equal(users[1].email);
-                    });
+                return Repository.deleteUser(oliverId).then(response => {
+                    expectUserShape(response);
+                    expect(response.name).to.equal(users[1].name);
+                    expect(response.email).to.equal(users[1].email);
+                });
             });
 
             it('returns an error if a user id is not provided', () => {
-                return Repository.deleteUser()
-                    .catch(error => {
-                        expect(error).to.exist;
-                        expect(error.message).to.contain('user id is required');
-                    });
+                return Repository.deleteUser().catch(error => {
+                    expect(error).to.exist;
+                    expect(error.message).to.contain('user id is required');
+                });
             });
         });
     });

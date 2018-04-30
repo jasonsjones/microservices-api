@@ -3,48 +3,39 @@ import request from 'supertest';
 
 import app from '../config/app';
 import { dbConnection, dropCollection } from '../utils/dbTestUtils';
-
-const expectJSONShape = json => {
-    expect(json).to.be.an('Object');
-    expect(json).to.have.property('success');
-    expect(json).to.have.property('message');
-    expect(json).to.have.property('payload');
-};
+import { expectJSONShape } from '../utils/testUtils';
 
 describe('User acceptance tests', () => {
-
-    context('signs up a new user and uploads a custom avatar', () => {
+    context('has routes to', () => {
         let oliverId;
         after(() => {
             dropCollection(dbConnection, 'users');
             dropCollection(dbConnection, 'avatars');
         });
 
-        it('POST /api/signup', () => {
+        it('signup a new user', () => {
             return request(app)
                 .post('/api/signup')
                 .send({
-                    'name': 'Oliver Queen',
-                    'email': 'oliver@qc.com',
-                    'password': '123456'
+                    name: 'Oliver Queen',
+                    email: 'oliver@qc.com',
+                    password: '123456'
                 })
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body);
-                    expect(res.body.payload).to.have.property('user');
+                    expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
                     oliverId = res.body.payload.user._id;
                 });
         });
 
-        it('POST /api/users/:userid/avatar', () => {
+        it('upload custom avatar image for user', () => {
             return request(app)
                 .post(`/api/users/${oliverId}/avatar`)
                 .attach('avatar', `${__dirname}/../../assets/male3.png`)
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body);
-                    expect(res.body.payload).to.have.property('user');
+                    expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.user).to.have.property('id');
                     expect(res.body.payload.user).to.have.property('name');
@@ -54,13 +45,12 @@ describe('User acceptance tests', () => {
                 });
         });
 
-        it('GET /api/users/:id', () => {
+        it('verify the user has been added', () => {
             return request(app)
                 .get(`/api/users/${oliverId}`)
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body);
-                    expect(res.body.payload).to.have.property('user');
+                    expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.user).to.have.property('_id');
                     expect(res.body.payload.user).to.have.property('name');
@@ -71,18 +61,18 @@ describe('User acceptance tests', () => {
         });
     });
 
-    context('gets all users and individual users by id', () => {
+    context('has routes to', () => {
         let barryId, oliverId;
-        const barry ={
-            'name': 'Barry Allen',
-            'email': 'barry@starlabs.com',
-            'password': '123456'
+        const barry = {
+            name: 'Barry Allen',
+            email: 'barry@starlabs.com',
+            password: '123456'
         };
 
-        const oliver ={
-            'name': 'Oliver Queen',
-            'email': 'oliver@qc.com',
-            'password': '123456'
+        const oliver = {
+            name: 'Oliver Queen',
+            email: 'oliver@qc.com',
+            password: '123456'
         };
 
         before(() => {
@@ -97,33 +87,31 @@ describe('User acceptance tests', () => {
                         .send(oliver)
                         .expect(200);
                 })
-                .then(res => oliverId = res.body.payload.user._id);
+                .then(res => (oliverId = res.body.payload.user._id));
         });
 
         after(() => {
             dropCollection(dbConnection, 'users');
         });
 
-        it('GET /api/users', () => {
+        it('get all the users', () => {
             return request(app)
                 .get('/api/users')
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body);
-                    expect(res.body.payload).to.have.property('users');
+                    expectJSONShape(res.body, 'users');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.users).to.be.an('Array');
                     expect(res.body.payload.users.length).to.equal(2);
                 });
         });
 
-        it('GET /api/users/:id -- Barry', () => {
+        it('get barry user by id', () => {
             return request(app)
                 .get(`/api/users/${barryId}`)
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body);
-                    expect(res.body.payload).to.have.property('user');
+                    expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.user).to.have.property('_id');
                     expect(res.body.payload.user).to.have.property('name');
@@ -133,13 +121,12 @@ describe('User acceptance tests', () => {
                 });
         });
 
-        it('GET /api/users/:id -- Oliver', () => {
+        it('get oliver user by id', () => {
             return request(app)
                 .get(`/api/users/${oliverId}`)
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body);
-                    expect(res.body.payload).to.have.property('user');
+                    expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.user).to.have.property('_id');
                     expect(res.body.payload.user).to.have.property('name');
@@ -150,12 +137,12 @@ describe('User acceptance tests', () => {
         });
     });
 
-    context('updates user data', () => {
+    context('has route to', () => {
         let barryId;
-        const barry ={
-            'name': 'Barry Allen',
-            'email': 'barry@starlabs.com',
-            'password': '123456'
+        const barry = {
+            name: 'Barry Allen',
+            email: 'barry@starlabs.com',
+            password: '123456'
         };
 
         before(() => {
@@ -172,10 +159,10 @@ describe('User acceptance tests', () => {
             dropCollection(dbConnection, 'users');
         });
 
-        it('PUT /api/users/:id', () => {
+        it('update user data', () => {
             const updatedUserData = {
-                'name': 'The Flash',
-                'email': 'flash@starlabs.com'
+                name: 'The Flash',
+                email: 'flash@starlabs.com'
             };
 
             return request(app)
@@ -183,8 +170,7 @@ describe('User acceptance tests', () => {
                 .send(updatedUserData)
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body);
-                    expect(res.body.payload).to.have.property('user');
+                    expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
                     expect(res.body.payload.user).to.have.property('id');
                     expect(res.body.payload.user).to.have.property('name');
@@ -195,12 +181,12 @@ describe('User acceptance tests', () => {
         });
     });
 
-    context('deletes a user', () => {
+    context('has route to', () => {
         let barryId;
-        const barry ={
-            'name': 'Barry Allen',
-            'email': 'barry@starlabs.com',
-            'password': '123456'
+        const barry = {
+            name: 'Barry Allen',
+            email: 'barry@starlabs.com',
+            password: '123456'
         };
 
         before(() => {
@@ -217,16 +203,16 @@ describe('User acceptance tests', () => {
             dropCollection(dbConnection, 'users');
         });
 
-        it('DELETE /api/users/:id', () => {
+        it('delete a user', () => {
             const url = `/api/users/${barryId}`;
 
             return request(app)
                 .delete(url)
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body);
+                    expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
-                    expect(res.body.payload).to.be.an("Object");
+                    expect(res.body.payload).to.be.an('Object');
                     expect(res.body.payload.user.name).to.equal(barry.name);
                     return request(app)
                         .get(url)
@@ -235,17 +221,17 @@ describe('User acceptance tests', () => {
                 .then(res => {
                     expectJSONShape(res.body);
                     expect(res.body.success).to.be.true;
-                    expect(res.body.payload).to.be.an("Object");
+                    expect(res.body.payload).to.be.an('Object');
                     expect(res.body.payload.user).to.equal(null);
                 });
         });
     });
 
-    context('changes a user\'s password', () => {
-        const barry ={
-            'name': 'Barry Allen',
-            'email': 'barry@starlabs.com',
-            'password': '123456'
+    context('has route to', () => {
+        const barry = {
+            name: 'Barry Allen',
+            email: 'barry@starlabs.com',
+            password: '123456'
         };
 
         before(() => {
@@ -259,7 +245,7 @@ describe('User acceptance tests', () => {
             dropCollection(dbConnection, 'users');
         });
 
-        it('POST /api/users/changepassword', () => {
+        it("change a user's  password", () => {
             const payload = {
                 email: barry.email,
                 currentPassword: barry.password,

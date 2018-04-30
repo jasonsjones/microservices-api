@@ -62,40 +62,36 @@ const expectErrorResponse = (errorResponse, errMsg) => {
 };
 
 describe('User controller integration tests', () => {
-
     context('signUpUser()', () => {
         after(() => {
             dropCollection(dbConnection, 'users');
         });
 
         it('returns error payload if the user data is not provided', () => {
-            return Controller.signupUser()
-                .catch(error => {
-                    expectErrorResponse(error, 'request parameter is required');
-                });
+            return Controller.signupUser().catch(error => {
+                expectErrorResponse(error, 'request parameter is required');
+            });
         });
 
         it('creates a new user', () => {
             let req = {
                 body: users[0]
             };
-            return Controller.signupUser(req)
-                .then(response => {
-                    expect(response).to.have.property('success');
-                    expect(response).to.have.property('message');
-                    expect(response.success).to.be.true;
-                    expectUserShape(response.payload.user);
-                });
+            return Controller.signupUser(req).then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response.success).to.be.true;
+                expectUserShape(response.payload.user);
+            });
         });
     });
 
     context('uploadUserAvatar()', () => {
         let barryId;
         before(() => {
-            return Controller.signupUser({body: users[0]})
-                .then(response => {
-                    barryId = response.payload.user._id;
-                });
+            return Controller.signupUser({ body: users[0] }).then(response => {
+                barryId = response.payload.user._id;
+            });
         });
 
         after(() => {
@@ -104,10 +100,9 @@ describe('User controller integration tests', () => {
         });
 
         it('returns error payload if the request is not provided', () => {
-            return Controller.uploadUserAvatar()
-                .catch(error => {
-                    expectErrorResponse(error, 'request parameter is required');
-                });
+            return Controller.uploadUserAvatar().catch(error => {
+                expectErrorResponse(error, 'request parameter is required');
+            });
         });
 
         it('returns error payload if the avatar is not provided', () => {
@@ -116,10 +111,9 @@ describe('User controller integration tests', () => {
                     id: barryId
                 }
             };
-            return Controller.uploadUserAvatar(req)
-                .catch(error => {
-                    expectErrorResponse(error, 'avatar file is required');
-                });
+            return Controller.uploadUserAvatar(req).catch(error => {
+                expectErrorResponse(error, 'avatar file is required');
+            });
         });
 
         it('returns error payload if the user id is not provided', () => {
@@ -128,10 +122,9 @@ describe('User controller integration tests', () => {
             let req = {
                 file: avatar
             };
-            return Controller.uploadUserAvatar(req)
-                .catch(error => {
-                    expectErrorResponse(error, 'user id is required');
-                });
+            return Controller.uploadUserAvatar(req).catch(error => {
+                expectErrorResponse(error, 'user id is required');
+            });
         });
 
         it('uploads a custom user avatar', () => {
@@ -143,32 +136,30 @@ describe('User controller integration tests', () => {
                     id: barryId
                 }
             };
-            return Controller.uploadUserAvatar(req)
-                .then(response => {
-                    expect(response).to.have.property('success');
-                    expect(response).to.have.property('message');
-                    expect(response.success).to.be.true;
-                    expectClientJSONUserShape(response.payload.user);
-                    expect(response.payload.user.avatarUrl).not.to.contain('default');
-                });
+            return Controller.uploadUserAvatar(req).then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response.success).to.be.true;
+                expectClientJSONUserShape(response.payload.user);
+                expect(response.payload.user.avatarUrl).not.to.contain('default');
+            });
         });
     });
 
     context('changePassword()', () => {
         let barryId;
         before(() => {
-            return Controller.signupUser({body: users[0]})
-                .then(response => {
-                    barryId = response.payload.user._id;
-                    Controller.signupUser({body: users[1]});
-                });
+            return Controller.signupUser({ body: users[0] }).then(response => {
+                barryId = response.payload.user._id;
+                Controller.signupUser({ body: users[1] });
+            });
         });
 
         after(() => {
             dropCollection(dbConnection, 'users');
         });
 
-        it('changes the user\'s password', () => {
+        it("changes the user's password", () => {
             const req = {
                 params: {
                     id: barryId
@@ -180,19 +171,17 @@ describe('User controller integration tests', () => {
                 }
             };
 
-            return Controller.changePassword(req)
-                .then(response => {
-                    expect(response).to.have.property('success');
-                    expect(response).to.have.property('message');
-                    expect(response.success).to.be.true;
-                });
+            return Controller.changePassword(req).then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response.success).to.be.true;
+            });
         });
 
         it('returns an error if the request parameter is not provided', () => {
-            return Controller.changePassword()
-                .catch(error => {
-                    expectErrorResponse(error, 'request parameter is required');
-                });
+            return Controller.changePassword().catch(error => {
+                expectErrorResponse(error, 'request parameter is required');
+            });
         });
 
         it('returns an error if the required user data is not provided', () => {
@@ -201,21 +190,19 @@ describe('User controller integration tests', () => {
                     id: barryId
                 }
             };
-            return Controller.changePassword(req)
-                .catch(error => {
-                    expectErrorResponse(error, 'request body is required');
-                });
+            return Controller.changePassword(req).catch(error => {
+                expectErrorResponse(error, 'request body is required');
+            });
         });
     });
 
     context('user fetching and mutating related tests', () => {
         let barryId;
         before(() => {
-            return Controller.signupUser({body: users[0]})
-                .then(response => {
-                    barryId = response.payload.user._id;
-                    Controller.signupUser({body: users[1]});
-                });
+            return Controller.signupUser({ body: users[0] }).then(response => {
+                barryId = response.payload.user._id;
+                Controller.signupUser({ body: users[1] });
+            });
         });
 
         after(() => {
@@ -225,28 +212,26 @@ describe('User controller integration tests', () => {
 
         context('getUsers()', () => {
             it('returns all the users', () => {
-                return Controller.getUsers()
-                    .then(response => {
-                        expect(response).to.have.property('success');
-                        expect(response).to.have.property('message');
-                        expect(response).to.have.property('payload');
-                        expect(response.success).to.be.true;
-                        expect(response.payload.users).to.be.an('array');
-                        expectUserShape(response.payload.users[0]);
-                        expectUserShape(response.payload.users[1]);
-                    });
+                return Controller.getUsers().then(response => {
+                    expect(response).to.have.property('success');
+                    expect(response).to.have.property('message');
+                    expect(response).to.have.property('payload');
+                    expect(response.success).to.be.true;
+                    expect(response.payload.users).to.be.an('array');
+                    expectUserShape(response.payload.users[0]);
+                    expectUserShape(response.payload.users[1]);
+                });
             });
         });
 
         context('getUser()', () => {
             it('returns a payload with the user of the given id', () => {
-                return Controller.getUser({params: {id: barryId}})
-                    .then(response => {
-                        expect(response).to.have.property('success');
-                        expect(response).to.have.property('message');
-                        expect(response).to.have.property('payload');
-                        expect(response.success).to.be.true;
-                    });
+                return Controller.getUser({ params: { id: barryId } }).then(response => {
+                    expect(response).to.have.property('success');
+                    expect(response).to.have.property('message');
+                    expect(response).to.have.property('payload');
+                    expect(response.success).to.be.true;
+                });
             });
 
             it('returns a payload with the user and includes the avatar model', () => {
@@ -257,7 +242,7 @@ describe('User controller integration tests', () => {
                     },
                     file: avatar,
                     query: {
-                        includeAvatar: "true"
+                        includeAvatar: 'true'
                     }
                 };
                 return Controller.uploadUserAvatar(req)
@@ -273,10 +258,9 @@ describe('User controller integration tests', () => {
             });
 
             it('returns error payload if the request is not provided', () => {
-                return Controller.getUser()
-                    .catch(error => {
-                        expectErrorResponse(error, 'request parameter is required');
-                    });
+                return Controller.getUser().catch(error => {
+                    expectErrorResponse(error, 'request parameter is required');
+                });
             });
         });
 
@@ -309,23 +293,21 @@ describe('User controller integration tests', () => {
                         email: 'flash@starlabs.com'
                     }
                 };
-                return Controller.updateUser(req)
-                    .then(response => {
-                        expect(response).to.have.property('success');
-                        expect(response).to.have.property('message');
-                        expect(response).to.have.property('payload');
-                        expect(response.success).to.be.true;
-                        expectClientJSONUserShape(response.payload.user);
-                        expect(response.payload.user.name).to.not.equal(users[0].name);
-                        expect(response.payload.user.email).to.not.equal(users[0].email);
-                    });
+                return Controller.updateUser(req).then(response => {
+                    expect(response).to.have.property('success');
+                    expect(response).to.have.property('message');
+                    expect(response).to.have.property('payload');
+                    expect(response.success).to.be.true;
+                    expectClientJSONUserShape(response.payload.user);
+                    expect(response.payload.user.name).to.not.equal(users[0].name);
+                    expect(response.payload.user.email).to.not.equal(users[0].email);
+                });
             });
 
             it('returns an error if the request parameter is not provided', () => {
-                return Controller.updateUser()
-                    .catch(error => {
-                        expectErrorResponse(error, 'request parameter is required');
-                    });
+                return Controller.updateUser().catch(error => {
+                    expectErrorResponse(error, 'request parameter is required');
+                });
             });
 
             it('returns an error if the user id is not provided', () => {
@@ -334,10 +316,9 @@ describe('User controller integration tests', () => {
                         name: 'The Flash'
                     }
                 };
-                return Controller.updateUser(req)
-                    .catch(error => {
-                        expectErrorResponse(error, 'user id is required');
-                    });
+                return Controller.updateUser(req).catch(error => {
+                    expectErrorResponse(error, 'user id is required');
+                });
             });
 
             it('returns an error if the new user data is not provided', () => {
@@ -346,19 +327,17 @@ describe('User controller integration tests', () => {
                         id: barryId
                     }
                 };
-                return Controller.updateUser(req)
-                    .catch(error => {
-                        expectErrorResponse(error, 'user data is required');
-                    });
+                return Controller.updateUser(req).catch(error => {
+                    expectErrorResponse(error, 'user data is required');
+                });
             });
         });
 
         context('deleteUser()', () => {
             it('returns error payload if the request is not provided', () => {
-                return Controller.deleteUser()
-                    .catch(error => {
-                        expectErrorResponse(error, 'request parameter is required');
-                    });
+                return Controller.deleteUser().catch(error => {
+                    expectErrorResponse(error, 'request parameter is required');
+                });
             });
 
             it('returns the a payload with the user that was just deleted', () => {
@@ -367,18 +346,15 @@ describe('User controller integration tests', () => {
                         id: barryId
                     }
                 };
-                return Controller.deleteUser(req)
-                    .then(response => {
-                        expect(response).to.have.property('success');
-                        expect(response).to.have.property('message');
-                        expect(response).to.have.property('payload');
-                        expect(response.success).to.be.true;
-                        expectUserShape(response.payload.user);
-                        expect(response.payload.user._id).to.eql(barryId);
-                    });
+                return Controller.deleteUser(req).then(response => {
+                    expect(response).to.have.property('success');
+                    expect(response).to.have.property('message');
+                    expect(response).to.have.property('payload');
+                    expect(response.success).to.be.true;
+                    expectUserShape(response.payload.user);
+                    expect(response.payload.user._id).to.eql(barryId);
+                });
             });
-
         });
     });
-
 });
