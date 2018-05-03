@@ -70,4 +70,14 @@ avatarRoute(app);
 userRoute(app);
 indexRoute(app);
 
+app.use((err, req, res, next) => {
+    if (process.env.NODE_ENV === 'development') {
+        console.err(err);
+        res.json({
+            message: err.message,
+            error: err
+        });
+    }
+});
+
 export default app;
