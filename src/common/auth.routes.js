@@ -1,19 +1,6 @@
 import * as AuthUtils from './auth.utils';
 
 export default (app, passport) => {
-    app.get(
-        '/auth/sfdc',
-        passport.authenticate('forcedotcom', {
-            display: 'page',
-            prompt: '',
-            login_hint: ''
-        })
-    );
-
-    app.get(
-        '/auth/callback',
-        passport.authenticate('forcedotcom', { successRedirect: '/profile' })
-    );
 
     app.get('/api/signout', (req, res) => {
         req.logout();
