@@ -1,7 +1,6 @@
 import * as AuthUtils from './auth.utils';
 
 export default (app, passport) => {
-
     app.get('/api/signout', (req, res) => {
         req.logout();
         req.session.destroy(() => {

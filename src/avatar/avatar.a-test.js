@@ -72,7 +72,7 @@ describe('Avatar acceptence tests', () => {
         });
     });
 
-    context("has routes to", () => {
+    context('has routes to', () => {
         let avatarId, userId;
 
         before(() => {
