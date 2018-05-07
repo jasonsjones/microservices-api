@@ -95,14 +95,34 @@ describe('User acceptance tests', () => {
         });
 
         it('get all the users', () => {
+            let token;
             return request(app)
-                .get('/api/users')
+                .post('/api/login')
+                .send({
+                    email: 'oliver@qc.com',
+                    password: '123456'
+                })
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body, 'users');
-                    expect(res.body.success).to.be.true;
-                    expect(res.body.payload.users).to.be.an('Array');
-                    expect(res.body.payload.users.length).to.equal(2);
+                    token = res.body.payload.token;
+                })
+                .then(() => {
+                    return request(app)
+                        .put(`/api/users/${oliverId}`)
+                        .send({ roles: ['dev', 'admin'] })
+                        .expect(200);
+                })
+                .then(() => {
+                    return request(app)
+                        .get('/api/users')
+                        .set('x-access-token', token)
+                        .expect(200)
+                        .then(res => {
+                            expectJSONShape(res.body, 'users');
+                            expect(res.body.success).to.be.true;
+                            expect(res.body.payload.users).to.be.an('Array');
+                            expect(res.body.payload.users.length).to.equal(2);
+                        });
                 });
         });
 
