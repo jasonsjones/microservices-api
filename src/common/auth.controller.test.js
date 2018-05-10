@@ -240,18 +240,21 @@ describe.only('Auth controller', () => {
     });
 
     describe('protectAdminRoute()', () => {
-        it('returns a promise', () => {
+        it('rejects if the token had not be verified or decoded', () => {
             const req = {
                 query: {},
                 body: {},
-                headers: {
-                    'x-access-token': 'thisisa.fake.tokenvalue12345'
-                }
+                headers: {}
             };
             let promise = Controller.protectAdminRoute(req);
             expect(promise).to.be.a('promise');
-            return promise.catch(() => {});
+            return promise.catch(err => {
+                expectError(err);
+            });
         });
+        it('resolve to true if the user is an admin');
+        it('resolve to false if the user is an admin');
+        it('rejects if something went wrong getting the user');
     });
 });
 
