@@ -84,3 +84,14 @@ export function adminRoute(req) {
             );
     });
 }
+
+export const protectAdminRoute = req => {
+    return verifyToken(req).then(decoded => {
+        if (!req.decoded) {
+            return Promise.reject({
+                success: false,
+                message: 'Token has not yet been verified'
+            });
+        }
+    });
+};

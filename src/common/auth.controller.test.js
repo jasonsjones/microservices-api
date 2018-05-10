@@ -238,6 +238,21 @@ describe.only('Auth controller', () => {
             });
         });
     });
+
+    describe('protectAdminRoute()', () => {
+        it('returns a promise', () => {
+            const req = {
+                query: {},
+                body: {},
+                headers: {
+                    'x-access-token': 'thisisa.fake.tokenvalue12345'
+                }
+            };
+            let promise = Controller.protectAdminRoute(req);
+            expect(promise).to.be.a('promise');
+            return promise.catch(() => {});
+        });
+    });
 });
 
 const expectError = err => {
