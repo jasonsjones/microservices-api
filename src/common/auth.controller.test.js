@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 
 import User from '../user/user.model';
 import * as Controller from './auth.controller';
+import * as UserRepository from '../user/user.repository';
 
 import { mockUsers } from '../utils/userTestUtils';
 
@@ -252,9 +253,41 @@ describe.only('Auth controller', () => {
                 expectError(err);
             });
         });
+
         it('resolve to true if the user is an admin');
         it('resolve to false if the user is an admin');
-        it('rejects if something went wrong getting the user');
+
+        it('rejects if something went wrong getting the user', () => {
+            const expected = {
+                sub: '59c44d83f2943200228467b1',
+                email: 'oliver@qc.com',
+                iat: '1513453484',
+                exp: '1513453484'
+            };
+
+            const req = {
+                query: {},
+                body: {},
+                headers: {
+                    'x-access-token': 'thisisa.simulated.tokenvalue'
+                }
+            };
+
+            const userRepoStub = sinon.stub(UserRepository, 'getUser');
+            userRepoStub.rejects(new Error('Ooops, something went wrong getting the user'));
+
+            const jwtStub = sinon.stub(jwt, 'verify');
+            jwtStub.returns(expected);
+
+            let promise = Controller.protectAdminRoute(req);
+            expect(promise).to.be.a('promise');
+            return promise.catch(err => {
+                expectError(err);
+                expect(err.message).to.contain('Ooops, something went wrong getting the user');
+                userRepoStub.restore();
+                jwtStub.restore();
+            });
+        });
     });
 });
 
