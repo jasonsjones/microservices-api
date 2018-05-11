@@ -9,7 +9,15 @@ import * as UserRepository from '../user/user.repository';
 
 import { mockUsers } from '../utils/userTestUtils';
 
-describe.only('Auth controller', () => {
+const expectError = err => {
+    expect(err).to.exist;
+    expect(err).to.be.an('object');
+    expect(err).to.have.property('success');
+    expect(err).to.have.property('message');
+    expect(err.success).to.be.false;
+};
+
+describe('Auth controller', () => {
     describe('verifyToken()', () => {
         it('returns a promise that resolves with the decoded token', () => {
             const expected = {
@@ -240,7 +248,7 @@ describe.only('Auth controller', () => {
         });
     });
 
-    describe('protectAdminRoute()', () => {
+    describe('protectAdminRoute() -- new implementation', () => {
         it('rejects if the token had not be verified or decoded', () => {
             const req = {
                 query: {},
@@ -254,8 +262,69 @@ describe.only('Auth controller', () => {
             });
         });
 
-        it('resolve to true if the user is an admin');
-        it('resolve to false if the user is an admin');
+        it('resolve to true if the user is an admin', () => {
+            const expected = {
+                sub: '59c44d83f2943200228467b1',
+                email: 'oliver@qc.com',
+                iat: '1513453484',
+                exp: '1513453484'
+            };
+
+            const req = {
+                query: {},
+                body: {},
+                headers: {
+                    'x-access-token': 'thisisa.simulated.tokenvalue'
+                }
+            };
+
+            const userRepoStub = sinon.stub(UserRepository, 'getUser');
+            userRepoStub.resolves(new User(mockUsers[1]));
+
+            const jwtStub = sinon.stub(jwt, 'verify');
+            jwtStub.returns(expected);
+
+            let promise = Controller.protectAdminRoute(req);
+            return promise.then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response.success).to.be.true;
+                userRepoStub.restore();
+                jwtStub.restore();
+            });
+        });
+
+        it('resolve to false if the user is NOT an admin', () => {
+            const expected = {
+                sub: '59c44d83f2943200228467b3',
+                email: 'roy@qc.com',
+                iat: '1513453484',
+                exp: '1513453484'
+            };
+
+            const req = {
+                query: {},
+                body: {},
+                headers: {
+                    'x-access-token': 'thisisa.simulated.tokenvalue'
+                }
+            };
+
+            const userRepoStub = sinon.stub(UserRepository, 'getUser');
+            userRepoStub.resolves(new User(mockUsers[0]));
+
+            const jwtStub = sinon.stub(jwt, 'verify');
+            jwtStub.returns(expected);
+
+            let promise = Controller.protectAdminRoute(req);
+            return promise.then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response.success).to.be.false;
+                userRepoStub.restore();
+                jwtStub.restore();
+            });
+        });
 
         it('rejects if something went wrong getting the user', () => {
             const expected = {
@@ -290,11 +359,3 @@ describe.only('Auth controller', () => {
         });
     });
 });
-
-const expectError = err => {
-    expect(err).to.exist;
-    expect(err).to.be.an('object');
-    expect(err).to.have.property('success');
-    expect(err).to.have.property('message');
-    expect(err.success).to.be.false;
-};
