@@ -89,15 +89,6 @@ export function adminRoute(req) {
 export const protectAdminRoute = req => {
     return verifyToken(req)
         .then(decoded => {
-            if (!decoded) {
-                return Promise.reject({
-                    success: false,
-                    message: 'Token has not yet been verified'
-                });
-            }
-            return decoded;
-        })
-        .then(decoded => {
             return UserRepository.getUser(decoded.sub).then(user => {
                 if (user.isAdmin()) {
                     return Promise.resolve({

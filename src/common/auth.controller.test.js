@@ -249,7 +249,7 @@ describe('Auth controller', () => {
     });
 
     describe('protectAdminRoute() -- new implementation', () => {
-        it('rejects if the token had not be verified or decoded', () => {
+        it('rejects if the token is not provided', () => {
             const req = {
                 query: {},
                 body: {},
@@ -259,6 +259,26 @@ describe('Auth controller', () => {
             expect(promise).to.be.a('promise');
             return promise.catch(err => {
                 expectError(err);
+            });
+        });
+
+        it('rejects if the token had not be verified or decoded', () => {
+            const req = {
+                query: {},
+                body: {},
+                headers: {
+                    'x-access-token': 'thisisa.simulated.tokenvalue'
+                }
+            };
+
+            const jwtStub = sinon.stub(jwt, 'verify');
+            jwtStub.throws({ name: 'JsonWebTokenError', message: 'jwt malformed' });
+
+            let promise = Controller.protectAdminRoute(req);
+            expect(promise).to.be.a('promise');
+            return promise.catch(err => {
+                expectError(err);
+                jwtStub.restore();
             });
         });
 
