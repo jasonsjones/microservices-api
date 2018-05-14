@@ -36,7 +36,7 @@ const opts = {
     clientID: process.env.SFDC_CLIENT_ID,
     clientSecret: process.env.SFDC_CLIENT_SECRET,
     scope: ['full'],
-    callbackURL: 'http://localhost:3000/auth/callback',
+    callbackURL: 'http://localhost:3000/oauth/sfdc/callback',
     passReqToCallback: true
 };
 

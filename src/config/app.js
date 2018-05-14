@@ -10,7 +10,8 @@ import graphqlHTTP from 'express-graphql';
 import Config from './config';
 import schema from '../graphql';
 import passportConfig from './passport';
-import authRoute from '../common/auth.routes';
+import AuthRouter from '../common/auth.routes';
+import OauthRouter from '../common/oauth.routes';
 import avatarRoute from '../avatar/avatar.routes';
 import userRoute from '../user/user.routes';
 import indexRoute from '../index/index.routes';
@@ -65,9 +66,20 @@ app.use((req, res, next) => {
     next();
 });
 
-authRoute(app, passport);
+app.use('/oauth', OauthRouter(passport));
+app.use('/api', AuthRouter(passport));
 avatarRoute(app);
 userRoute(app);
 indexRoute(app);
+
+app.use((err, req, res, next) => {
+    if (process.env.NODE_ENV === 'development') {
+        console.error(err);
+        res.json({
+            message: err.message,
+            error: err
+        });
+    }
+});
 
 export default app;

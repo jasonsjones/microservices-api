@@ -1,14 +1,22 @@
 import multer from 'multer';
 import * as UserController from './user.controller';
-// import * as AuthController from '../common/auth.controller';
+import * as AuthController from '../common/auth.controller';
 
 export default app => {
     const upload = multer({ dest: './uploads/' });
 
     app.get(
         '/api/users',
-        //  AuthController.verifyToken,
-        //  AuthController.adminRoute,
+        (req, res, next) => {
+            AuthController.verifyToken(req)
+                .then(response => {
+                    next();
+                })
+                .catch(err => {
+                    console.log(err);
+                    next(err);
+                });
+        },
         (req, res) => {
             UserController.getUsers()
                 .then(response => res.json(response))

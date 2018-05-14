@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 
 import Config from '../config/config';
 import User from '../user/user.model';
+import * as UserRepository from '../user/user.repository';
 
 const env = process.env.NODE_ENV || /* istanbul ignore next */ 'development';
 const config = Config[env];
@@ -84,3 +85,29 @@ export function adminRoute(req) {
             );
     });
 }
+
+export const protectAdminRoute = req => {
+    return verifyToken(req)
+        .then(decoded => {
+            return UserRepository.getUser(decoded.sub).then(user => {
+                if (user.isAdmin()) {
+                    return Promise.resolve({
+                        success: true,
+                        message: 'Authorized user for this route'
+                    });
+                } else {
+                    return Promise.resolve({
+                        success: false,
+                        message: 'Not an authorized user for this route'
+                    });
+                }
+            });
+        })
+        .catch(err => {
+            return Promise.reject({
+                success: false,
+                message: err.message,
+                error: err
+            });
+        });
+};

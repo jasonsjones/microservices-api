@@ -5,42 +5,17 @@ import jwt from 'jsonwebtoken';
 
 import User from '../user/user.model';
 import * as Controller from './auth.controller';
+import * as UserRepository from '../user/user.repository';
 
-const mockUsers = [
-    {
-        _id: '59c44d83f2943200228467b3',
-        updatedAt: '2017-11-21T16:24:16.413Z',
-        createdAt: '2017-09-21T23:38:43.338Z',
-        name: 'Roy Harper',
-        email: 'roy@qc.com',
-        password: '$2a$12$DyizVZatjn.zMHeOhQI5nuIX64417O2zuRKXe/Ae0f06bLupmZ/d6',
-        avatar: '5a145330e6d09600aff70ef9',
-        avatarUrl: 'http://localhost:3000/api/avatar/5a145330e6d09600aff70ef9',
-        roles: ['user']
-    },
-    {
-        _id: '59c44d83f2943200228467b1',
-        updatedAt: '2017-09-21T23:38:45.575Z',
-        createdAt: '2017-09-21T23:38:43.337Z',
-        name: 'Oliver Queen',
-        email: 'oliver@qc.com',
-        password: '$2a$12$wwUJRxZdDzpZ5uK2u.7eNelWp6y4HT/WE/zzZ6e2L4VVvv/tJE2dK',
-        avatar: '59c44d85f2943200228467b4',
-        avatarUrl: 'http://localhost:3000/api/avatar/59c44d85f2943200228467b4',
-        roles: ['admin', 'user']
-    },
-    {
-        _id: '59c6c317f9760b01a35c63b1',
-        updatedAt: '2017-11-16T17:56:35.118Z',
-        createdAt: '2017-09-23T20:24:55.748Z',
-        name: 'Jason Jones',
-        email: 'jsjones96@gmail.com',
-        password: '$2a$12$5GCSOcQgHZ1tJHaMiOvvXOcFCoOoZCmjkQfD9hd/vIrF/dm0zrXa2',
-        avatar: null,
-        avatarUrl: 'http://localhost:3000/api/avatar/default',
-        roles: ['user']
-    }
-];
+import { mockUsers } from '../utils/userTestUtils';
+
+const expectError = err => {
+    expect(err).to.exist;
+    expect(err).to.be.an('object');
+    expect(err).to.have.property('success');
+    expect(err).to.have.property('message');
+    expect(err.success).to.be.false;
+};
 
 describe('Auth controller', () => {
     describe('verifyToken()', () => {
@@ -272,12 +247,135 @@ describe('Auth controller', () => {
             });
         });
     });
-});
 
-const expectError = err => {
-    expect(err).to.exist;
-    expect(err).to.be.an('object');
-    expect(err).to.have.property('success');
-    expect(err).to.have.property('message');
-    expect(err.success).to.be.false;
-};
+    describe('protectAdminRoute() -- new implementation', () => {
+        it('rejects if the token is not provided', () => {
+            const req = {
+                query: {},
+                body: {},
+                headers: {}
+            };
+            let promise = Controller.protectAdminRoute(req);
+            expect(promise).to.be.a('promise');
+            return promise.catch(err => {
+                expectError(err);
+            });
+        });
+
+        it('rejects if the token had not be verified or decoded', () => {
+            const req = {
+                query: {},
+                body: {},
+                headers: {
+                    'x-access-token': 'thisisa.simulated.tokenvalue'
+                }
+            };
+
+            const jwtStub = sinon.stub(jwt, 'verify');
+            jwtStub.throws({ name: 'JsonWebTokenError', message: 'jwt malformed' });
+
+            let promise = Controller.protectAdminRoute(req);
+            expect(promise).to.be.a('promise');
+            return promise.catch(err => {
+                expectError(err);
+                jwtStub.restore();
+            });
+        });
+
+        it('resolve to true if the user is an admin', () => {
+            const expected = {
+                sub: '59c44d83f2943200228467b1',
+                email: 'oliver@qc.com',
+                iat: '1513453484',
+                exp: '1513453484'
+            };
+
+            const req = {
+                query: {},
+                body: {},
+                headers: {
+                    'x-access-token': 'thisisa.simulated.tokenvalue'
+                }
+            };
+
+            const userRepoStub = sinon.stub(UserRepository, 'getUser');
+            userRepoStub.resolves(new User(mockUsers[1]));
+
+            const jwtStub = sinon.stub(jwt, 'verify');
+            jwtStub.returns(expected);
+
+            let promise = Controller.protectAdminRoute(req);
+            return promise.then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response.success).to.be.true;
+                userRepoStub.restore();
+                jwtStub.restore();
+            });
+        });
+
+        it('resolve to false if the user is NOT an admin', () => {
+            const expected = {
+                sub: '59c44d83f2943200228467b3',
+                email: 'roy@qc.com',
+                iat: '1513453484',
+                exp: '1513453484'
+            };
+
+            const req = {
+                query: {},
+                body: {},
+                headers: {
+                    'x-access-token': 'thisisa.simulated.tokenvalue'
+                }
+            };
+
+            const userRepoStub = sinon.stub(UserRepository, 'getUser');
+            userRepoStub.resolves(new User(mockUsers[0]));
+
+            const jwtStub = sinon.stub(jwt, 'verify');
+            jwtStub.returns(expected);
+
+            let promise = Controller.protectAdminRoute(req);
+            return promise.then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response.success).to.be.false;
+                userRepoStub.restore();
+                jwtStub.restore();
+            });
+        });
+
+        it('rejects if something went wrong getting the user', () => {
+            const expected = {
+                sub: '59c44d83f2943200228467b1',
+                email: 'oliver@qc.com',
+                iat: '1513453484',
+                exp: '1513453484'
+            };
+
+            const req = {
+                query: {},
+                body: {},
+                headers: {
+                    'x-access-token': 'thisisa.simulated.tokenvalue'
+                }
+            };
+
+            const userRepoStub = sinon.stub(UserRepository, 'getUser');
+            userRepoStub.rejects(new Error('Ooops, something went wrong getting the user'));
+
+            const jwtStub = sinon.stub(jwt, 'verify');
+            jwtStub.returns(expected);
+
+            let promise = Controller.protectAdminRoute(req);
+            expect(promise).to.be.a('promise');
+            return promise.catch(err => {
+                expectError(err);
+                expect(err.message).to.contain('Ooops, something went wrong getting the user');
+                userRepoStub.restore();
+                jwtStub.restore();
+            });
+        });
+    });
+});

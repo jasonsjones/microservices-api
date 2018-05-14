@@ -5,6 +5,42 @@ import app from '../config/app';
 import { dbConnection, dropCollection } from '../utils/dbTestUtils';
 import { expectJSONShape } from '../utils/testUtils';
 
+const barry = {
+    name: 'Barry Allen',
+    email: 'barry@starlabs.com',
+    password: '123456'
+};
+
+const oliver = {
+    name: 'Oliver Queen',
+    email: 'oliver@qc.com',
+    password: '123456'
+};
+
+const createUser = userData => {
+    return request(app)
+        .post('/api/signup')
+        .send(userData)
+        .expect(200);
+};
+
+const createAdminUser = userData => {
+    let userId;
+    return request(app)
+        .post('/api/signup')
+        .send(userData)
+        .expect(200)
+        .then(res => {
+            userId = res.body.payload.user._id;
+        })
+        .then(() => {
+            return request(app)
+                .put(`/api/users/${userId}`)
+                .send({ roles: ['user', 'admin'] })
+                .expect(200);
+        });
+};
+
 describe('User acceptance tests', () => {
     context('has routes to', () => {
         let oliverId;
@@ -13,20 +49,20 @@ describe('User acceptance tests', () => {
             dropCollection(dbConnection, 'avatars');
         });
 
+        it('creates an admin user', () => {
+            return createAdminUser(oliver).then(res => {
+                expectJSONShape(res.body, 'user');
+                expect(res.body.success).to.be.true;
+                expect(res.body.payload.user.roles).to.contain('admin');
+            });
+        });
+
         it('signup a new user', () => {
-            return request(app)
-                .post('/api/signup')
-                .send({
-                    name: 'Oliver Queen',
-                    email: 'oliver@qc.com',
-                    password: '123456'
-                })
-                .expect(200)
-                .then(res => {
-                    expectJSONShape(res.body, 'user');
-                    expect(res.body.success).to.be.true;
-                    oliverId = res.body.payload.user._id;
-                });
+            return createUser(oliver).then(res => {
+                expectJSONShape(res.body, 'user');
+                expect(res.body.success).to.be.true;
+                oliverId = res.body.payload.user._id;
+            });
         });
 
         it('upload custom avatar image for user', () => {
@@ -35,13 +71,14 @@ describe('User acceptance tests', () => {
                 .attach('avatar', `${__dirname}/../../assets/male3.png`)
                 .expect(200)
                 .then(res => {
+                    const { user } = res.body.payload;
                     expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
-                    expect(res.body.payload.user).to.have.property('id');
-                    expect(res.body.payload.user).to.have.property('name');
-                    expect(res.body.payload.user).to.have.property('email');
-                    expect(res.body.payload.user).to.have.property('avatarUrl');
-                    expect(res.body.payload.user.avatarUrl).not.to.contain('default');
+                    expect(user).to.have.property('id');
+                    expect(user).to.have.property('name');
+                    expect(user).to.have.property('email');
+                    expect(user).to.have.property('avatarUrl');
+                    expect(user.avatarUrl).not.to.contain('default');
                 });
         });
 
@@ -50,44 +87,28 @@ describe('User acceptance tests', () => {
                 .get(`/api/users/${oliverId}`)
                 .expect(200)
                 .then(res => {
+                    const { user } = res.body.payload;
                     expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
-                    expect(res.body.payload.user).to.have.property('_id');
-                    expect(res.body.payload.user).to.have.property('name');
-                    expect(res.body.payload.user).to.have.property('email');
-                    expect(res.body.payload.user).to.have.property('avatarUrl');
-                    expect(res.body.payload.user.avatarUrl).not.to.contain('default');
+                    expect(user).to.have.property('_id');
+                    expect(user).to.have.property('name');
+                    expect(user).to.have.property('email');
+                    expect(user).to.have.property('avatarUrl');
+                    expect(user.avatarUrl).not.to.contain('default');
                 });
         });
     });
 
     context('has routes to', () => {
         let barryId, oliverId;
-        const barry = {
-            name: 'Barry Allen',
-            email: 'barry@starlabs.com',
-            password: '123456'
-        };
-
-        const oliver = {
-            name: 'Oliver Queen',
-            email: 'oliver@qc.com',
-            password: '123456'
-        };
 
         before(() => {
-            return request(app)
-                .post('/api/signup')
-                .send(barry)
-                .expect(200)
+            return createUser(barry)
                 .then(res => {
                     barryId = res.body.payload.user._id;
-                    return request(app)
-                        .post('/api/signup')
-                        .send(oliver)
-                        .expect(200);
+                    return createAdminUser(oliver);
                 })
-                .then(res => (oliverId = res.body.payload.user._id));
+                .then(res => (oliverId = res.body.payload.user.id));
         });
 
         after(() => {
@@ -95,14 +116,28 @@ describe('User acceptance tests', () => {
         });
 
         it('get all the users', () => {
+            let token;
             return request(app)
-                .get('/api/users')
+                .post('/api/login')
+                .send({
+                    email: 'oliver@qc.com',
+                    password: '123456'
+                })
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body, 'users');
-                    expect(res.body.success).to.be.true;
-                    expect(res.body.payload.users).to.be.an('Array');
-                    expect(res.body.payload.users.length).to.equal(2);
+                    token = res.body.payload.token;
+                })
+                .then(() => {
+                    return request(app)
+                        .get('/api/users')
+                        .set('x-access-token', token)
+                        .expect(200)
+                        .then(res => {
+                            expectJSONShape(res.body, 'users');
+                            expect(res.body.success).to.be.true;
+                            expect(res.body.payload.users).to.be.an('Array');
+                            expect(res.body.payload.users.length).to.equal(2);
+                        });
                 });
         });
 
