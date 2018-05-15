@@ -16,19 +16,30 @@ const dockerDbUriTest = 'mongodb://mongo/sandboxapi-test';
 //                "sandboxcluster-shard-00-02-ks6uh.mongodb.net:27017/test" + // <-- update db name when new cluster is created.
 //                "?ssl=true&replicaSet=SandboxCluster-shard-0&authSource=admin"
 
-export default {
+const env = process.env.NODE_ENV || 'development';
+
+let baseConfig = {
     version: '0.2.4',
-    development: {
-        port,
-        token_secret,
-        session_secret,
-        baseUrl: 'http://localhost',
-        dbUrl: dockerDbUri
-    },
-    test: {
-        port,
-        token_secret,
-        session_secret,
-        dbUrl: dockerDbUriTest
-    }
+    env,
+    port,
+    token_secret,
+    session_secret,
+    baseUrl: 'http://localhost'
 };
+
+let devConfig = {
+    dbUrl: dockerDbUri
+};
+
+let testConfig = {
+    dbUrl: dockerDbUriTest
+};
+
+let config;
+if (baseConfig.env === 'development') {
+    config = Object.assign(baseConfig, devConfig);
+} else if (baseConfig.env === 'testing') {
+    config = Object.assign(baseConfig, testConfig);
+}
+
+export default config;

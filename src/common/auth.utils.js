@@ -1,8 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-import Config from '../config/config';
-
-const config = Config[process.env.NODE_ENV];
+import config from '../config/config';
 
 export const generateToken = user => {
     if (!user) {
