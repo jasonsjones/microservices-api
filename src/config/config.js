@@ -1,11 +1,11 @@
 import dotenv from 'dotenv';
+import devConfig from './devConfig';
 dotenv.config();
 
 const port = process.env.PORT || 3000;
 const token_secret = process.env.JWT_SECRET;
 const session_secret = process.env.SESSION_SECRET;
 
-const dockerDbUri = 'mongodb://mongo/sandboxapi';
 const dockerDbUriTest = 'mongodb://mongo/sandboxapi-test';
 // const mLabDbUri = `mongodb://${process.env.MLAB_USER}:${process.env.DB_PASSWD}@ds119436.mlab.com:19436/sandboxapi`
 // const mLabDbUriTest = `mongodb://${process.env.MLAB_USER}:${process.env.DB_PASSWD}@ds135966.mlab.com:35966/sandboxapi-test`;
@@ -25,10 +25,6 @@ let baseConfig = {
     token_secret,
     session_secret,
     baseUrl: 'http://localhost'
-};
-
-let devConfig = {
-    dbUrl: dockerDbUri
 };
 
 let testConfig = {
