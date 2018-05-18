@@ -56,7 +56,7 @@ app.use(
 );
 
 app.use((req, res, next) => {
-    if (config.env !== 'testing') {
+    if (config.env !== 'test') {
         log('******************');
         log(`Session ID: ${req.session.id}`);
         log(`user is authenticated: ${req.isAuthenticated()}`);

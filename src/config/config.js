@@ -21,7 +21,7 @@ let configBase = {
 let config;
 if (configBase.env === 'development') {
     config = Object.assign({}, configBase, configDev);
-} else if (configBase.env === 'testing') {
+} else if (configBase.env === 'test') {
     config = Object.assign({}, configBase, configTest);
 } else {
     config = Object.assign({}, configBase);

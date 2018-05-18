@@ -23,7 +23,7 @@ services:
         volumes:
             - .:/home/blacktab
         environment:
-            - NODE_ENV=testing
+            - NODE_ENV=test
             - PORT=3003
             - DEBUG=app,test
         tty: true
