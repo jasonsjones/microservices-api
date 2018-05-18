@@ -7,7 +7,7 @@ import passport from 'passport';
 import cors from 'cors';
 import graphqlHTTP from 'express-graphql';
 
-import Config from './config';
+import config from './config';
 import schema from '../graphql';
 import passportConfig from './passport';
 import AuthRouter from '../common/auth.routes';
@@ -17,9 +17,7 @@ import userRoute from '../user/user.routes';
 import indexRoute from '../index/index.routes';
 
 const log = debug('app');
-const env = process.env.NODE_ENV || 'development';
-log(`Running in ${env} mode`);
-const config = Config[env];
+log(`Running in ${config.env} mode`);
 
 const app = express();
 
@@ -28,7 +26,7 @@ app.use(express.static('public'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-if (env === 'development') {
+if (config.env === 'development') {
     app.use(morgan('dev'));
 }
 app.use(cors());
@@ -58,7 +56,7 @@ app.use(
 );
 
 app.use((req, res, next) => {
-    if (process.env.NODE_ENV !== 'test') {
+    if (config.env !== 'test') {
         log('******************');
         log(`Session ID: ${req.session.id}`);
         log(`user is authenticated: ${req.isAuthenticated()}`);
@@ -73,7 +71,7 @@ userRoute(app);
 indexRoute(app);
 
 app.use((err, req, res, next) => {
-    if (process.env.NODE_ENV === 'development') {
+    if (config.env === 'development') {
         console.error(err);
         res.json({
             message: err.message,
