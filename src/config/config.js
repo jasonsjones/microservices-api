@@ -9,7 +9,7 @@ const token_secret = process.env.JWT_SECRET;
 const session_secret = process.env.SESSION_SECRET;
 
 let configBase = {
-    version: '0.2.4',
+    version: '0.2.5',
     env,
     port,
     token_secret,
