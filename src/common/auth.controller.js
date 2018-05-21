@@ -1,11 +1,8 @@
 import jwt from 'jsonwebtoken';
 
-import Config from '../config/config';
+import config from '../config/config';
 import User from '../user/user.model';
 import * as UserRepository from '../user/user.repository';
-
-const env = process.env.NODE_ENV || /* istanbul ignore next */ 'development';
-const config = Config[env];
 
 export function verifyToken(req) {
     return new Promise((resolve, reject) => {

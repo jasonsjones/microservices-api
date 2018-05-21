@@ -1,6 +1,6 @@
 {
   "name": "microservices-api",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "A sandbox API built on microservices",
   "main": "index.js",
   "nyc": {
@@ -10,7 +10,6 @@
       "src/utils/*.js",
       "src/config",
       "src/graphql",
-      "src/dbSeed.js",
       "src/server.js"
     ],
     "sourceMap": false,
