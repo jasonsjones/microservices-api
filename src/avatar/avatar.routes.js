@@ -15,8 +15,7 @@ export default app => {
             });
     });
 
-    AvatarRouter
-        .route('/:id')
+    AvatarRouter.route('/:id')
         .get((req, res) => {
             AvatarController.getAvatar(req)
                 .then(response => {
