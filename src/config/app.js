@@ -12,7 +12,7 @@ import schema from '../graphql';
 import passportConfig from './passport';
 import AuthRouter from '../common/auth.routes';
 import OauthRouter from '../common/oauth.routes';
-import avatarRoute from '../avatar/avatar.routes';
+import AvatarRouter from '../avatar/avatar.routes';
 import userRoute from '../user/user.routes';
 import indexRoute from '../index/index.routes';
 
@@ -66,7 +66,7 @@ app.use((req, res, next) => {
 
 app.use('/oauth', OauthRouter(passport));
 app.use('/api', AuthRouter(passport));
-avatarRoute(app);
+app.use('/api/avatars', AvatarRouter());
 userRoute(app);
 indexRoute(app);
 

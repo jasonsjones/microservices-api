@@ -1,10 +1,12 @@
+import express from 'express';
 import multer from 'multer';
 import * as AvatarController from './avatar.controller';
 
 export default app => {
+    let AvatarRouter = express.Router();
     const upload = multer({ dest: './uploads/' });
 
-    app.route('/api/avatars').get((req, res) => {
+    AvatarRouter.route('/').get((req, res) => {
         AvatarController.getAvatars()
             .then(response => res.json(response))
             .catch(err => {
@@ -13,8 +15,8 @@ export default app => {
             });
     });
 
-    app
-        .route('/api/avatars/:id')
+    AvatarRouter
+        .route('/:id')
         .get((req, res) => {
             AvatarController.getAvatar(req)
                 .then(response => {
@@ -36,7 +38,7 @@ export default app => {
                 });
         });
 
-    app.route('/api/avatars/default/:index').get((req, res) => {
+    AvatarRouter.route('/default/:index').get((req, res) => {
         AvatarController.getDefaultAvatar(req)
             .then(response => {
                 res.contentType(response.contentType);
@@ -49,7 +51,7 @@ export default app => {
             });
     });
 
-    app.route('/api/avatars/default').post(upload.single('avatar'), (req, res) => {
+    AvatarRouter.route('/default').post(upload.single('avatar'), (req, res) => {
         AvatarController.uploadDefaultAvatar(req)
             .then(response => res.json(response))
             .catch(err => {
@@ -57,4 +59,6 @@ export default app => {
                 res.json(err);
             });
     });
+
+    return AvatarRouter;
 };
