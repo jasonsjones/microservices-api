@@ -13,7 +13,7 @@ import passportConfig from './passport';
 import AuthRouter from '../common/auth.routes';
 import OauthRouter from '../common/oauth.routes';
 import AvatarRouter from '../avatar/avatar.routes';
-import userRoute from '../user/user.routes';
+import UserRouter from '../user/user.routes';
 import indexRoute from '../index/index.routes';
 
 const log = debug('app');
@@ -67,7 +67,7 @@ app.use((req, res, next) => {
 app.use('/oauth', OauthRouter(passport));
 app.use('/api', AuthRouter(passport));
 app.use('/api/avatars', AvatarRouter());
-userRoute(app);
+app.use('/api/users', UserRouter());
 indexRoute(app);
 
 app.use((err, req, res, next) => {

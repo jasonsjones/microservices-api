@@ -1,12 +1,14 @@
+import express from 'express';
 import multer from 'multer';
 import * as UserController from './user.controller';
 import * as AuthController from '../common/auth.controller';
 
 export default app => {
+    let UserRouter = express.Router();
     const upload = multer({ dest: './uploads/' });
 
-    app.get(
-        '/api/users',
+    UserRouter.get(
+        '/',
         (req, res, next) => {
             AuthController.verifyToken(req)
                 .then(response => {
@@ -27,7 +29,7 @@ export default app => {
         }
     );
 
-    app.get('/api/users/:id', (req, res) => {
+    UserRouter.get('/:id', (req, res) => {
         UserController.getUser(req)
             .then(response => res.json(response))
             .catch(err => {
@@ -36,7 +38,7 @@ export default app => {
             });
     });
 
-    app.put('/api/users/:id', (req, res) => {
+    UserRouter.put('/:id', (req, res) => {
         UserController.updateUser(req)
             .then(response => res.json(response))
             .catch(err => {
@@ -45,7 +47,7 @@ export default app => {
             });
     });
 
-    app.delete('/api/users/:id', (req, res) => {
+    UserRouter.delete('/:id', (req, res) => {
         UserController.deleteUser(req)
             .then(response => res.json(response))
             .catch(err => {
@@ -54,7 +56,7 @@ export default app => {
             });
     });
 
-    app.get('/api/unlinksfdc', (req, res) => {
+    UserRouter.get('/unlinksfdc', (req, res) => {
         UserController.unlinkSFDCAccount(req)
             .then(response => res.json(response))
             .catch(err => {
@@ -63,7 +65,7 @@ export default app => {
             });
     });
 
-    app.post('/api/signup', (req, res) => {
+    UserRouter.post('/signup', (req, res) => {
         UserController.signupUser(req)
             .then(response => res.json(response))
             .catch(err => {
@@ -72,8 +74,8 @@ export default app => {
             });
     });
 
-    app.post(
-        '/api/users/:id/avatar',
+    UserRouter.post(
+        '/:id/avatar',
         //   AuthController.verifyToken,
         //   AuthController.protectRouteByUser,
         upload.single('avatar'),
@@ -88,7 +90,7 @@ export default app => {
         }
     );
 
-    app.post('/api/users/changepassword', (req, res) => {
+    UserRouter.post('/changepassword', (req, res) => {
         UserController.changePassword(req)
             .then(response => res.json(response))
             .catch(err => {
@@ -96,4 +98,6 @@ export default app => {
                 res.json(err);
             });
     });
+
+    return UserRouter;
 };
