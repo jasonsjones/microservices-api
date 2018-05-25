@@ -7,8 +7,7 @@ export default app => {
     let UserRouter = express.Router();
     const upload = multer({ dest: './uploads/' });
 
-    UserRouter.get(
-        '/',
+    UserRouter.route('/').get(
         (req, res, next) => {
             AuthController.verifyToken(req)
                 .then(response => {
@@ -29,32 +28,31 @@ export default app => {
         }
     );
 
-    UserRouter.get('/:id', (req, res) => {
-        UserController.getUser(req)
-            .then(response => res.json(response))
-            .catch(err => {
-                res.status(500);
-                res.json(err);
-            });
-    });
-
-    UserRouter.put('/:id', (req, res) => {
-        UserController.updateUser(req)
-            .then(response => res.json(response))
-            .catch(err => {
-                res.status(500);
-                res.json(err);
-            });
-    });
-
-    UserRouter.delete('/:id', (req, res) => {
-        UserController.deleteUser(req)
-            .then(response => res.json(response))
-            .catch(err => {
-                res.status(500);
-                res.json(err);
-            });
-    });
+    UserRouter.route('/:id')
+        .get((req, res) => {
+            UserController.getUser(req)
+                .then(response => res.json(response))
+                .catch(err => {
+                    res.status(500);
+                    res.json(err);
+                });
+        })
+        .put((req, res) => {
+            UserController.updateUser(req)
+                .then(response => res.json(response))
+                .catch(err => {
+                    res.status(500);
+                    res.json(err);
+                });
+        })
+        .delete((req, res) => {
+            UserController.deleteUser(req)
+                .then(response => res.json(response))
+                .catch(err => {
+                    res.status(500);
+                    res.json(err);
+                });
+        });
 
     UserRouter.get('/unlinksfdc', (req, res) => {
         UserController.unlinkSFDCAccount(req)
