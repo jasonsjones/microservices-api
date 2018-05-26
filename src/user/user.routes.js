@@ -3,7 +3,7 @@ import multer from 'multer';
 import * as UserController from './user.controller';
 import * as AuthController from '../common/auth.controller';
 
-export default app => {
+export default () => {
     let UserRouter = express.Router();
     const upload = multer({ dest: './uploads/' });
 
