@@ -1,4 +1,5 @@
 import graphqlHTTP from 'express-graphql';
+import debug from 'debug';
 import schema from '../graphql';
 import config from './config';
 import AuthRouter from '../common/auth.routes';
@@ -6,6 +7,8 @@ import OauthRouter from '../common/oauth.routes';
 import AvatarRouter from '../avatar/avatar.routes';
 import UserRouter from '../user/user.routes';
 import indexRoute from '../index/index.routes';
+
+const log = debug('app');
 
 export default (app, passport) => {
     app.use((req, res, next) => {
