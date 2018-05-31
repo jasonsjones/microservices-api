@@ -3,13 +3,14 @@ import configDev from './configDev';
 import configTest from './configTest';
 dotenv.config();
 
+const version = '0.2.6';
 const env = process.env.NODE_ENV || 'development';
 const port = process.env.PORT || 3000;
 const token_secret = process.env.JWT_SECRET;
 const session_secret = process.env.SESSION_SECRET;
 
 let configBase = {
-    version: '0.2.5',
+    version,
     env,
     port,
     token_secret,

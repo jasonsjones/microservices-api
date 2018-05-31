@@ -1,11 +1,10 @@
 import debug from 'debug';
 import app from '../config/app';
-import Config from '../config/config';
+import config from '../config/config';
 import db from '../config/db';
 import { seedData } from './dbSeedUtils';
 
 const env = process.env.NODE_ENV || 'development';
-const config = Config[env];
 
 const log = debug('db:seed');
 const dbConn = db(config);

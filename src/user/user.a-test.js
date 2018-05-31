@@ -19,7 +19,7 @@ const oliver = {
 
 const createUser = userData => {
     return request(app)
-        .post('/api/signup')
+        .post('/api/users/signup')
         .send(userData)
         .expect(200);
 };
@@ -27,7 +27,7 @@ const createUser = userData => {
 const createAdminUser = userData => {
     let userId;
     return request(app)
-        .post('/api/signup')
+        .post('/api/users/signup')
         .send(userData)
         .expect(200)
         .then(res => {
@@ -182,7 +182,7 @@ describe('User acceptance tests', () => {
 
         before(() => {
             return request(app)
-                .post('/api/signup')
+                .post('/api/users/signup')
                 .send(barry)
                 .expect(200)
                 .then(res => {
@@ -226,7 +226,7 @@ describe('User acceptance tests', () => {
 
         before(() => {
             return request(app)
-                .post('/api/signup')
+                .post('/api/users/signup')
                 .send(barry)
                 .expect(200)
                 .then(res => {
@@ -271,7 +271,7 @@ describe('User acceptance tests', () => {
 
         before(() => {
             return request(app)
-                .post('/api/signup')
+                .post('/api/users/signup')
                 .send(barry)
                 .expect(200);
         });

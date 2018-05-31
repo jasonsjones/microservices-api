@@ -79,7 +79,7 @@ describe('Avatar acceptence tests', () => {
             dropCollection(dbConnection, 'users');
 
             return request(app)
-                .post('/api/signup')
+                .post('/api/users/signup')
                 .send({
                     name: 'Oliver Queen',
                     email: 'oliver@qc.com',

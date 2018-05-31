@@ -1,10 +1,9 @@
 import debug from 'debug';
 import fetch from 'node-fetch';
 import request from 'supertest';
-import Config from '../config/config';
+import config from '../config/config';
 
 const env = process.env.NODE_ENV || 'development';
-const config = Config[env];
 
 const log = debug('db:seed');
 
