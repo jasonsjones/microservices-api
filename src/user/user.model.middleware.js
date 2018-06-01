@@ -15,6 +15,7 @@ export function hashPassword(next) {
                 return next(err);
             }
             user.password = hash;
+            user.passwordLastUpdatedAt = Date.now();
             next(null, user);
         });
     });

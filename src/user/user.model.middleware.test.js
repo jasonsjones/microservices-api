@@ -106,13 +106,14 @@ describe('User model middleware', () => {
 
     describe('hashPassword()', () => {
         const ORIG_PWD = 'arrow';
-        let user;
+        let user, hashPasswordFn;
         beforeEach(() => {
             user = new User({
                 name: 'Oliver Queen',
                 email: 'oliver@qc.com',
                 password: ORIG_PWD
             });
+            hashPasswordFn = Middleware.hashPassword.bind(user);
         });
 
         afterEach(() => {
@@ -120,25 +121,29 @@ describe('User model middleware', () => {
         });
 
         it('hashes the password to save in db', done => {
-            // need to bind the middleware function to the user to ensure the
-            // proper 'this' context from within the function
-            Middleware.hashPassword.bind(user, function(err, hashedUser) {
+            hashPasswordFn((err, hashedUser) => {
                 expect(hashedUser.password).to.not.equal(ORIG_PWD);
                 expect(hashedUser.password.startsWith('$2a$')).to.be.true;
                 done();
-            })();
+            });
+        });
+
+        it('sets the passwordLastUpdatedAt property when the password is hashed', done => {
+            hashPasswordFn((err, hashedUser) => {
+                expect(hashedUser.passwordLastUpdatedAt).to.exist;
+                expect(hashedUser.passwordLastUpdatedAt).to.be.a('Date');
+                done();
+            });
         });
 
         it('does not hash the password if it has not changed', done => {
             user.isModified = () => false;
 
-            // need to bind the middleware function to the user to ensure the
-            // proper 'this' context from within the function
-            Middleware.hashPassword.bind(user, function(err, hashedUser) {
+            hashPasswordFn((err, hashedUser) => {
                 expect(err).to.not.exist;
                 expect(hashedUser).to.not.exist;
                 done();
-            })();
+            });
         });
 
         it('invokes the callback with an error if there was a problem with bcrypt salt', done => {
@@ -147,14 +152,12 @@ describe('User model middleware', () => {
             const bcryptStub = sinon.stub(bcrypt, 'genSalt');
             bcryptStub.yields(new Error('Oops, something went wrong with the salt...'));
 
-            // need to bind the middleware function to the user to ensure the
-            // proper 'this' context from within the function
-            Middleware.hashPassword.bind(user, function(err, hashedUser) {
+            hashPasswordFn((err, hashedUser) => {
                 expect(err).to.exist;
                 expect(hashedUser).to.not.exist;
                 bcryptStub.restore();
                 done();
-            })();
+            });
         });
 
         it('invokes the callback with an error if there was a problem with bcrypt hash', done => {
@@ -163,14 +166,12 @@ describe('User model middleware', () => {
             const bcryptStub = sinon.stub(bcrypt, 'hash');
             bcryptStub.yields(new Error('Oops, something went wrong with the hash...'));
 
-            // need to bind the middleware function to the user to ensure the
-            // proper 'this' context from within the function
-            Middleware.hashPassword.bind(user, function(err, hashedUser) {
+            hashPasswordFn((err, hashedUser) => {
                 expect(err).to.exist;
                 expect(hashedUser).to.not.exist;
                 bcryptStub.restore();
                 done();
-            })();
+            });
         });
     });
 
