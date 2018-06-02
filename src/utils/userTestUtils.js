@@ -9,7 +9,7 @@ export const mockUsersWithAvatar = [
         passwordLastUpdatedAt: '2018-01-21T16:24:16.413Z',
         __v: 0,
         avatar: {
-            _id: '5a145330e6d09600aff70ef9',
+            _id: '59e4062a4c3bc800574e895f',
             updatedAt: '2017-11-21T16:24:16.403Z',
             createdAt: '2017-11-21T16:24:16.403Z',
             user: '59c44d83f2943200228467b3',
@@ -65,7 +65,7 @@ export const mockUsers = [
         email: 'roy@qc.com',
         password: '$2a$12$DyizVZatjn.zMHeOhQI5nuIX64417O2zuRKXe/Ae0f06bLupmZ/d6',
         passwordLastUpdatedAt: '2018-01-21T16:24:16.413Z',
-        avatar: '5a145330e6d09600aff70ef9',
+        avatar: '59e4062a4c3bc800574e895f',
         avatarUrl: 'http://localhost:3000/api/avatar/5a145330e6d09600aff70ef9',
         roles: ['user']
     },
