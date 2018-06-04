@@ -9,5 +9,6 @@ const dockerDbUriTest = 'mongodb://mongo/sandboxapi-test';
 //                "?ssl=true&replicaSet=SandboxCluster-shard-0&authSource=admin"
 
 export default {
+    logging: false,
     dbUrl: dockerDbUriTest
 };

@@ -12,7 +12,7 @@ const log = debug('app');
 
 export default (app, passport) => {
     app.use((req, res, next) => {
-        if (config.env !== 'test') {
+        if (config.logging) {
             log('******************');
             log(`Session ID: ${req.session.id}`);
             log(`user is authenticated: ${req.isAuthenticated()}`);
