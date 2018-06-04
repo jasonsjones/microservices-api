@@ -5,44 +5,7 @@ import 'sinon-mongoose';
 
 import Avatar from './avatar.model';
 import * as AvatarRepository from './avatar.repository';
-
-const mockAvatars = [
-    {
-        _id: '59c44d83f2943200228467b0',
-        contentType: 'image/png',
-        fileSize: 5012,
-        defaultImg: true,
-        user: undefined
-    },
-    {
-        _id: '59c44d85f2943200228467b4',
-        contentType: 'image/png',
-        fileSize: 62079,
-        defaultImg: false,
-        user: '59c44d83f2943200228467b1'
-    },
-    {
-        _id: '59c44d9d0e584d00425c1722',
-        contentType: 'image/png',
-        fileSize: 71955,
-        defaultImg: false,
-        user: '59c44d83f2943200228467b2'
-    },
-    {
-        _id: '59c44dc50e584d00425c1723',
-        contentType: 'image/png',
-        fileSize: 138317,
-        defaultImg: false,
-        user: '59c44d83f2943200228467b3'
-    },
-    {
-        _id: '59e4062a4c3bc800574e895f',
-        contentType: 'image/png',
-        fileSize: 117632,
-        defaultImg: false,
-        user: '59c6c317f9760b01a35c63b1'
-    }
-];
+import { mockAvatars } from '../utils/avatarTestUtils';
 
 describe('Avatar Repository', () => {
     let AvatarMock;
@@ -63,7 +26,7 @@ describe('Avatar Repository', () => {
 
             return promise.then(avatars => {
                 expect(avatars).to.be.an('array');
-                expect(avatars.length).to.equal(5);
+                expect(avatars.length).to.equal(3);
             });
         });
 
@@ -108,10 +71,10 @@ describe('Avatar Repository', () => {
         it('with avatar id rejects with error if something goes wrong with the lookup', () => {
             AvatarMock = sinon.mock(Avatar);
             AvatarMock.expects('findById')
-                .withArgs(mockAvatars[3]._id)
+                .withArgs(mockAvatars[1]._id)
                 .chain('exec')
                 .rejects(new Error('Oops, something went wrong getting image'));
-            const promise = AvatarRepository.getAvatar(mockAvatars[3]._id);
+            const promise = AvatarRepository.getAvatar(mockAvatars[1]._id);
             expect(promise).to.be.a('Promise');
             return promise.catch(err => {
                 expect(err).to.exist;
@@ -200,10 +163,10 @@ describe('Avatar Repository', () => {
         it('with avatar id rejects with error if something goes wrong with the lookup', () => {
             AvatarMock = sinon.mock(Avatar);
             AvatarMock.expects('findById')
-                .withArgs(mockAvatars[3]._id)
+                .withArgs(mockAvatars[2]._id)
                 .chain('exec')
                 .rejects(new Error('Oops, something went wrong getting image'));
-            const promise = AvatarRepository.deleteAvatar(mockAvatars[3]._id);
+            const promise = AvatarRepository.deleteAvatar(mockAvatars[2]._id);
             expect(promise).to.be.a('Promise');
             return promise.catch(err => {
                 expect(err).to.exist;
@@ -213,15 +176,15 @@ describe('Avatar Repository', () => {
 
         it('with avatar id resolves with avatar.remove()', () => {
             const stub = sinon.stub(Avatar.prototype, 'remove');
-            stub.resolves(new Avatar(mockAvatars[3]));
+            stub.resolves(new Avatar(mockAvatars[2]));
 
             AvatarMock = sinon.mock(Avatar);
             AvatarMock.expects('findById')
-                .withArgs(mockAvatars[3]._id)
+                .withArgs(mockAvatars[2]._id)
                 .chain('exec')
                 .resolves(stub());
 
-            const promise = AvatarRepository.deleteAvatar(mockAvatars[3]._id);
+            const promise = AvatarRepository.deleteAvatar(mockAvatars[2]._id);
             expect(promise).to.be.a('Promise');
             return promise.then(avatar => {
                 expect(avatar).to.be.an('object');
