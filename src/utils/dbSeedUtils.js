@@ -51,7 +51,7 @@ const seedAvatarImage = imgPath => {
 };
 
 const seedUser = userData => {
-    return fetch(`${baseUrl}/api/signup`, {
+    return fetch(`${baseUrl}/api/users/signup`, {
         method: 'POST',
         body: JSON.stringify(userData),
         headers: {
