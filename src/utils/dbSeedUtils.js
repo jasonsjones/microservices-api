@@ -1,6 +1,7 @@
 import debug from 'debug';
 import fetch from 'node-fetch';
 import request from 'supertest';
+import User from '../user/user.model';
 import config from '../config/config';
 
 const env = process.env.NODE_ENV || 'development';
@@ -92,8 +93,23 @@ const seedDefaultUserAPI = () => {
     });
 };
 
+const seedDefaultUserDb = () => {
+    return User.find()
+        .exec()
+        .then(doc => {
+            if (doc.length === 0) {
+                log('adding user...');
+                // only seed oliver for now...
+                return seedUser(initialUsers[0]);
+            } else {
+                log('user(s) already in db...');
+                return Promise.resolve();
+            }
+        });
+};
+
 export const seedData = () => {
-    const userPromise = seedDefaultUserAPI();
+    const userPromise = seedDefaultUserDb();
     const avatarPromise = seedDefaultAvatarAPI();
     return Promise.all([userPromise, avatarPromise]);
 };
