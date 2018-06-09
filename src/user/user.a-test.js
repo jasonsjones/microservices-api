@@ -280,7 +280,7 @@ describe('User acceptance tests', () => {
             dropCollection(dbConnection, 'users');
         });
 
-        it("change a user's  password", () => {
+        it("change a user's password", () => {
             const payload = {
                 email: barry.email,
                 currentPassword: barry.password,
