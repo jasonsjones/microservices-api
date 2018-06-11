@@ -103,7 +103,7 @@ const seedDefaultUserDb = () => {
                 return seedUser(initialUsers[0]);
             } else {
                 log('user(s) already in db...');
-                return Promise.resolve();
+                return Promise.resolve('users not required');
             }
         });
 };
