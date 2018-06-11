@@ -26,12 +26,13 @@ services:
             - NODE_ENV=test
             - PORT=3003
             - DEBUG=app,test
+            - RUNNING_IN_DOCKER=true
         tty: true
         ports:
             - "3003:3003"
         depends_on:
             - mongo
-        command: ["yarn", "_test:acceptance"]
+        command: ["yarn", "test:acceptance"]
 
     mongo:
         container_name: database

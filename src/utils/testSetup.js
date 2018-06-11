@@ -1,5 +1,4 @@
 import debug from 'debug';
-const log = debug('test');
-process.env.NODE_ENV = 'test';
+import { setupEnv } from './testUtils';
 
-log(`*** Running in ${process.env.NODE_ENV} mode`);
+setupEnv();
