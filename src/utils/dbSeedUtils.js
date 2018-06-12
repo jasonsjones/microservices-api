@@ -1,10 +1,8 @@
 import debug from 'debug';
 import fetch from 'node-fetch';
 import request from 'supertest';
-import User from '../user/user.model';
+import { getUsers } from '../user/user.repository';
 import config from '../config/config';
-
-const env = process.env.NODE_ENV || 'development';
 
 const log = debug('db:seed');
 
@@ -94,18 +92,16 @@ const seedDefaultUserAPI = () => {
 };
 
 const seedDefaultUserDb = () => {
-    return User.find()
-        .exec()
-        .then(doc => {
-            if (doc.length === 0) {
-                log('adding user...');
-                // only seed oliver for now...
-                return seedUser(initialUsers[0]);
-            } else {
-                log('user(s) already in db...');
-                return Promise.resolve('users not required');
-            }
-        });
+    return getUsers().then(users => {
+        if (users.length === 0) {
+            log('adding user...');
+            // only seed oliver for now...
+            return seedUser(initialUsers[0]);
+        } else {
+            log('user(s) already in db...');
+            return Promise.resolve('users not required');
+        }
+    });
 };
 
 export const seedData = () => {
