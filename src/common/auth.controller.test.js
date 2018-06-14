@@ -446,6 +446,30 @@ describe('Auth controller', () => {
             });
         });
 
+        it('updates req.user with the newly fetched logged in user', () => {
+            req.headers = {
+                'x-access-token': 'thisisa.simulated.tokenvalue'
+            };
+
+            const userRepoStub = sinon
+                .stub(UserRepository, 'getUser')
+                .resolves(new User(mockUsers[0]));
+
+            const jwtStub = sinon.stub(jwt, 'verify').returns(expected);
+
+            expect(req.user).to.not.exist;
+            let promise = Controller.getUpdatedLoggedInUser(req);
+            expect(promise).to.be.a('Promise');
+            return promise.then(response => {
+                expect(response).to.have.property('success');
+                expect(response.success).to.be.true;
+                expect(req.user).to.exist;
+                expect(req.user).to.be.an('Object');
+                userRepoStub.restore();
+                jwtStub.restore();
+            });
+        });
+
         it('resolves with success false if user is not found', () => {
             req.headers = {
                 'x-access-token': 'thisisa.simulated.tokenvalue'
