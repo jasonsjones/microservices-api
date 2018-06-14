@@ -256,7 +256,7 @@ describe('Auth controller', () => {
                 headers: {}
             };
             let promise = Controller.protectAdminRoute(req);
-            expect(promise).to.be.a('promise');
+            expect(promise).to.be.a('Promise');
             return promise.catch(err => {
                 expectError(err);
             });
@@ -275,7 +275,7 @@ describe('Auth controller', () => {
             jwtStub.throws({ name: 'JsonWebTokenError', message: 'jwt malformed' });
 
             let promise = Controller.protectAdminRoute(req);
-            expect(promise).to.be.a('promise');
+            expect(promise).to.be.a('Promise');
             return promise.catch(err => {
                 expectError(err);
                 jwtStub.restore();
@@ -305,6 +305,7 @@ describe('Auth controller', () => {
             jwtStub.returns(expected);
 
             let promise = Controller.protectAdminRoute(req);
+            expect(promise).to.be.a('Promise');
             return promise.then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
@@ -337,6 +338,7 @@ describe('Auth controller', () => {
             jwtStub.returns(expected);
 
             let promise = Controller.protectAdminRoute(req);
+            expect(promise).to.be.a('Promise');
             return promise.then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
@@ -369,7 +371,7 @@ describe('Auth controller', () => {
             jwtStub.returns(expected);
 
             let promise = Controller.protectAdminRoute(req);
-            expect(promise).to.be.a('promise');
+            expect(promise).to.be.a('Promise');
             return promise.catch(err => {
                 expectError(err);
                 expect(err.message).to.contain('Ooops, something went wrong getting the user');
@@ -398,7 +400,7 @@ describe('Auth controller', () => {
 
         it('rejects if the token is not provided', () => {
             let promise = Controller.getUpdatedLoggedInUser(req);
-            expect(promise).to.be.a('promise');
+            expect(promise).to.be.a('Promise');
             return promise.catch(err => {
                 expectError(err);
             });
@@ -414,7 +416,7 @@ describe('Auth controller', () => {
                 .throws({ name: 'JsonWebTokenError', message: 'jwt malformed' });
 
             let promise = Controller.getUpdatedLoggedInUser(req);
-            expect(promise).to.be.a('promise');
+            expect(promise).to.be.a('Promise');
             return promise.catch(err => {
                 expectError(err);
                 jwtStub.restore();
@@ -433,6 +435,7 @@ describe('Auth controller', () => {
             const jwtStub = sinon.stub(jwt, 'verify').returns(expected);
 
             let promise = Controller.getUpdatedLoggedInUser(req);
+            expect(promise).to.be.a('Promise');
             return promise.then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
@@ -453,6 +456,7 @@ describe('Auth controller', () => {
             const jwtStub = sinon.stub(jwt, 'verify').returns(expected);
 
             let promise = Controller.getUpdatedLoggedInUser(req);
+            expect(promise).to.be.a('Promise');
             return promise.then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
@@ -474,6 +478,7 @@ describe('Auth controller', () => {
             const jwtStub = sinon.stub(jwt, 'verify').returns(expected);
 
             let promise = Controller.getUpdatedLoggedInUser(req);
+            expect(promise).to.be.a('Promise');
             return promise.catch(err => {
                 expectError(err);
                 userRepoStub.restore();
