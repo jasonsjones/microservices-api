@@ -109,7 +109,7 @@ export const protectAdminRoute = req => {
         });
 };
 
-export const getUpdatedUser = req => {
+export const getUpdatedLoggedInUser = req => {
     return verifyToken(req)
         .then(decoded => {
             return UserRepository.getUser(decoded.sub).then(user => {

@@ -379,7 +379,7 @@ describe('Auth controller', () => {
         });
     });
 
-    describe('getUpdatedUser()', () => {
+    describe('getUpdatedLoggedInUser()', () => {
         let req;
         beforeEach(() => {
             req = {
@@ -390,7 +390,7 @@ describe('Auth controller', () => {
         });
 
         it('rejects if the token is not provided', () => {
-            let promise = Controller.getUpdatedUser(req);
+            let promise = Controller.getUpdatedLoggedInUser(req);
             expect(promise).to.be.a('promise');
             return promise.catch(err => {
                 expectError(err);
@@ -406,7 +406,7 @@ describe('Auth controller', () => {
                 .stub(jwt, 'verify')
                 .throws({ name: 'JsonWebTokenError', message: 'jwt malformed' });
 
-            let promise = Controller.getUpdatedUser(req);
+            let promise = Controller.getUpdatedLoggedInUser(req);
             expect(promise).to.be.a('promise');
             return promise.catch(err => {
                 expectError(err);
@@ -432,7 +432,7 @@ describe('Auth controller', () => {
 
             const jwtStub = sinon.stub(jwt, 'verify').returns(expected);
 
-            let promise = Controller.getUpdatedUser(req);
+            let promise = Controller.getUpdatedLoggedInUser(req);
             return promise.then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
@@ -459,7 +459,7 @@ describe('Auth controller', () => {
 
             const jwtStub = sinon.stub(jwt, 'verify').returns(expected);
 
-            let promise = Controller.getUpdatedUser(req);
+            let promise = Controller.getUpdatedLoggedInUser(req);
             return promise.then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
@@ -487,7 +487,7 @@ describe('Auth controller', () => {
 
             const jwtStub = sinon.stub(jwt, 'verify').returns(expected);
 
-            let promise = Controller.getUpdatedUser(req);
+            let promise = Controller.getUpdatedLoggedInUser(req);
             return promise.catch(err => {
                 expectError(err);
                 userRepoStub.restore();
