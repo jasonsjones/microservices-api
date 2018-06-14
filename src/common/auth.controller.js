@@ -108,3 +108,33 @@ export const protectAdminRoute = req => {
             });
         });
 };
+
+export const getUpdatedUser = req => {
+    return verifyToken(req)
+        .then(decoded => {
+            return UserRepository.getUser(decoded.sub).then(user => {
+                if (user._id) {
+                    req.user = user;
+                    return Promise.resolve({
+                        success: true,
+                        message: 'updating user',
+                        payload: {
+                            user
+                        }
+                    });
+                } else {
+                    return Promise.resolve({
+                        success: false,
+                        message: 'user not found'
+                    });
+                }
+            });
+        })
+        .catch(err => {
+            return Promise.reject({
+                success: false,
+                message: err.message,
+                error: err
+            });
+        });
+};

@@ -97,7 +97,7 @@ describe('Auth controller', () => {
             UserMock.restore();
         });
 
-        it('resolve to true if the user is an admin', () => {
+        it('resolves to true if the user is an admin', () => {
             const req = {
                 decoded: {
                     sub: '59c44d83f2943200228467b1',
@@ -122,7 +122,7 @@ describe('Auth controller', () => {
             });
         });
 
-        it('resolve to false if the user is an admin', () => {
+        it('resolves to false if the user is an admin', () => {
             const req = {
                 decoded: {
                     sub: '59c44d83f2943200228467b3',
@@ -373,6 +373,123 @@ describe('Auth controller', () => {
             return promise.catch(err => {
                 expectError(err);
                 expect(err.message).to.contain('Ooops, something went wrong getting the user');
+                userRepoStub.restore();
+                jwtStub.restore();
+            });
+        });
+    });
+
+    describe('getUpdatedUser()', () => {
+        let req;
+        beforeEach(() => {
+            req = {
+                query: {},
+                body: {},
+                headers: {}
+            };
+        });
+
+        it('rejects if the token is not provided', () => {
+            let promise = Controller.getUpdatedUser(req);
+            expect(promise).to.be.a('promise');
+            return promise.catch(err => {
+                expectError(err);
+            });
+        });
+
+        it('rejects if the token had not be verified or decoded', () => {
+            req.headers = {
+                'x-access-token': 'thisisa.simulated.tokenvalue'
+            };
+
+            const jwtStub = sinon
+                .stub(jwt, 'verify')
+                .throws({ name: 'JsonWebTokenError', message: 'jwt malformed' });
+
+            let promise = Controller.getUpdatedUser(req);
+            expect(promise).to.be.a('promise');
+            return promise.catch(err => {
+                expectError(err);
+                jwtStub.restore();
+            });
+        });
+
+        it('resolves with the logged in user given a valid token', () => {
+            const expected = {
+                sub: '59c44d83f2943200228467b3',
+                email: 'roy@qc.com',
+                iat: '1513453484',
+                exp: '1513453484'
+            };
+
+            req.headers = {
+                'x-access-token': 'thisisa.simulated.tokenvalue'
+            };
+
+            const userRepoStub = sinon
+                .stub(UserRepository, 'getUser')
+                .resolves(new User(mockUsers[0]));
+
+            const jwtStub = sinon.stub(jwt, 'verify').returns(expected);
+
+            let promise = Controller.getUpdatedUser(req);
+            return promise.then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response).to.have.property('payload');
+                expect(response.payload).to.have.property('user');
+                userRepoStub.restore();
+                jwtStub.restore();
+            });
+        });
+
+        it('resolves with success false if user is not found', () => {
+            const expected = {
+                sub: '59c44d83f2943200228467b3',
+                email: 'roy@qc.com',
+                iat: '1513453484',
+                exp: '1513453484'
+            };
+
+            req.headers = {
+                'x-access-token': 'thisisa.simulated.tokenvalue'
+            };
+
+            const userRepoStub = sinon.stub(UserRepository, 'getUser').resolves({});
+
+            const jwtStub = sinon.stub(jwt, 'verify').returns(expected);
+
+            let promise = Controller.getUpdatedUser(req);
+            return promise.then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response.success).to.be.false;
+                userRepoStub.restore();
+                jwtStub.restore();
+            });
+        });
+
+        it('rejects if there is an error getting the current user', () => {
+            const expected = {
+                sub: '59c44d83f2943200228467b3',
+                email: 'roy@qc.com',
+                iat: '1513453484',
+                exp: '1513453484'
+            };
+
+            req.headers = {
+                'x-access-token': 'thisisa.simulated.tokenvalue'
+            };
+
+            const userRepoStub = sinon
+                .stub(UserRepository, 'getUser')
+                .rejects(new Error('Ooopss...something went wrong :-('));
+
+            const jwtStub = sinon.stub(jwt, 'verify').returns(expected);
+
+            let promise = Controller.getUpdatedUser(req);
+            return promise.catch(err => {
+                expectError(err);
                 userRepoStub.restore();
                 jwtStub.restore();
             });
