@@ -380,12 +380,19 @@ describe('Auth controller', () => {
     });
 
     describe('getUpdatedLoggedInUser()', () => {
-        let req;
+        let req, expected;
         beforeEach(() => {
             req = {
                 query: {},
                 body: {},
                 headers: {}
+            };
+
+            expected = {
+                sub: '59c44d83f2943200228467b3',
+                email: 'roy@qc.com',
+                iat: '1513453484',
+                exp: '1513453484'
             };
         });
 
@@ -415,13 +422,6 @@ describe('Auth controller', () => {
         });
 
         it('resolves with the logged in user given a valid token', () => {
-            const expected = {
-                sub: '59c44d83f2943200228467b3',
-                email: 'roy@qc.com',
-                iat: '1513453484',
-                exp: '1513453484'
-            };
-
             req.headers = {
                 'x-access-token': 'thisisa.simulated.tokenvalue'
             };
@@ -444,13 +444,6 @@ describe('Auth controller', () => {
         });
 
         it('resolves with success false if user is not found', () => {
-            const expected = {
-                sub: '59c44d83f2943200228467b3',
-                email: 'roy@qc.com',
-                iat: '1513453484',
-                exp: '1513453484'
-            };
-
             req.headers = {
                 'x-access-token': 'thisisa.simulated.tokenvalue'
             };
@@ -470,13 +463,6 @@ describe('Auth controller', () => {
         });
 
         it('rejects if there is an error getting the current user', () => {
-            const expected = {
-                sub: '59c44d83f2943200228467b3',
-                email: 'roy@qc.com',
-                iat: '1513453484',
-                exp: '1513453484'
-            };
-
             req.headers = {
                 'x-access-token': 'thisisa.simulated.tokenvalue'
             };
