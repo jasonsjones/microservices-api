@@ -50,7 +50,7 @@ describe('User acceptance tests', () => {
         });
 
         it('creates an admin user', () => {
-            return createAdminUser(oliver).then(res => {
+            return createAdminUser(barry).then(res => {
                 expectJSONShape(res.body, 'user');
                 expect(res.body.success).to.be.true;
                 expect(res.body.payload.user.roles).to.contain('admin');
@@ -138,6 +138,32 @@ describe('User acceptance tests', () => {
                             expect(res.body.payload.users).to.be.an('Array');
                             expect(res.body.payload.users.length).to.equal(2);
                         });
+                });
+        });
+
+        it('get me', () => {
+            let token;
+            return request(app)
+                .post('/api/login')
+                .send({
+                    email: 'oliver@qc.com',
+                    password: '123456'
+                })
+                .expect(200)
+                .then(res => {
+                    token = res.body.payload.token;
+                })
+                .then(() => {
+                    return request(app)
+                        .get('/api/users/get/me')
+                        .set('x-access-token', token)
+                        .expect(200)
+                        .then(res => {
+                            // expectJSONShape(res.body, 'user');
+                            expect(res.body.success).to.be.true;
+                            expect(res.body.payload.user.email).to.eql(oliver.email);
+                        })
+                        .catch(err => console.log(err));
                 });
         });
 

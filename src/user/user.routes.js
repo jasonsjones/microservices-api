@@ -62,6 +62,29 @@ export default () => {
             .catch(handleError(res));
     });
 
+    UserRouter.get(
+        '/get/me',
+        (req, res, next) => {
+            AuthController.getUpdatedLoggedInUser(req)
+                .then(response => {
+                    if (response.success) {
+                        next();
+                    } else {
+                        next(response);
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                    next(err);
+                });
+        },
+        (req, res) => {
+            UserController.getMe(req)
+                .then(handleSuccess(res))
+                .catch(handleError(res));
+        }
+    );
+
     // TODO: add middleware to protect the route
     // AuthController.verifyToken,
     // AuthController.protectRouteByUser,
