@@ -21,7 +21,12 @@ const createUser = userData => {
     return request(app)
         .post('/api/users/signup')
         .send(userData)
-        .expect(200);
+        .expect(200)
+        .then(res => {
+            if (res.body.success) {
+                return Promise.resolve(res.body.payload.user);
+            }
+        });
 };
 
 const createAdminUser = userData => {
@@ -38,6 +43,11 @@ const createAdminUser = userData => {
                 .put(`/api/users/${userId}`)
                 .send({ roles: ['user', 'admin'] })
                 .expect(200);
+        })
+        .then(res => {
+            if (res.body.success) {
+                return Promise.resolve(res.body.payload.user);
+            }
         });
 };
 
@@ -73,35 +83,40 @@ const loginUser = userCreds => {
         });
 };
 
-describe.only('User acceptance tests', () => {
+describe('User acceptance tests', () => {
     context('has routes to', () => {
         let oliverId;
-        after(() => {
+
+        before(() => {
             dropCollection(dbConnection, 'users');
             dropCollection(dbConnection, 'avatars');
         });
 
-        it('creates an admin user', () => {
-            return createAdminUser(barry).then(res => {
-                expectJSONShape(res.body, 'user');
-                expect(res.body.success).to.be.true;
-                expect(res.body.payload.user.roles).to.contain('admin');
-            });
+        afterEach(() => {
+            dropCollection(dbConnection, 'users');
+            dropCollection(dbConnection, 'avatars');
         });
 
         it('signup a new user', () => {
-            return createUser(oliver).then(res => {
-                expectJSONShape(res.body, 'user');
-                expect(res.body.success).to.be.true;
-                oliverId = res.body.payload.user._id;
-            });
+            return request(app)
+                .post('/api/users/signup')
+                .send(oliver)
+                .expect(200)
+                .then(res => {
+                    expectJSONShape(res.body, 'user');
+                    expect(res.body.success).to.be.true;
+                    oliverId = res.body.payload.user._id;
+                });
         });
 
         it('upload custom avatar image for user', () => {
-            return request(app)
-                .post(`/api/users/${oliverId}/avatar`)
-                .attach('avatar', `${__dirname}/../../assets/male3.png`)
-                .expect(200)
+            return createUser(oliver)
+                .then(user => {
+                    return request(app)
+                        .post(`/api/users/${user._id}/avatar`)
+                        .attach('avatar', `${__dirname}/../../assets/male3.png`)
+                        .expect(200);
+                })
                 .then(res => {
                     const { user } = res.body.payload;
                     expectJSONShape(res.body, 'user');
@@ -115,9 +130,20 @@ describe.only('User acceptance tests', () => {
         });
 
         it('verify the user has been added', () => {
-            return request(app)
-                .get(`/api/users/${oliverId}`)
-                .expect(200)
+            let userId;
+            return createUser(oliver)
+                .then(user => {
+                    userId = user._id;
+                    return request(app)
+                        .post(`/api/users/${userId}/avatar`)
+                        .attach('avatar', `${__dirname}/../../assets/male3.png`)
+                        .expect(200);
+                })
+                .then(() =>
+                    request(app)
+                        .get(`/api/users/${userId}`)
+                        .expect(200)
+                )
                 .then(res => {
                     const { user } = res.body.payload;
                     expectJSONShape(res.body, 'user');
@@ -135,12 +161,16 @@ describe.only('User acceptance tests', () => {
         let barryId, oliverId;
 
         before(() => {
+            dropCollection(dbConnection, 'users');
             return createUser(barry)
-                .then(res => {
-                    barryId = res.body.payload.user._id;
+                .then(user => {
+                    barryId = user._id;
                     return createAdminUser(oliver);
                 })
-                .then(res => (oliverId = res.body.payload.user.id));
+                .then(user => {
+                    oliverId = user.id;
+                    return;
+                });
         });
 
         after(() => {
@@ -149,16 +179,8 @@ describe.only('User acceptance tests', () => {
 
         it('get all the users', () => {
             let token;
-            return request(app)
-                .post('/api/login')
-                .send({
-                    email: 'oliver@qc.com',
-                    password: '123456'
-                })
-                .expect(200)
-                .then(res => {
-                    token = res.body.payload.token;
-                })
+            return loginUser(oliver)
+                .then(resToken => (token = resToken))
                 .then(() => {
                     return request(app)
                         .get('/api/users')
@@ -175,16 +197,8 @@ describe.only('User acceptance tests', () => {
 
         it('get me', () => {
             let token;
-            return request(app)
-                .post('/api/login')
-                .send({
-                    email: 'oliver@qc.com',
-                    password: '123456'
-                })
-                .expect(200)
-                .then(res => {
-                    token = res.body.payload.token;
-                })
+            return loginUser(oliver)
+                .then(resToken => (token = resToken))
                 .then(() => {
                     return request(app)
                         .get('/api/users/get/me')
@@ -239,13 +253,10 @@ describe.only('User acceptance tests', () => {
         };
 
         before(() => {
-            return request(app)
-                .post('/api/users/signup')
-                .send(barry)
-                .expect(200)
-                .then(res => {
-                    barryId = res.body.payload.user._id;
-                });
+            dropCollection(dbConnection, 'users');
+            return createUser(barry).then(user => {
+                barryId = user._id;
+            });
         });
 
         after(() => {
