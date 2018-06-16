@@ -35,9 +35,7 @@ const createAdminUser = userData => {
         .post('/api/users/signup')
         .send(userData)
         .expect(200)
-        .then(res => {
-            userId = res.body.payload.user._id;
-        })
+        .then(res => (userId = res.body.payload.user._id))
         .then(() => {
             return request(app)
                 .put(`/api/users/${userId}`)
@@ -205,7 +203,6 @@ describe('User acceptance tests', () => {
                         .set('x-access-token', token)
                         .expect(200)
                         .then(res => {
-                            // expectJSONShape(res.body, 'user');
                             expect(res.body.success).to.be.true;
                             expect(res.body.payload.user.email).to.eql(oliver.email);
                         })
@@ -294,13 +291,10 @@ describe('User acceptance tests', () => {
         };
 
         before(() => {
-            return request(app)
-                .post('/api/users/signup')
-                .send(barry)
-                .expect(200)
-                .then(res => {
-                    barryId = res.body.payload.user._id;
-                });
+            dropCollection(dbConnection, 'users');
+            return createUser(barry).then(user => {
+                barryId = user._id;
+            });
         });
 
         after(() => {
@@ -339,10 +333,8 @@ describe('User acceptance tests', () => {
         };
 
         before(() => {
-            return request(app)
-                .post('/api/users/signup')
-                .send(barry)
-                .expect(200);
+            dropCollection(dbConnection, 'users');
+            return createUser(barry);
         });
 
         after(() => {
