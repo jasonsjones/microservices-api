@@ -41,7 +41,39 @@ const createAdminUser = userData => {
         });
 };
 
-describe('User acceptance tests', () => {
+const signupAndLogin = userData => {
+    return request(app)
+        .post('/api/users/signup')
+        .send(userData)
+        .expect(200)
+        .then(() => {
+            return request(app)
+                .post('/api/login')
+                .send({
+                    email: userData.email,
+                    password: userData.password
+                })
+                .expect(200)
+                .then(res => {
+                    return Promise.resolve(res.body.payload.token);
+                });
+        });
+};
+
+const loginUser = userCreds => {
+    return request(app)
+        .post('/api/login')
+        .send({
+            email: userCreds.email,
+            password: userCreds.password
+        })
+        .expect(200)
+        .then(res => {
+            return Promise.resolve(res.body.payload.token);
+        });
+};
+
+describe.only('User acceptance tests', () => {
     context('has routes to', () => {
         let oliverId;
         after(() => {
@@ -323,6 +355,19 @@ describe('User acceptance tests', () => {
                     expect(res.body.success).to.be.true;
                     expect(res.body.message).to.contain('user password changed');
                 });
+        });
+    });
+
+    context('has helper to', () => {
+        after(() => {
+            dropCollection(dbConnection, 'users');
+        });
+
+        it('get the token', () => {
+            return signupAndLogin(oliver).then(token => {
+                expect(token).to.exist;
+                expect(token).to.be.a('String');
+            });
         });
     });
 });
