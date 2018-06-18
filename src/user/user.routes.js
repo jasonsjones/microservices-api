@@ -33,7 +33,7 @@ export default () => {
             .catch(handleError(res));
     });
 
-    UserRouter.route('/:id')
+    UserRouter.route('/:id([0-9a-zA-Z]{24})')
         .get((req, res) => {
             UserController.getUser(req)
                 .then(handleSuccess(res))
@@ -63,7 +63,7 @@ export default () => {
     });
 
     UserRouter.get(
-        '/get/me',
+        '/me',
         (req, res, next) => {
             AuthController.getUpdatedLoggedInUser(req)
                 .then(response => {

@@ -199,7 +199,7 @@ describe('User acceptance tests', () => {
                 .then(resToken => (token = resToken))
                 .then(() => {
                     return request(app)
-                        .get('/api/users/get/me')
+                        .get('/api/users/me')
                         .set('x-access-token', token)
                         .expect(200)
                         .then(res => {
