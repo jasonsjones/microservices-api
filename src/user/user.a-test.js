@@ -4,6 +4,7 @@ import request from 'supertest';
 import app from '../config/app';
 import { dbConnection, dropCollection } from '../utils/dbTestUtils';
 import { expectJSONShape } from '../utils/testUtils';
+import { createUser } from '../utils/userTestUtils';
 
 const barry = {
     name: 'Barry Allen',
@@ -14,58 +15,23 @@ const barry = {
 const oliver = {
     name: 'Oliver Queen',
     email: 'oliver@qc.com',
+    roles: ['admin', 'user'],
     password: '123456'
 };
 
-const createUser = userData => {
-    return request(app)
-        .post('/api/users/signup')
-        .send(userData)
-        .expect(200)
-        .then(res => {
-            if (res.body.success) {
-                return Promise.resolve(res.body.payload.user);
-            }
-        });
-};
-
-const createAdminUser = userData => {
-    let userId;
-    return request(app)
-        .post('/api/users/signup')
-        .send(userData)
-        .expect(200)
-        .then(res => (userId = res.body.payload.user._id))
-        .then(() => {
-            return request(app)
-                .put(`/api/users/${userId}`)
-                .send({ roles: ['user', 'admin'] })
-                .expect(200);
-        })
-        .then(res => {
-            if (res.body.success) {
-                return Promise.resolve(res.body.payload.user);
-            }
-        });
-};
-
 const signupAndLogin = userData => {
-    return request(app)
-        .post('/api/users/signup')
-        .send(userData)
-        .expect(200)
-        .then(() => {
-            return request(app)
-                .post('/api/login')
-                .send({
-                    email: userData.email,
-                    password: userData.password
-                })
-                .expect(200)
-                .then(res => {
-                    return Promise.resolve(res.body.payload.token);
-                });
-        });
+    return createUser(userData).then(() => {
+        return request(app)
+            .post('/api/login')
+            .send({
+                email: userData.email,
+                password: userData.password
+            })
+            .expect(200)
+            .then(res => {
+                return Promise.resolve(res.body.payload.token);
+            });
+    });
 };
 
 const loginUser = userCreds => {
@@ -163,7 +129,7 @@ describe('User acceptance tests', () => {
             return createUser(barry)
                 .then(user => {
                     barryId = user._id;
-                    return createAdminUser(oliver);
+                    return createUser(oliver);
                 })
                 .then(user => {
                     oliverId = user.id;

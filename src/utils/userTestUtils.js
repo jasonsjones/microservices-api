@@ -1,3 +1,5 @@
+import { signUpUser } from '../user/user.repository';
+
 export const mockUsersWithAvatar = [
     {
         _id: '59c44d83f2943200228467b3',
@@ -94,3 +96,7 @@ export const mockUsers = [
         roles: ['user']
     }
 ];
+
+export const createUser = userData => {
+    return signUpUser(userData);
+};
