@@ -1,5 +1,13 @@
 import * as UserRepository from './user.repository';
 
+const buildError = msg => {
+    return {
+        success: false,
+        message: msg,
+        error: new Error(msg)
+    };
+};
+
 export function getUsers() {
     return UserRepository.getUsers()
         .then(users => {
@@ -260,3 +268,24 @@ export function changePassword(req) {
             };
         });
 }
+
+export const getMe = req => {
+    if (!req) {
+        return Promise.reject(buildError('request parameter is required'));
+    }
+    if (req.user) {
+        return Promise.resolve({
+            success: true,
+            message: 'updated user',
+            payload: {
+                user: req.user
+            }
+        });
+    } else {
+        return Promise.resolve({
+            success: false,
+            message: 'no user is logged in',
+            payload: null
+        });
+    }
+};

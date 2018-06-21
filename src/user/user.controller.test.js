@@ -113,6 +113,39 @@ describe('User controller', () => {
         });
     });
 
+    describe('getMe()', () => {
+        it('returns a promise that resolves to the signed in user (me)', () => {
+            const req = {
+                user: new User(mockUsers[1])
+            };
+            const promise = Controller.getMe(req);
+            expect(promise).to.be.a('Promise');
+            return promise.then(response => {
+                expectUserResponse(response);
+            });
+        });
+
+        it('returns a promise that resolves to success false if a user is not logged in', () => {
+            const req = {};
+            const promise = Controller.getMe(req);
+            expect(promise).to.be.a('Promise');
+            return promise.then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response).to.have.property('payload');
+                expect(response.success).to.be.false;
+            });
+        });
+
+        it('rejects with error if req parameter is not provided', () => {
+            const promise = Controller.getMe();
+            expect(promise).to.be.a('Promise');
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+    });
+
     describe('updateUser()', () => {
         let req, stub;
         beforeEach(() => {
