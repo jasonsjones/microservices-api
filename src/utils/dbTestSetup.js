@@ -1,6 +1,7 @@
 import { dbConnection } from './dbTestUtils';
+import { setupEnv } from './testUtils';
 
-process.env.NODE_ENV = 'test';
+setupEnv();
 
 after(() => {
     dbConnection.close();

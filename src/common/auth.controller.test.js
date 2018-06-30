@@ -97,7 +97,7 @@ describe('Auth controller', () => {
             UserMock.restore();
         });
 
-        it('resolve to true if the user is an admin', () => {
+        it('resolves to true if the user is an admin', () => {
             const req = {
                 decoded: {
                     sub: '59c44d83f2943200228467b1',
@@ -122,7 +122,7 @@ describe('Auth controller', () => {
             });
         });
 
-        it('resolve to false if the user is an admin', () => {
+        it('resolves to false if the user is an admin', () => {
             const req = {
                 decoded: {
                     sub: '59c44d83f2943200228467b3',
@@ -256,7 +256,7 @@ describe('Auth controller', () => {
                 headers: {}
             };
             let promise = Controller.protectAdminRoute(req);
-            expect(promise).to.be.a('promise');
+            expect(promise).to.be.a('Promise');
             return promise.catch(err => {
                 expectError(err);
             });
@@ -275,7 +275,7 @@ describe('Auth controller', () => {
             jwtStub.throws({ name: 'JsonWebTokenError', message: 'jwt malformed' });
 
             let promise = Controller.protectAdminRoute(req);
-            expect(promise).to.be.a('promise');
+            expect(promise).to.be.a('Promise');
             return promise.catch(err => {
                 expectError(err);
                 jwtStub.restore();
@@ -305,6 +305,7 @@ describe('Auth controller', () => {
             jwtStub.returns(expected);
 
             let promise = Controller.protectAdminRoute(req);
+            expect(promise).to.be.a('Promise');
             return promise.then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
@@ -337,6 +338,7 @@ describe('Auth controller', () => {
             jwtStub.returns(expected);
 
             let promise = Controller.protectAdminRoute(req);
+            expect(promise).to.be.a('Promise');
             return promise.then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
@@ -369,10 +371,140 @@ describe('Auth controller', () => {
             jwtStub.returns(expected);
 
             let promise = Controller.protectAdminRoute(req);
-            expect(promise).to.be.a('promise');
+            expect(promise).to.be.a('Promise');
             return promise.catch(err => {
                 expectError(err);
                 expect(err.message).to.contain('Ooops, something went wrong getting the user');
+                userRepoStub.restore();
+                jwtStub.restore();
+            });
+        });
+    });
+
+    describe('getUpdatedLoggedInUser()', () => {
+        let req, expected;
+        beforeEach(() => {
+            req = {
+                query: {},
+                body: {},
+                headers: {}
+            };
+
+            expected = {
+                sub: '59c44d83f2943200228467b3',
+                email: 'roy@qc.com',
+                iat: '1513453484',
+                exp: '1513453484'
+            };
+        });
+
+        it('rejects if the token is not provided', () => {
+            let promise = Controller.getUpdatedLoggedInUser(req);
+            expect(promise).to.be.a('Promise');
+            return promise.catch(err => {
+                expectError(err);
+            });
+        });
+
+        it('rejects if the token had not be verified or decoded', () => {
+            req.headers = {
+                'x-access-token': 'thisisa.simulated.tokenvalue'
+            };
+
+            const jwtStub = sinon
+                .stub(jwt, 'verify')
+                .throws({ name: 'JsonWebTokenError', message: 'jwt malformed' });
+
+            let promise = Controller.getUpdatedLoggedInUser(req);
+            expect(promise).to.be.a('Promise');
+            return promise.catch(err => {
+                expectError(err);
+                jwtStub.restore();
+            });
+        });
+
+        it('resolves with the logged in user given a valid token', () => {
+            req.headers = {
+                'x-access-token': 'thisisa.simulated.tokenvalue'
+            };
+
+            const userRepoStub = sinon
+                .stub(UserRepository, 'getUser')
+                .resolves(new User(mockUsers[0]));
+
+            const jwtStub = sinon.stub(jwt, 'verify').returns(expected);
+
+            let promise = Controller.getUpdatedLoggedInUser(req);
+            expect(promise).to.be.a('Promise');
+            return promise.then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response).to.have.property('payload');
+                expect(response.payload).to.have.property('user');
+                userRepoStub.restore();
+                jwtStub.restore();
+            });
+        });
+
+        it('updates req.user with the newly fetched logged in user', () => {
+            req.headers = {
+                'x-access-token': 'thisisa.simulated.tokenvalue'
+            };
+
+            const userRepoStub = sinon
+                .stub(UserRepository, 'getUser')
+                .resolves(new User(mockUsers[0]));
+
+            const jwtStub = sinon.stub(jwt, 'verify').returns(expected);
+
+            expect(req.user).to.not.exist;
+            let promise = Controller.getUpdatedLoggedInUser(req);
+            expect(promise).to.be.a('Promise');
+            return promise.then(response => {
+                expect(response).to.have.property('success');
+                expect(response.success).to.be.true;
+                expect(req.user).to.exist;
+                expect(req.user).to.be.an('Object');
+                userRepoStub.restore();
+                jwtStub.restore();
+            });
+        });
+
+        it('resolves with success false if user is not found', () => {
+            req.headers = {
+                'x-access-token': 'thisisa.simulated.tokenvalue'
+            };
+
+            const userRepoStub = sinon.stub(UserRepository, 'getUser').resolves({});
+
+            const jwtStub = sinon.stub(jwt, 'verify').returns(expected);
+
+            let promise = Controller.getUpdatedLoggedInUser(req);
+            expect(promise).to.be.a('Promise');
+            return promise.then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response.success).to.be.false;
+                userRepoStub.restore();
+                jwtStub.restore();
+            });
+        });
+
+        it('rejects if there is an error getting the current user', () => {
+            req.headers = {
+                'x-access-token': 'thisisa.simulated.tokenvalue'
+            };
+
+            const userRepoStub = sinon
+                .stub(UserRepository, 'getUser')
+                .rejects(new Error('Ooopss...something went wrong :-('));
+
+            const jwtStub = sinon.stub(jwt, 'verify').returns(expected);
+
+            let promise = Controller.getUpdatedLoggedInUser(req);
+            expect(promise).to.be.a('Promise');
+            return promise.catch(err => {
+                expectError(err);
                 userRepoStub.restore();
                 jwtStub.restore();
             });

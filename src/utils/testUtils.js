@@ -1,4 +1,7 @@
 import { expect } from 'chai';
+import debug from 'debug';
+
+const log = debug('test');
 
 export const expectJSONShape = (json, modelName) => {
     expect(json).to.be.an('Object');
@@ -8,4 +11,8 @@ export const expectJSONShape = (json, modelName) => {
     if (modelName) {
         expect(json.payload).to.have.property(modelName);
     }
+};
+
+export const setupEnv = () => {
+    log(`*** Running in ${process.env.NODE_ENV} mode`);
 };

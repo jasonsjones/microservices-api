@@ -1,9 +1,8 @@
 import debug from 'debug';
 import fetch from 'node-fetch';
 import request from 'supertest';
+import { getUsers } from '../user/user.repository';
 import config from '../config/config';
-
-const env = process.env.NODE_ENV || 'development';
 
 const log = debug('db:seed');
 
@@ -51,7 +50,7 @@ const seedAvatarImage = imgPath => {
 };
 
 const seedUser = userData => {
-    return fetch(`${baseUrl}/api/signup`, {
+    return fetch(`${baseUrl}/api/users/signup`, {
         method: 'POST',
         body: JSON.stringify(userData),
         headers: {
@@ -92,8 +91,21 @@ const seedDefaultUserAPI = () => {
     });
 };
 
+const seedDefaultUserDb = () => {
+    return getUsers().then(users => {
+        if (users.length === 0) {
+            log('adding user...');
+            // only seed oliver for now...
+            return seedUser(initialUsers[0]);
+        } else {
+            log('user(s) already in db...');
+            return Promise.resolve('users not required');
+        }
+    });
+};
+
 export const seedData = () => {
-    const userPromise = seedDefaultUserAPI();
+    const userPromise = seedDefaultUserDb();
     const avatarPromise = seedDefaultAvatarAPI();
     return Promise.all([userPromise, avatarPromise]);
 };

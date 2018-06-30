@@ -1,3 +1,5 @@
+import { signUpUser } from '../user/user.repository';
+
 export const mockUsersWithAvatar = [
     {
         _id: '59c44d83f2943200228467b3',
@@ -6,9 +8,10 @@ export const mockUsersWithAvatar = [
         name: 'Roy Harper',
         email: 'roy@qc.com',
         password: '$2a$12$DyizVZatjn.zMHeOhQI5nuIX64417O2zuRKXe/Ae0f06bLupmZ/d6',
+        passwordLastUpdatedAt: '2018-01-21T16:24:16.413Z',
         __v: 0,
         avatar: {
-            _id: '5a145330e6d09600aff70ef9',
+            _id: '59e4062a4c3bc800574e895f',
             updatedAt: '2017-11-21T16:24:16.403Z',
             createdAt: '2017-11-21T16:24:16.403Z',
             user: '59c44d83f2943200228467b3',
@@ -26,6 +29,7 @@ export const mockUsersWithAvatar = [
         name: 'Oliver Queen',
         email: 'oliver@qc.com',
         password: '$2a$12$wwUJRxZdDzpZ5uK2u.7eNelWp6y4HT/WE/zzZ6e2L4VVvv/tJE2dK',
+        passwordLastUpdatedAt: '2018-01-23T16:24:16.413Z',
         __v: 0,
         avatar: {
             _id: '59c44d85f2943200228467b4',
@@ -46,6 +50,7 @@ export const mockUsersWithAvatar = [
         name: 'Jason Jones',
         email: 'jsjones96@gmail.com',
         password: '$2a$12$5GCSOcQgHZ1tJHaMiOvvXOcFCoOoZCmjkQfD9hd/vIrF/dm0zrXa2',
+        passwordLastUpdatedAt: '2018-03-27T16:24:16.413Z',
         __v: 0,
         avatar: null,
         avatarUrl: 'http://localhost:3000/api/avatar/default',
@@ -61,7 +66,8 @@ export const mockUsers = [
         name: 'Roy Harper',
         email: 'roy@qc.com',
         password: '$2a$12$DyizVZatjn.zMHeOhQI5nuIX64417O2zuRKXe/Ae0f06bLupmZ/d6',
-        avatar: '5a145330e6d09600aff70ef9',
+        passwordLastUpdatedAt: '2018-01-21T16:24:16.413Z',
+        avatar: '59e4062a4c3bc800574e895f',
         avatarUrl: 'http://localhost:3000/api/avatar/5a145330e6d09600aff70ef9',
         roles: ['user']
     },
@@ -72,6 +78,7 @@ export const mockUsers = [
         name: 'Oliver Queen',
         email: 'oliver@qc.com',
         password: '$2a$12$wwUJRxZdDzpZ5uK2u.7eNelWp6y4HT/WE/zzZ6e2L4VVvv/tJE2dK',
+        passwordLastUpdatedAt: '2018-01-23T16:24:16.413Z',
         avatar: '59c44d85f2943200228467b4',
         avatarUrl: 'http://localhost:3000/api/avatar/59c44d85f2943200228467b4',
         roles: ['admin', 'user']
@@ -83,8 +90,13 @@ export const mockUsers = [
         name: 'Jason Jones',
         email: 'jsjones96@gmail.com',
         password: '$2a$12$5GCSOcQgHZ1tJHaMiOvvXOcFCoOoZCmjkQfD9hd/vIrF/dm0zrXa2',
+        passwordLastUpdatedAt: '2018-03-27T16:24:16.413Z',
         avatar: null,
         avatarUrl: 'http://localhost:3000/api/avatar/default',
         roles: ['user']
     }
 ];
+
+export const createUser = userData => {
+    return signUpUser(userData);
+};

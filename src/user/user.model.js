@@ -16,9 +16,12 @@ const userSchema = new Schema(
                 return this.sfdc.id === undefined;
             }
         },
+        passwordLastUpdatedAt: {
+            type: Date
+        },
         roles: { type: [String], enum: allowedRoles, default: ['user'] },
         avatar: { type: Schema.Types.ObjectId, ref: 'Avatar' },
-        avatarUrl: { type: String, default: `${baseUrl}/api/avatar/default/0` },
+        avatarUrl: { type: String, default: `${baseUrl}/api/avatars/default/0` },
         sfdc: {
             id: { type: String },
             accessToken: { type: String },

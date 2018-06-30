@@ -12,12 +12,13 @@ export default passport => {
     });
 
     AuthRouter.post('/login', passport.authenticate('local'), (req, res) => {
+        const user = req.user;
         res.json({
             success: true,
             message: 'authenticated via passport',
             payload: {
-                user: req.user.toClientJSON(),
-                token: AuthUtils.generateToken(req.user)
+                user: user.toClientJSON(),
+                token: AuthUtils.generateToken(user)
             }
         });
     });
