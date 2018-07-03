@@ -1,3 +1,4 @@
+import fetch from 'node-fetch';
 import * as UserRepository from './user.repository';
 
 const buildError = msg => {
@@ -288,4 +289,10 @@ export const getMe = req => {
             payload: null
         });
     }
+};
+
+export const getRandomUser = () => {
+    return fetch('https://randomuser.me/api?nat=us')
+        .then(response => response.json())
+        .then(data => data);
 };
