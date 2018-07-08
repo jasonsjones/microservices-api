@@ -158,3 +158,7 @@ export const unlinkSFDCAccount = user => {
     user.sfdc.profile = {};
     return user.save();
 };
+
+export const getRandomUser = () => {
+    return Promise.resolve();
+};

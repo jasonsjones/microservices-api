@@ -623,6 +623,12 @@ describe('User repository', () => {
             });
         });
     });
+
+    describe('getRandomUser()', () => {
+        it('returns a promise', () => {
+            expect(Repository.getRandomUser()).to.be.a('Promise');
+        });
+    });
 });
 
 const expectUserToHaveAvatar = user => {

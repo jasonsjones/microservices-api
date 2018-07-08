@@ -292,7 +292,5 @@ export const getMe = req => {
 };
 
 export const getRandomUser = () => {
-    return fetch('https://randomuser.me/api?nat=us')
-        .then(response => response.json())
-        .then(data => data);
+    return UserRepository.getRandomUser();
 };

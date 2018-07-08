@@ -597,27 +597,13 @@ describe('User controller', () => {
     });
 
     describe('getRandomUser()', () => {
-        let promise;
-        beforeEach(() => {
-            promise = Controller.getRandomUser();
-        });
-
         it('returns a promise', () => {
+            let stub = sinon.stub(Repository, 'getRandomUser');
+            stub.resolves(true);
+            let promise = Controller.getRandomUser();
             expect(promise).to.be.a('Promise');
-        });
-
-        it('resolves to an object with results and info properties', () => {
-            promise.then(data => {
-                expect(data).to.be.an('Object');
-                expect(data).to.have.property('results');
-                expect(data).to.have.property('info');
-            });
-        });
-
-        it('resolves to an object with results array', () => {
-            promise.then(data => {
-                expect(data.results).to.be.an('Array');
-                expect(data.results).to.have.length(1);
+            promise.then(() => {
+                stub.restore();
             });
         });
     });
