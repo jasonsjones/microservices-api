@@ -606,6 +606,8 @@ describe('User controller', () => {
                 stub.restore();
             });
         });
+
+        it('returns a promise that resolves to a random user');
     });
 });
 
