@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 import * as UserRepository from './user.repository';
 
 const buildError = msg => {
