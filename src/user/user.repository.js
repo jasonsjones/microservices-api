@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 import User from './user.model';
 import { deleteAvatar, makeAvatarModel } from '../avatar/avatar.repository';
 
@@ -160,5 +162,11 @@ export const unlinkSFDCAccount = user => {
 };
 
 export const getRandomUser = () => {
-    return Promise.resolve();
+    return fetch('https://randomuser.me/api?nat=us')
+        .then(response => response.json())
+        .then(data => {
+            if (data.results.length === 1) {
+                return data.results[0];
+            }
+        });
 };

@@ -628,6 +628,18 @@ describe('User repository', () => {
         it('returns a promise', () => {
             expect(Repository.getRandomUser()).to.be.a('Promise');
         });
+
+        it('returns a promise that resolves to an random user', () => {
+            let promise = Repository.getRandomUser();
+            return promise.then(response => {
+                expect(response).to.be.an('object');
+                expect(response).to.have.property('name');
+                expect(response).to.have.property('email');
+                expect(response).to.have.property('location');
+                expect(response).to.have.property('login');
+                expect(response).to.have.property('picture');
+            });
+        });
     });
 });
 
