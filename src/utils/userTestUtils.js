@@ -97,6 +97,59 @@ export const mockUsers = [
     }
 ];
 
+export const randomUser = {
+    gender: 'male',
+    name: {
+        title: 'mr',
+        first: 'perry',
+        last: 'lewis'
+    },
+    location: {
+        street: '8943 wycliff ave',
+        city: 'norman',
+        state: 'arizona',
+        postcode: 56747,
+        coordinates: {
+            latitude: '16.9829',
+            longitude: '-123.0333'
+        },
+        timezone: {
+            offset: '+5:00',
+            description: 'Ekaterinburg, Islamabad, Karachi, Tashkent'
+        }
+    },
+    email: 'perry.lewis@example.com',
+    login: {
+        uuid: 'c8aef908-fdf9-412d-8e3b-71e77edb389d',
+        username: 'brownpeacock509',
+        password: 'true',
+        salt: '9Z9Kgl1G',
+        md5: '39ff6e2e77988289b36783158cde775c',
+        sha1: '5b47f0aafc79bdf0f7e9c2159403011be29034cb',
+        sha256: '26985ebbbaf183d9f571dc1b421b5fd8eb24d518d1e5d863ad66ede20ca61344'
+    },
+    dob: {
+        date: '1949-03-30T14:50:16Z',
+        age: 69
+    },
+    registered: {
+        date: '2016-10-28T12:48:48Z',
+        age: 1
+    },
+    phone: '(498)-615-5896',
+    cell: '(772)-179-7640',
+    id: {
+        name: 'SSN',
+        value: '293-84-6915'
+    },
+    picture: {
+        large: 'https://randomuser.me/api/portraits/men/47.jpg',
+        medium: 'https://randomuser.me/api/portraits/med/men/47.jpg',
+        thumbnail: 'https://randomuser.me/api/portraits/thumb/men/47.jpg'
+    },
+    nat: 'US'
+};
+
 export const createUser = userData => {
     return signUpUser(userData);
 };
