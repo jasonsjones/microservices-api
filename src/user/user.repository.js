@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 
 import User from './user.model';
+import { normalizeRandomUserData } from '../utils/userUtils';
 import { deleteAvatar, makeAvatarModel } from '../avatar/avatar.repository';
 
 export function getUsers(queryCondition = {}, inclAvatars = false) {
@@ -161,12 +162,14 @@ export const unlinkSFDCAccount = user => {
     return user.save();
 };
 
-export const getRandomUser = () => {
+export const getRandomUser = (sendRawData = false) => {
     return fetch('https://randomuser.me/api?nat=us')
         .then(response => response.json())
         .then(data => {
-            if (data.results.length === 1) {
+            if (sendRawData) {
                 return data.results[0];
             }
+            let randomUser = data.results[0];
+            return normalizeRandomUserData(randomUser);
         });
 };
