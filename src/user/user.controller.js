@@ -291,5 +291,13 @@ export const getMe = req => {
 };
 
 export const getRandomUser = () => {
-    return UserRepository.getRandomUser();
+    return UserRepository.getRandomUser().then(user => {
+        return {
+            success: true,
+            message: 'random user provided',
+            payload: {
+                user
+            }
+        };
+    });
 };
