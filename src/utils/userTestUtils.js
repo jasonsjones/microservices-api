@@ -97,7 +97,7 @@ export const mockUsers = [
     }
 ];
 
-export const randomUser = {
+export const mockRandomUser = {
     gender: 'male',
     name: {
         title: 'mr',
