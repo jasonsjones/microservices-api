@@ -327,6 +327,18 @@ describe('User acceptance tests', () => {
         });
     });
 
+    context('has route to', () => {
+        it('get a random user', () => {
+            return request(app)
+                .get('/api/users/randomuser')
+                .expect(200)
+                .then(res => {
+                    expectJSONShape(res.body, 'user');
+                    expect(res.body.success).to.be.true;
+                });
+        });
+    });
+
     context('has helper to', () => {
         after(() => {
             dropCollection(dbConnection, 'users');
