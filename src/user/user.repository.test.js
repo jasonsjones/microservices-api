@@ -623,6 +623,31 @@ describe('User repository', () => {
             });
         });
     });
+
+    describe('getRandomUser()', () => {
+        it('returns a promise', () => {
+            expect(Repository.getRandomUser()).to.be.a('Promise');
+        });
+
+        it('returns a promise that resolves to a random user with raw data when sendRawData is true', () => {
+            let promise = Repository.getRandomUser(true);
+            return promise.then(response => {
+                expect(response).to.be.an('object');
+                expect(response).to.have.property('name');
+                expect(response).to.have.property('email');
+                expect(response).to.have.property('location');
+                expect(response).to.have.property('login');
+                expect(response).to.have.property('picture');
+            });
+        });
+
+        it('returns a promise that resolves to a random user with normalized data when sendRawData is false (default)', () => {
+            let promise = Repository.getRandomUser(false);
+            return promise.then(response => {
+                expectUserProperties(response);
+            });
+        });
+    });
 });
 
 const expectUserToHaveAvatar = user => {

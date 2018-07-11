@@ -4,7 +4,8 @@ import sinon from 'sinon';
 import * as Repository from './user.repository';
 import * as Controller from './user.controller';
 import User from './user.model';
-import { mockUsers, mockUsersWithAvatar } from '../utils/userTestUtils';
+import { mockUsers, mockUsersWithAvatar, mockRandomUser } from '../utils/userTestUtils';
+import { normalizeRandomUserData } from '../utils/userUtils';
 
 describe('User controller', () => {
     describe('getUsers()', () => {
@@ -539,7 +540,7 @@ describe('User controller', () => {
         });
     });
 
-    describe('unlinkSFDCAccount', () => {
+    describe('unlinkSFDCAccount()', () => {
         let req, stub;
         beforeEach(() => {
             stub = sinon.stub(Repository, 'unlinkSFDCAccount');
@@ -592,6 +593,34 @@ describe('User controller', () => {
             expect(promise).to.be.a('Promise');
             promise.catch(response => {
                 expectErrorResponse(response);
+            });
+        });
+    });
+
+    describe('getRandomUser()', () => {
+        let stub;
+
+        beforeEach(() => {
+            stub = sinon.stub(Repository, 'getRandomUser');
+        });
+
+        afterEach(() => {
+            stub.restore();
+        });
+
+        it('returns a promise', () => {
+            stub.resolves(true);
+            let promise = Controller.getRandomUser();
+            expect(promise).to.be.a('Promise');
+        });
+
+        it('returns a promise that resolves to a payload with a random user', () => {
+            stub.resolves(normalizeRandomUserData(mockRandomUser));
+            let promise = Controller.getRandomUser();
+            expect(promise).to.be.a('Promise');
+            promise.then(response => {
+                expectUserResponse(response);
+                expect(response).to.have.property('message');
             });
         });
     });

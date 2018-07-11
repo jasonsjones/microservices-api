@@ -85,6 +85,10 @@ export default () => {
         }
     );
 
+    UserRouter.get('/randomuser', (req, res) => {
+        UserController.getRandomUser().then(handleSuccess(res));
+    });
+
     // TODO: add middleware to protect the route
     // AuthController.verifyToken,
     // AuthController.protectRouteByUser,
