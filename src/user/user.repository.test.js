@@ -644,7 +644,6 @@ describe('User repository', () => {
         it('returns a promise that resolves to a random user with normalized data when sendRawData is false (default)', () => {
             let promise = Repository.getRandomUser(false);
             return promise.then(response => {
-                console.log(response);
                 expectUserProperties(response);
             });
         });
