@@ -1,4 +1,5 @@
 import * as UserRepository from './user.repository';
+import * as AuthUtils from '../common/auth.utils';
 
 const buildError = msg => {
     return {
@@ -194,7 +195,8 @@ export function signupUser(req) {
                 success: true,
                 message: 'new user saved',
                 payload: {
-                    user
+                    user: user.toClientJSON(),
+                    token: AuthUtils.generateToken(user)
                 }
             };
         })

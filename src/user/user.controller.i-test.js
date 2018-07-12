@@ -81,7 +81,8 @@ describe('User controller integration tests', () => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
                 expect(response.success).to.be.true;
-                expectUserShape(response.payload.user);
+                expect(response.payload).to.have.property('token');
+                expectClientJSONUserShape(response.payload.user);
             });
         });
     });
@@ -90,7 +91,7 @@ describe('User controller integration tests', () => {
         let barryId;
         before(() => {
             return Controller.signupUser({ body: users[0] }).then(response => {
-                barryId = response.payload.user._id;
+                barryId = response.payload.user.id;
             });
         });
 
@@ -150,7 +151,7 @@ describe('User controller integration tests', () => {
         let barryId;
         before(() => {
             return Controller.signupUser({ body: users[0] }).then(response => {
-                barryId = response.payload.user._id;
+                barryId = response.payload.user.id;
                 Controller.signupUser({ body: users[1] });
             });
         });
@@ -200,7 +201,7 @@ describe('User controller integration tests', () => {
         let barryId;
         before(() => {
             return Controller.signupUser({ body: users[0] }).then(response => {
-                barryId = response.payload.user._id;
+                barryId = response.payload.user.id;
                 Controller.signupUser({ body: users[1] });
             });
         });
