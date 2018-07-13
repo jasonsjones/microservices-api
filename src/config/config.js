@@ -16,7 +16,7 @@ let configBase = {
     token_secret,
     session_secret,
     baseUrl: 'http://localhost',
-    dbUrl: 'mongodb://mongo/sandboxapi-default'
+    dbUrl: 'mongodb://mongo:27017/sandboxapi-default'
 };
 
 let config;

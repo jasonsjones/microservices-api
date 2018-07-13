@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-const dockerDbUriTest = 'mongodb://mongo/sandboxapi-test';
+const dockerDbUriTest = 'mongodb://mongo:27017/sandboxapi-test';
 
 // TODO: Need to start up another cluster to use the atlas Mongo SAAS solution.
 // const atlasUri = "mongodb://dbadmin:" + process.env.DB_PASSWD + "@sandboxcluster-shard-00-00-ks6uh.mongodb.net:27017,"+
