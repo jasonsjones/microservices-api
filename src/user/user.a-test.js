@@ -68,6 +68,7 @@ describe('User acceptance tests', () => {
                 .expect(200)
                 .then(res => {
                     expectJSONShape(res.body, 'user');
+                    expectJSONShape(res.body, 'token');
                     expect(res.body.success).to.be.true;
                     oliverId = res.body.payload.user._id;
                 });
