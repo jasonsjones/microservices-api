@@ -44,7 +44,7 @@ const expectUserShape = res => {
 };
 
 const expectClientJSONUserShape = res => {
-    expect(res).to.have.property('id');
+    expect(res).to.have.property('_id');
     expect(res).to.have.property('name');
     expect(res).to.have.property('email');
     expect(res).to.have.property('roles');
@@ -91,7 +91,7 @@ describe('User controller integration tests', () => {
         let barryId;
         before(() => {
             return Controller.signupUser({ body: users[0] }).then(response => {
-                barryId = response.payload.user.id;
+                barryId = response.payload.user._id;
             });
         });
 
@@ -151,7 +151,7 @@ describe('User controller integration tests', () => {
         let barryId;
         before(() => {
             return Controller.signupUser({ body: users[0] }).then(response => {
-                barryId = response.payload.user.id;
+                barryId = response.payload.user._id;
                 Controller.signupUser({ body: users[1] });
             });
         });
@@ -201,7 +201,7 @@ describe('User controller integration tests', () => {
         let barryId;
         before(() => {
             return Controller.signupUser({ body: users[0] }).then(response => {
-                barryId = response.payload.user.id;
+                barryId = response.payload.user._id;
                 Controller.signupUser({ body: users[1] });
             });
         });

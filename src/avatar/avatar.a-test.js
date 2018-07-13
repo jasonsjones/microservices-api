@@ -87,7 +87,7 @@ describe('Avatar acceptence tests', () => {
                 })
                 .expect(200)
                 .then(res => {
-                    userId = res.body.payload.user.id;
+                    userId = res.body.payload.user._id;
                     return request(app)
                         .post(`/api/users/${userId}/avatar`)
                         .attach('avatar', `${__dirname}/../../assets/male3.png`)

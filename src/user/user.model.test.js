@@ -199,7 +199,7 @@ describe('User model', () => {
         });
         const clientJSON = user.toClientJSON();
         expect(clientJSON).to.be.an('object');
-        expect(clientJSON).to.have.property('id');
+        expect(clientJSON).to.have.property('_id');
         expect(clientJSON).to.have.property('name');
         expect(clientJSON).to.have.property('email');
         expect(clientJSON).to.have.property('avatarUrl');
@@ -225,7 +225,7 @@ describe('User model', () => {
         });
         const clientJSON = user.toClientJSON();
         expect(clientJSON).to.be.an('object');
-        expect(clientJSON).to.have.property('id');
+        expect(clientJSON).to.have.property('_id');
         expect(clientJSON).to.have.property('name');
         expect(clientJSON).to.have.property('email');
         expect(clientJSON).to.have.property('avatarUrl');

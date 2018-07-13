@@ -63,7 +63,7 @@ userSchema.methods.hasCustomAvatar = function() {
 
 userSchema.methods.toClientJSON = function() {
     let userDataForClient = {
-        id: this._id,
+        _id: this._id,
         name: this.name,
         email: this.email,
         avatarUrl: this.avatarUrl,
