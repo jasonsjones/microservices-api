@@ -13,7 +13,7 @@ export default config => {
     let db = mongoose.connection;
 
     db.once('open', () => {
-        log(`Connected to ${config.dbUrl} in mongo container`);
+        log(`Connected to ${config.dbUrl}`);
     });
 
     db.on('error', console.error.bind(console, 'connection error'));
