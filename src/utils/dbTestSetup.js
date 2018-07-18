@@ -1,7 +1,9 @@
 import { dbConnection } from './dbTestUtils';
 import { setupEnv } from './testUtils';
 
-setupEnv();
+before(() => {
+    setupEnv();
+});
 
 after(() => {
     dbConnection.close();
