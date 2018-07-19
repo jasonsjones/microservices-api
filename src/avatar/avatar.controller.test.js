@@ -230,9 +230,9 @@ describe('Avatar controller', () => {
         });
 
         it('sends a success false and message when error occurs', () => {
-            stub
-                .withArgs(req.file, req.params.userId)
-                .rejects(new Error('Oops, something went wrong uploading the image...'));
+            stub.withArgs(req.file, req.params.userId).rejects(
+                new Error('Oops, something went wrong uploading the image...')
+            );
 
             return Controller.uploadAvatar(req).catch(response => {
                 expectErrorResponse(response);
@@ -280,9 +280,9 @@ describe('Avatar controller', () => {
         });
 
         it('sends a success false and message when error occurs', () => {
-            stub
-                .withArgs(req.file)
-                .rejects(new Error('Oops, something went wrong uploading the image...'));
+            stub.withArgs(req.file).rejects(
+                new Error('Oops, something went wrong uploading the image...')
+            );
 
             return Controller.uploadDefaultAvatar(req).catch(response => {
                 expectErrorResponse(response);

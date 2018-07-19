@@ -502,7 +502,7 @@ describe('User controller', () => {
                 email: 'roy@qc.com',
                 password: 'arsenal'
             };
-            stub.resolves(mockUsers[0]);
+            stub.resolves(new User(mockUsers[0]));
             const promise = Controller.signupUser(req);
             expect(promise).to.be.a('Promise');
 
@@ -512,6 +512,24 @@ describe('User controller', () => {
                 expect(response.payload).to.have.property('user');
                 expect(response.payload.user).to.be.an('object');
                 expect(response.success).to.be.true;
+            });
+        });
+
+        it('returns a promise that has the token in the payload for the new user', () => {
+            req.body = {
+                name: 'Roy Harper',
+                email: 'roy@qc.com',
+                password: 'arsenal'
+            };
+            stub.resolves(new User(mockUsers[0]));
+            const promise = Controller.signupUser(req);
+            expect(promise).to.be.a('Promise');
+
+            return promise.then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('payload');
+                expect(response.success).to.be.true;
+                expect(response.payload).to.have.property('token');
             });
         });
 

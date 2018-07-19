@@ -1,8 +1,7 @@
 {
     "name": "microservices-api",
-    "version": "0.2.8",
+    "version": "0.2.9",
     "description": "A sandbox API built on microservices",
-    "main": "index.js",
     "nyc": {
         "exclude": [
             "src/**/*test.js",
@@ -17,29 +16,20 @@
     },
     "scripts": {
         "predev": "npm run dbSeed",
-        "dev":
-            "NODE_ENV=development DEBUG=db*,app nodemon src/server.js --inspect=0.0.0.0:5858 --watch src/ --exec babel-node",
+        "dev": "NODE_ENV=development DEBUG=db*,app nodemon src/server.js --inspect=0.0.0.0:5858 --watch src/ --exec babel-node",
         "clean": "rm -rf .v8flags* uploads/*",
         "dbSeed": "babel-node src/utils/dbSeed.js",
         "security-check": "nsp check",
         "lt": "lt --port 3000 --subdomain sandboxapi",
-        "lint": "eslint webpack.config.js src/**/*.js src/*.js",
-        "test:unit:all":
-            "DEBUG=test nodemon --exec 'nyc mocha --exit --reporter landing src/utils/testSetup.js src/**/*.test.js --require babel-register'",
-        "test:unit:avatar":
-            "DEBUG=test nodemon --exec 'mocha src/utils/testSetup.js src/avatar/*.test.js --require babel-register'",
-        "test:unit:common":
-            "DEBUG=test nodemon --exec 'mocha src/utils/testSetup.js src/common/*.test.js --require babel-register'",
-        "test:unit:user":
-            "DEBUG=test nodemon --exec 'mocha src/utils/testSetup.js src/user/*.test.js --require babel-register'",
-        "test:acceptance":
-            "NODE_ENV=test DEBUG=db:connection,test nodemon --exec 'mocha --exit src/utils/dbTestSetup.js src/**/*.a-test.js --require babel-register'",
-        "test:integration":
-            "NODE_ENV=test DEBUG=db:connection,test nodemon --exec 'mocha --exit src/utils/dbTestSetup.js src/**/*.i-test.js --require babel-register'",
-        "test:a-i":
-            "NODE_ENV=test DEBUG=db:connection,test nodemon --exec 'mocha --exit src/utils/dbTestSetup.js src/**/*.*-test.js --require babel-register'",
-        "test:all":
-            "NODE_ENV=test DEBUG=db:connection,test nyc mocha --exit src/utils/dbTestSetup.js src/**/*.*test.js --require babel-register",
+        "lint": "eslint src/**/*.js src/*.js",
+        "test:unit:all": "DEBUG=test nyc mocha --exit --reporter landing src/utils/testSetup.js src/**/*.test.js",
+        "test:unit:avatar": "DEBUG=test nodemon --exec 'mocha src/utils/testSetup.js src/avatar/*.test.js'",
+        "test:unit:common": "DEBUG=test nodemon --exec 'mocha src/utils/testSetup.js src/common/*.test.js'",
+        "test:unit:user": "DEBUG=test nodemon --exec 'mocha src/utils/testSetup.js src/user/*.test.js'",
+        "test:acceptance": "NODE_ENV=test DEBUG=db:connection,test mocha --exit src/utils/dbTestSetup.js src/**/*.a-test.js",
+        "test:integration": "NODE_ENV=test DEBUG=db:connection,test mocha --exit src/utils/dbTestSetup.js src/**/*.i-test.js",
+        "test:a-i": "npm run test:integration -s && npm run test:acceptance -s",
+        "test:all": "NODE_ENV=test DEBUG=db:connection,test nyc mocha --exit src/utils/dbTestSetup.js src/**/*.*test.js",
         "up:dev": "docker-compose up node-server",
         "up:test:acceptance": "docker-compose up node-test",
         "up:test:integration": "docker-compose run --rm node-test yarn test:integration",
@@ -51,7 +41,11 @@
         "type": "git",
         "url": "git+https://github.com/jasonsjones/microservices-api.git"
     },
-    "keywords": ["node", "api", "microservices"],
+    "keywords": [
+        "node",
+        "api",
+        "microservices"
+    ],
     "author": "Jason Jones",
     "license": "MIT",
     "bugs": {
@@ -62,7 +56,7 @@
         "bcrypt-nodejs": "0.0.3",
         "body-parser": "^1.17.2",
         "cors": "^2.8.4",
-        "dotenv": "^5.0.0",
+        "dotenv": "^6.0.0",
         "ejs": "^2.5.7",
         "express": "^4.15.3",
         "express-graphql": "^0.6.7",
@@ -80,14 +74,14 @@
     "devDependencies": {
         "babel-cli": "^6.24.1",
         "babel-core": "^6.26.0",
-        "babel-eslint": "8.2.2",
+        "babel-eslint": "^8.2.2",
         "babel-plugin-istanbul": "^4.1.5",
         "babel-preset-env": "^1.6.1",
         "babel-preset-stage-2": "^6.24.1",
         "babel-register": "^6.24.1",
         "chai": "^4.1.1",
         "debug": "^3.0.0",
-        "eslint": "^4.18.0",
+        "eslint": "^5.1.0",
         "eslint-config-prettier": "^2.9.0",
         "eslint-plugin-prettier": "^2.6.0",
         "extract-text-webpack-plugin": "^3.0.0",
@@ -95,9 +89,9 @@
         "mocha": "^5.0.0",
         "nodemon": "^1.11.0",
         "nsp": "^3.1.0",
-        "nyc": "^11.3.0",
+        "nyc": "^12.0.0",
         "prettier": "^1.12.1",
-        "sinon": "4.4.3",
+        "sinon": "^6.1.0",
         "sinon-mongoose": "^2.0.2",
         "supertest": "^3.0.0"
     }

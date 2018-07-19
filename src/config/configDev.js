@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-const dockerDbUri = 'mongodb://mongo/sandboxapi';
+const dockerDbUri = 'mongodb://mongo:27017/sandboxapi';
 
 export default {
     logging: true,

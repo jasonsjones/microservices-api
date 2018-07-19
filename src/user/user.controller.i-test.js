@@ -44,7 +44,7 @@ const expectUserShape = res => {
 };
 
 const expectClientJSONUserShape = res => {
-    expect(res).to.have.property('id');
+    expect(res).to.have.property('_id');
     expect(res).to.have.property('name');
     expect(res).to.have.property('email');
     expect(res).to.have.property('roles');
@@ -81,7 +81,8 @@ describe('User controller integration tests', () => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
                 expect(response.success).to.be.true;
-                expectUserShape(response.payload.user);
+                expect(response.payload).to.have.property('token');
+                expectClientJSONUserShape(response.payload.user);
             });
         });
     });

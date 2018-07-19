@@ -68,6 +68,7 @@ describe('User acceptance tests', () => {
                 .expect(200)
                 .then(res => {
                     expectJSONShape(res.body, 'user');
+                    expectJSONShape(res.body, 'token');
                     expect(res.body.success).to.be.true;
                     oliverId = res.body.payload.user._id;
                 });
@@ -85,7 +86,7 @@ describe('User acceptance tests', () => {
                     const { user } = res.body.payload;
                     expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
-                    expect(user).to.have.property('id');
+                    expect(user).to.have.property('_id');
                     expect(user).to.have.property('name');
                     expect(user).to.have.property('email');
                     expect(user).to.have.property('avatarUrl');
@@ -132,7 +133,7 @@ describe('User acceptance tests', () => {
                     return createUser(oliver);
                 })
                 .then(user => {
-                    oliverId = user.id;
+                    oliverId = user._id;
                     return;
                 });
         });
@@ -239,7 +240,7 @@ describe('User acceptance tests', () => {
                 .then(res => {
                     expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
-                    expect(res.body.payload.user).to.have.property('id');
+                    expect(res.body.payload.user).to.have.property('_id');
                     expect(res.body.payload.user).to.have.property('name');
                     expect(res.body.payload.user).to.have.property('email');
                     expect(res.body.payload.user.name).to.equal(updatedUserData.name);
