@@ -2,7 +2,6 @@
     "name": "microservices-api",
     "version": "0.2.9",
     "description": "A sandbox API built on microservices",
-    "main": "index.js",
     "nyc": {
         "exclude": [
             "src/**/*test.js",
