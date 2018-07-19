@@ -17,29 +17,20 @@
     },
     "scripts": {
         "predev": "npm run dbSeed",
-        "dev":
-            "NODE_ENV=development DEBUG=db*,app nodemon src/server.js --inspect=0.0.0.0:5858 --watch src/ --exec babel-node",
+        "dev": "NODE_ENV=development DEBUG=db*,app nodemon src/server.js --inspect=0.0.0.0:5858 --watch src/ --exec babel-node",
         "clean": "rm -rf .v8flags* uploads/*",
         "dbSeed": "babel-node src/utils/dbSeed.js",
         "security-check": "nsp check",
         "lt": "lt --port 3000 --subdomain sandboxapi",
-        "lint": "eslint webpack.config.js src/**/*.js src/*.js",
-        "test:unit:all":
-            "DEBUG=test nodemon --exec 'nyc mocha --exit --reporter landing src/utils/testSetup.js src/**/*.test.js --require babel-register'",
-        "test:unit:avatar":
-            "DEBUG=test nodemon --exec 'mocha src/utils/testSetup.js src/avatar/*.test.js --require babel-register'",
-        "test:unit:common":
-            "DEBUG=test nodemon --exec 'mocha src/utils/testSetup.js src/common/*.test.js --require babel-register'",
-        "test:unit:user":
-            "DEBUG=test nodemon --exec 'mocha src/utils/testSetup.js src/user/*.test.js --require babel-register'",
-        "test:acceptance":
-            "NODE_ENV=test DEBUG=db:connection,test nodemon --exec 'mocha --exit src/utils/dbTestSetup.js src/**/*.a-test.js --require babel-register'",
-        "test:integration":
-            "NODE_ENV=test DEBUG=db:connection,test nodemon --exec 'mocha --exit src/utils/dbTestSetup.js src/**/*.i-test.js --require babel-register'",
-        "test:a-i":
-            "NODE_ENV=test DEBUG=db:connection,test nodemon --exec 'mocha --exit src/utils/dbTestSetup.js src/**/*.*-test.js --require babel-register'",
-        "test:all":
-            "NODE_ENV=test DEBUG=db:connection,test nyc mocha --exit src/utils/dbTestSetup.js src/**/*.*test.js --require babel-register",
+        "lint": "eslint src/**/*.js src/*.js",
+        "test:unit:all": "DEBUG=test nyc mocha --exit --reporter landing src/utils/testSetup.js src/**/*.test.js",
+        "test:unit:avatar": "DEBUG=test nodemon --exec 'mocha src/utils/testSetup.js src/avatar/*.test.js'",
+        "test:unit:common": "DEBUG=test nodemon --exec 'mocha src/utils/testSetup.js src/common/*.test.js'",
+        "test:unit:user": "DEBUG=test nodemon --exec 'mocha src/utils/testSetup.js src/user/*.test.js'",
+        "test:acceptance": "NODE_ENV=test DEBUG=db:connection,test mocha --exit src/utils/dbTestSetup.js src/**/*.a-test.js",
+        "test:integration": "NODE_ENV=test DEBUG=db:connection,test mocha --exit src/utils/dbTestSetup.js src/**/*.i-test.js",
+        "test:a-i": "npm run test:integration -s && npm run test:acceptance -s",
+        "test:all": "NODE_ENV=test DEBUG=db:connection,test nyc mocha --exit src/utils/dbTestSetup.js src/**/*.*test.js",
         "up:dev": "docker-compose up node-server",
         "up:test:acceptance": "docker-compose up node-test",
         "up:test:integration": "docker-compose run --rm node-test yarn test:integration",
@@ -51,7 +42,11 @@
         "type": "git",
         "url": "git+https://github.com/jasonsjones/microservices-api.git"
     },
-    "keywords": ["node", "api", "microservices"],
+    "keywords": [
+        "node",
+        "api",
+        "microservices"
+    ],
     "author": "Jason Jones",
     "license": "MIT",
     "bugs": {
