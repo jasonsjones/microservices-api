@@ -20,12 +20,16 @@ let configBase = {
 };
 
 let config;
-if (configBase.env === 'development') {
-    config = Object.assign({}, configBase, configDev);
-} else if (configBase.env === 'test') {
-    config = Object.assign({}, configBase, configTest);
-} else {
-    config = Object.assign({}, configBase);
+switch (env) {
+    case 'development':
+        config = Object.assign({}, configBase, configDev);
+        break;
+    case 'test':
+        config = Object.assign({}, configBase, configTest);
+        break;
+    default:
+        config = Object.assign({}, configBase);
+        break;
 }
 
 export default config;
