@@ -1,12 +1,15 @@
 import bcrypt from 'bcrypt-nodejs';
+import config from '../config/config';
 import Avatar from '../avatar/avatar.model';
+
+let numRounds = config.env === 'test' ? 1 : 12;
 
 export function hashPassword(next) {
     let user = this;
     if (!user.isModified('password')) {
         return next();
     }
-    bcrypt.genSalt(12, (err, salt) => {
+    bcrypt.genSalt(numRounds, (err, salt) => {
         if (err) {
             return next(err);
         }
