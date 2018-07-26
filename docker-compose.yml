@@ -8,6 +8,8 @@ services:
         volumes:
             - .:/home/blacktab
         tty: true
+        environment:
+            - RUNNING_IN_DOCKER=true
         env_file:
             - .env
         ports:

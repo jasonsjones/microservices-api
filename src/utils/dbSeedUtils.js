@@ -6,7 +6,7 @@ import config from '../config/config';
 
 const log = debug('db:seed');
 
-const baseUrl = `${config.baseUrl}:${config.port}`;
+const url = config.url;
 const assetPath = `${__dirname}/../../assets`;
 const defaultAvatarFile = `${assetPath}/sfdc_default_avatar.png`;
 const initialUsers = [
@@ -40,17 +40,17 @@ const initialUsers = [
 ];
 
 const getResource = endpoint => {
-    return fetch(`${baseUrl}${endpoint}`).then(response => response.json());
+    return fetch(`${url}${endpoint}`).then(response => response.json());
 };
 
 const seedAvatarImage = imgPath => {
-    return request(`${baseUrl}`)
+    return request(url)
         .post('/api/avatars/default')
         .attach('avatar', imgPath);
 };
 
 const seedUser = userData => {
-    return fetch(`${baseUrl}/api/users/signup`, {
+    return fetch(`${url}/api/users/signup`, {
         method: 'POST',
         body: JSON.stringify(userData),
         headers: {

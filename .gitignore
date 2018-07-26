@@ -1,5 +1,6 @@
 node_modules/
 data/
+build/
 uploads/
 public/
 npm-debug.log

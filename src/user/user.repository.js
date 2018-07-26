@@ -4,6 +4,8 @@ import User from './user.model';
 import { normalizeRandomUserData } from '../utils/userUtils';
 import { deleteAvatar, makeAvatarModel } from '../avatar/avatar.repository';
 
+const baseUrl = 'http://localhost:3000';
+
 export function getUsers(queryCondition = {}, inclAvatars = false) {
     let query;
     if (inclAvatars) {
@@ -94,7 +96,7 @@ export function uploadUserAvatar(id, file, deleteAfterUpload = true) {
             file,
             user._id,
             deleteAfterUpload,
-            false /* idDefaultAvatar */
+            false /* isDefaultAvatar */
         );
         return avatar.save();
     });
@@ -103,7 +105,7 @@ export function uploadUserAvatar(id, file, deleteAfterUpload = true) {
         .then(values => {
             let [user, img] = values;
             user.avatar = img._id;
-            user.avatarUrl = `http://localhost:3000/api/avatar/${img._id}`;
+            user.avatarUrl = `${baseUrl}/api/avatar/${img._id}`;
             return user.save();
         })
         .catch(err => Promise.reject(err));
