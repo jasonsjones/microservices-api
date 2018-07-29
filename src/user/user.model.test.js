@@ -115,6 +115,60 @@ describe('User model', () => {
         })();
     }).timeout(6000);
 
+    it('does not verify an empty password', done => {
+        const ORIG_PWD = 'arrow';
+        let user = new User({
+            name: 'Oliver Queen',
+            email: 'oliver@qc.com',
+            password: ORIG_PWD,
+            isModified: () => {
+                return true;
+            }
+        });
+        // need to bind the middleware function to the user to ensure the
+        // proper 'this' context from within the function
+        middleware.hashPassword.bind(user, (err, user) => {
+            expect(user.verifyPassword('')).to.be.false;
+            done();
+        })();
+    }).timeout(6000);
+
+    it('does not verify a password of null', done => {
+        const ORIG_PWD = 'arrow';
+        let user = new User({
+            name: 'Oliver Queen',
+            email: 'oliver@qc.com',
+            password: ORIG_PWD,
+            isModified: () => {
+                return true;
+            }
+        });
+        // need to bind the middleware function to the user to ensure the
+        // proper 'this' context from within the function
+        middleware.hashPassword.bind(user, (err, user) => {
+            expect(user.verifyPassword(null)).to.be.false;
+            done();
+        })();
+    }).timeout(6000);
+
+    it('does not verify a password of undefined', done => {
+        const ORIG_PWD = 'arrow';
+        let user = new User({
+            name: 'Oliver Queen',
+            email: 'oliver@qc.com',
+            password: ORIG_PWD,
+            isModified: () => {
+                return true;
+            }
+        });
+        // need to bind the middleware function to the user to ensure the
+        // proper 'this' context from within the function
+        middleware.hashPassword.bind(user, (err, user) => {
+            expect(user.verifyPassword(undefined)).to.be.false;
+            done();
+        })();
+    }).timeout(6000);
+
     it('adds a valid role to a user', () => {
         let user = new User({
             name: 'Oliver Queen',

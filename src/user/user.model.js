@@ -37,6 +37,7 @@ userSchema.post('save', middleware.checkForErrors);
 userSchema.post('remove', middleware.removeAvatarOnDelete);
 
 userSchema.methods.verifyPassword = function(password) {
+    if (password == null || password == undefined) return false;
     return bcrypt.compareSync(password, this.password);
 };
 
