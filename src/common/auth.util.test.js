@@ -69,4 +69,12 @@ describe('Auth util', () => {
             }
         });
     });
+
+    describe('generateRandomToken()', () => {
+        it('generates a 20 byte random hex token', () => {
+            const token = Util.generateRandomToken();
+            expect(token).to.be.a('String');
+            expect(token.length).to.equal(40);
+        });
+    });
 });
