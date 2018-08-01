@@ -199,6 +199,12 @@ describe('User repository integration tests', () => {
                 });
             });
 
+            it('returns null when user email is not found', () => {
+                return Repository.lookupUserByEmail('notfound@email.com').then(response => {
+                    expect(response).to.be.null;
+                });
+            });
+
             it('returns the user with the given email and avatar populated if requested', () => {
                 return Repository.lookupUserByEmail(users[1].email, true).then(response => {
                     expectUserShape(response);

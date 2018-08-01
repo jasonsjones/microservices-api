@@ -173,6 +173,21 @@ describe('User repository', () => {
             });
         });
 
+        it('resolves to null if the user is not found', () => {
+            const email = 'notfound@email.com';
+            UserMock.expects('findOne')
+                .withArgs({ email })
+                .chain('exec')
+                .resolves(null);
+
+            const promise = Repository.lookupUserByEmail(email);
+            expect(promise).to.be.a('Promise');
+
+            return promise.then(user => {
+                expect(user).to.be.null;
+            });
+        });
+
         it('rejects with error if something went wrong', () => {
             const email = mockUsers[0].email;
             UserMock.expects('findOne')
