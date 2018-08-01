@@ -732,19 +732,6 @@ describe('User repository', () => {
     });
 });
 
-const expectUserToHaveAvatar = user => {
-    expect(user).to.be.an('Object');
-    expect(user).to.have.property('name');
-    expect(user).to.have.property('email');
-    expect(user).to.have.property('avatarUrl');
-    expect(user).to.have.property('roles');
-    expect(user).to.have.property('avatar');
-    expect(user.avatar).to.be.an('Object');
-    expect(user.avatar).to.have.property('user');
-    expect(user.avatar).to.have.property('fileSize');
-    expect(user.avatar).to.have.property('contentType');
-};
-
 const expectUserProperties = user => {
     expect(user).to.be.an('Object');
     expect(user).to.have.property('name');
@@ -752,4 +739,12 @@ const expectUserProperties = user => {
     expect(user).to.have.property('avatarUrl');
     expect(user).to.have.property('roles');
     expect(user).to.have.property('avatar');
+};
+
+const expectUserToHaveAvatar = user => {
+    expectUserProperties(user);
+    expect(user.avatar).to.be.an('Object');
+    expect(user.avatar).to.have.property('user');
+    expect(user.avatar).to.have.property('fileSize');
+    expect(user.avatar).to.have.property('contentType');
 };
