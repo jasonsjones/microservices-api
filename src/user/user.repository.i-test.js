@@ -290,6 +290,36 @@ describe('User repository integration tests', () => {
             });
         });
 
+        context('generateAndSetResetToken()', () => {
+            it('returns an error if the users email is not provided', () => {
+                return Repository.generateAndSetResetToken().catch(error => {
+                    expect(error).to.exist;
+                    expect(error).to.be.an('Error');
+                });
+            });
+
+            it('returns null if the user is not found', () => {
+                return Repository.generateAndSetResetToken('notfound@email.com').then(response => {
+                    expect(response).to.be.null;
+                });
+            });
+
+            it('updates the user model with the reset token added', () => {
+                return Repository.generateAndSetResetToken(users[0].email).then(response => {
+                    expect(response.passwordResetToken).to.exist;
+                    expect(response.passwordResetToken).to.be.a('string');
+                    expect(response.passwordResetToken.length).to.equal(40);
+                });
+            });
+
+            it('updates the user model with the reset token expiration date set', () => {
+                return Repository.generateAndSetResetToken(users[0].email).then(response => {
+                    expect(response.passwordResetTokenExpiresAt).to.exist;
+                    expect(response.passwordResetTokenExpiresAt).to.be.a('Date');
+                });
+            });
+        });
+
         context('updateUser()', () => {
             it('returns the updated user with the given id', () => {
                 const updatedData = {

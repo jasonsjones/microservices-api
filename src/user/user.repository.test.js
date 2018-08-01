@@ -663,6 +663,73 @@ describe('User repository', () => {
             });
         });
     });
+
+    describe('generateAndSetResetToken()', () => {
+        it('rejects with error if the email param is not provided', () => {
+            const promise = Repository.generateAndSetResetToken();
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(err => {
+                expect(err).to.exist;
+                expect(err).to.be.an('Error');
+            });
+        });
+
+        it('resolves to null if user is not found', () => {
+            let user = new User(mockUsers[0]);
+            UserMock.expects('findOne')
+                .withArgs({ email: user.email })
+                .chain('exec')
+                .resolves(null);
+
+            const promise = Repository.generateAndSetResetToken(user.email);
+            expect(promise).to.be.an('Promise');
+
+            return promise.then(response => {
+                expect(response).to.be.null;
+            });
+        });
+
+        it('updates user with password reset token and expiration date', () => {
+            let user = new User(mockUsers[0]);
+            const stub = sinon.stub(User.prototype, 'save');
+            stub.resolves(user);
+
+            UserMock.expects('findOne')
+                .withArgs({ email: user.email })
+                .chain('exec')
+                .resolves(user);
+
+            const promise = Repository.generateAndSetResetToken(user.email);
+            expect(promise).to.be.an('Promise');
+
+            promise.then(user => {
+                expect(user).to.have.property('passwordResetToken');
+                expect(user.passwordResetToken).to.be.a('string');
+                stub.restore();
+            });
+        });
+
+        it('updates user with password reset expiration date', () => {
+            let user = new User(mockUsers[0]);
+            const stub = sinon.stub(User.prototype, 'save');
+            stub.resolves(user);
+
+            UserMock.expects('findOne')
+                .withArgs({ email: user.email })
+                .chain('exec')
+                .resolves(user);
+
+            const promise = Repository.generateAndSetResetToken(user.email);
+            expect(promise).to.be.an('Promise');
+
+            promise.then(user => {
+                expect(user).to.have.property('passwordResetTokenExpiresAt');
+                expect(user.passwordResetTokenExpiresAt).to.be.a('Date');
+                stub.restore();
+            });
+        });
+    });
 });
 
 const expectUserToHaveAvatar = user => {
