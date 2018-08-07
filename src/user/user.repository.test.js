@@ -254,7 +254,7 @@ describe('User repository', () => {
         });
     });
 
-    describe('signUpUser()', () => {
+    describe('createUser()', () => {
         let newUser;
         beforeEach(() => {
             newUser = {
@@ -273,7 +273,7 @@ describe('User repository', () => {
             const stub = sinon.stub(User.prototype, 'save');
             stub.resolves(mockUsers[0]);
 
-            const promise = Repository.signUpUser(newUser);
+            const promise = Repository.createUser(newUser);
             expect(promise).to.be.an('Promise');
 
             promise.then(user => {
@@ -286,7 +286,7 @@ describe('User repository', () => {
             const stub = sinon.stub(User.prototype, 'save');
             stub.rejects(new Error('Ooops, something went wrong when saving the user'));
 
-            const promise = Repository.signUpUser(newUser);
+            const promise = Repository.createUser(newUser);
             expect(promise).to.be.an('Promise');
 
             promise.catch(err => {
@@ -297,7 +297,7 @@ describe('User repository', () => {
         });
 
         it('rejects with error if the user data is not provided', () => {
-            const promise = Repository.signUpUser();
+            const promise = Repository.createUser();
             expect(promise).to.be.a('Promise');
 
             return promise.catch(err => {

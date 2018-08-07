@@ -484,10 +484,10 @@ describe('User controller', () => {
         });
     });
 
-    describe('signUpUser()', () => {
+    describe('createUser()', () => {
         let req, stub;
         beforeEach(() => {
-            stub = sinon.stub(Repository, 'signUpUser');
+            stub = sinon.stub(Repository, 'createUser');
             req = {};
         });
 
@@ -503,7 +503,7 @@ describe('User controller', () => {
                 password: 'arsenal'
             };
             stub.resolves(new User(mockUsers[0]));
-            const promise = Controller.signupUser(req);
+            const promise = Controller.createUser(req);
             expect(promise).to.be.a('Promise');
 
             return promise.then(response => {
@@ -522,7 +522,7 @@ describe('User controller', () => {
                 password: 'arsenal'
             };
             stub.resolves(new User(mockUsers[0]));
-            const promise = Controller.signupUser(req);
+            const promise = Controller.createUser(req);
             expect(promise).to.be.a('Promise');
 
             return promise.then(response => {
@@ -540,7 +540,7 @@ describe('User controller', () => {
                 password: 'arsenal'
             };
             stub.rejects(new Error('Oops, something went wrong when signing up'));
-            const promise = Controller.signupUser(req);
+            const promise = Controller.createUser(req);
             expect(promise).to.be.a('Promise');
 
             return promise.catch(response => {
@@ -549,7 +549,7 @@ describe('User controller', () => {
         });
 
         it('rejects with error if req parameter is not provided', () => {
-            const promise = Controller.signupUser();
+            const promise = Controller.createUser();
             expect(promise).to.be.a('Promise');
 
             return promise.catch(response => {

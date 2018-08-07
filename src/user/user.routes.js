@@ -57,7 +57,7 @@ export default () => {
     });
 
     UserRouter.post('/signup', (req, res) => {
-        UserController.signupUser(req)
+        UserController.createUser(req)
             .then(handleSuccess(res))
             .catch(handleError(res));
     });

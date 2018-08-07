@@ -62,13 +62,13 @@ const expectErrorResponse = (errorResponse, errMsg) => {
 };
 
 describe('User controller integration tests', () => {
-    context('signUpUser()', () => {
+    context('createUser()', () => {
         after(() => {
             dropCollection(dbConnection, 'users');
         });
 
         it('returns error payload if the user data is not provided', () => {
-            return Controller.signupUser().catch(error => {
+            return Controller.createUser().catch(error => {
                 expectErrorResponse(error, 'request parameter is required');
             });
         });
@@ -77,7 +77,7 @@ describe('User controller integration tests', () => {
             let req = {
                 body: users[0]
             };
-            return Controller.signupUser(req).then(response => {
+            return Controller.createUser(req).then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
                 expect(response.success).to.be.true;
@@ -90,7 +90,7 @@ describe('User controller integration tests', () => {
     context('uploadUserAvatar()', () => {
         let barryId;
         before(() => {
-            return Controller.signupUser({ body: users[0] }).then(response => {
+            return Controller.createUser({ body: users[0] }).then(response => {
                 barryId = response.payload.user._id;
             });
         });
@@ -150,9 +150,9 @@ describe('User controller integration tests', () => {
     context('changePassword()', () => {
         let barryId;
         before(() => {
-            return Controller.signupUser({ body: users[0] }).then(response => {
+            return Controller.createUser({ body: users[0] }).then(response => {
                 barryId = response.payload.user._id;
-                Controller.signupUser({ body: users[1] });
+                Controller.createUser({ body: users[1] });
             });
         });
 
@@ -200,9 +200,9 @@ describe('User controller integration tests', () => {
     context('user fetching and mutating related tests', () => {
         let barryId;
         before(() => {
-            return Controller.signupUser({ body: users[0] }).then(response => {
+            return Controller.createUser({ body: users[0] }).then(response => {
                 barryId = response.payload.user._id;
-                Controller.signupUser({ body: users[1] });
+                Controller.createUser({ body: users[1] });
             });
         });
 
