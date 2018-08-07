@@ -19,3 +19,7 @@ export const getMailTransporter = () => {
     }
     return _transporter;
 };
+
+export const clearMailTransporterCache = () => {
+    _transporter = null;
+};
