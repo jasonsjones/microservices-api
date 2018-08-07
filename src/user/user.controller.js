@@ -1,5 +1,12 @@
+import debug from 'debug';
+import nodemailer from 'nodemailer';
+
+import config from '../config/config';
+import { getMailTransporter } from '../common/mailer';
 import * as UserRepository from './user.repository';
 import * as AuthUtils from '../common/auth.utils';
+
+const log = debug('test');
 
 const buildError = msg => {
     return {
@@ -292,6 +299,49 @@ export const getMe = req => {
     }
 };
 
+export const forgotPassword = req => {
+    if (!req) {
+        return Promise.reject({
+            success: false,
+            message: 'request parameter is required',
+            error: new Error('request parameter is required')
+        });
+    }
+
+    if (!req.body || !req.body.email) {
+        return Promise.reject({
+            success: false,
+            message: 'email is required',
+            error: new Error('email is required')
+        });
+    }
+
+    return UserRepository.generateAndSetResetToken(req.body.email)
+        .then(user => {
+            if (user) {
+                const resetUrl = `${config.url}/reset/${user.passwordResetToken}`;
+                return sendPasswordResetEmail(user, resetUrl);
+            }
+        })
+        .then(data => {
+            return Promise.resolve({
+                success: true,
+                message: `reset email sent to ${data.email}`,
+                payload: {
+                    email: data.email,
+                    info: data.info
+                }
+            });
+        })
+        .catch(error => {
+            return Promise.reject({
+                success: false,
+                message: error.message,
+                error: error
+            });
+        });
+};
+
 export const getRandomUser = () => {
     return UserRepository.getRandomUser().then(user => {
         return {
@@ -301,5 +351,27 @@ export const getRandomUser = () => {
                 user
             }
         };
+    });
+};
+
+const sendPasswordResetEmail = (user, resetUrl) => {
+    return new Promise((resolve, reject) => {
+        let mailOptions = {
+            from: '"Sandbox API" <support@sandboxapi.com>', // sender address
+            to: `"${user.name}" <${user.email}>`, // list of receivers
+            subject: 'Password Reset', // Subject line
+            text: 'Password reset...', // plain text body
+            html: '<b>Password</b> reset...' // html body
+        };
+        let transporter = getMailTransporter();
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                reject(error);
+            }
+            log('Message sent: %s', info.messageId);
+            // Preview only available when sending through an Ethereal account
+            log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+            resolve({ email: user.email, info });
+        });
     });
 };

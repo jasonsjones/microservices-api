@@ -1,11 +1,13 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
+import nodemailer from 'nodemailer';
 
 import * as Repository from './user.repository';
 import * as Controller from './user.controller';
 import User from './user.model';
 import { mockUsers, mockUsersWithAvatar, mockRandomUser } from '../utils/userTestUtils';
 import { normalizeRandomUserData } from '../utils/userUtils';
+import { clearMailTransporterCache } from '../common/mailer';
 
 describe('User controller', () => {
     describe('getUsers()', () => {
@@ -639,6 +641,101 @@ describe('User controller', () => {
             promise.then(response => {
                 expectUserResponse(response);
                 expect(response).to.have.property('message');
+            });
+        });
+    });
+
+    describe('forgotPassword()', () => {
+        let req, stub, resolvedUser;
+        beforeEach(() => {
+            stub = sinon.stub(Repository, 'generateAndSetResetToken');
+            req = {};
+            resolvedUser = new User(mockUsers[1]);
+            resolvedUser.passwordResetToken = '562835a1c7c63581ee81f15bad8bbc851123b581';
+            resolvedUser.passwordResetTokenExpiresAt = Date.now() + 3600000;
+        });
+
+        afterEach(() => {
+            stub.restore();
+            req = {};
+            resolvedUser = null;
+        });
+
+        it('rejects with error if req parameter is not provided', () => {
+            const promise = Controller.forgotPassword();
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if req.body is not provided', () => {
+            const promise = Controller.forgotPassword(req);
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if req.body.email is not provided', () => {
+            req.body = {};
+            const promise = Controller.forgotPassword(req);
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if there is an error sending the email', () => {
+            let mockTransporter = {
+                sendMail: (data, cb) => {
+                    const err = new Error('Oops, there was an error sending the message');
+                    cb(err, null);
+                }
+            };
+
+            let mailerStub = sinon.stub(nodemailer, 'createTransport').returns(mockTransporter);
+
+            req.body = {
+                email: 'oliver@qc.com'
+            };
+            stub.resolves(resolvedUser);
+            const promise = Controller.forgotPassword(req);
+            expect(promise).to.be.a('Promise');
+            return promise.catch(response => {
+                expectErrorResponse(response);
+                clearMailTransporterCache();
+                mailerStub.restore();
+            });
+        });
+
+        it('resolves with an object with success and message property', () => {
+            let mockTransporter = {
+                sendMail: (data, cb) => {
+                    cb(null, { messageId: '<abcdef12345>@etherreal.mail.com' });
+                }
+            };
+
+            let mailerStub = sinon.stub(nodemailer, 'createTransport').returns(mockTransporter);
+
+            req.body = {
+                email: 'oliver@qc.com'
+            };
+            stub.resolves(resolvedUser);
+            const promise = Controller.forgotPassword(req);
+            expect(promise).to.be.a('Promise');
+            return promise.then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response.payload).to.be.an('object');
+                expect(response.payload.email).to.be.a('string');
+                expect(response.payload.info.messageId).to.be.a('string');
+                expect(response.success).to.be.true;
+                clearMailTransporterCache();
+                mailerStub.restore();
             });
         });
     });
