@@ -4,7 +4,7 @@ import request from 'supertest';
 import app from '../config/app';
 import { dbConnection, dropCollection } from '../utils/dbTestUtils';
 import { expectJSONShape } from '../utils/testUtils';
-import { createUser } from '../utils/userTestUtils';
+import { createUserUtil } from '../utils/userTestUtils';
 
 const barry = {
     name: 'Barry Allen',
@@ -20,7 +20,7 @@ const oliver = {
 };
 
 const signupAndLogin = userData => {
-    return createUser(userData).then(() => {
+    return createUserUtil(userData).then(() => {
         return request(app)
             .post('/api/login')
             .send({
@@ -75,7 +75,7 @@ describe('User acceptance tests', () => {
         });
 
         it('upload custom avatar image for user', () => {
-            return createUser(oliver)
+            return createUserUtil(oliver)
                 .then(user => {
                     return request(app)
                         .post(`/api/users/${user._id}/avatar`)
@@ -96,7 +96,7 @@ describe('User acceptance tests', () => {
 
         it('verify the user has been added', () => {
             let userId;
-            return createUser(oliver)
+            return createUserUtil(oliver)
                 .then(user => {
                     userId = user._id;
                     return request(app)
@@ -127,10 +127,10 @@ describe('User acceptance tests', () => {
 
         before(() => {
             dropCollection(dbConnection, 'users');
-            return createUser(barry)
+            return createUserUtil(barry)
                 .then(user => {
                     barryId = user._id;
-                    return createUser(oliver);
+                    return createUserUtil(oliver);
                 })
                 .then(user => {
                     oliverId = user._id;
@@ -218,7 +218,7 @@ describe('User acceptance tests', () => {
 
         before(() => {
             dropCollection(dbConnection, 'users');
-            return createUser(barry).then(user => {
+            return createUserUtil(barry).then(user => {
                 barryId = user._id;
             });
         });
@@ -259,7 +259,7 @@ describe('User acceptance tests', () => {
 
         before(() => {
             dropCollection(dbConnection, 'users');
-            return createUser(barry).then(user => {
+            return createUserUtil(barry).then(user => {
                 barryId = user._id;
             });
         });
@@ -301,7 +301,7 @@ describe('User acceptance tests', () => {
 
         before(() => {
             dropCollection(dbConnection, 'users');
-            return createUser(barry);
+            return createUserUtil(barry);
         });
 
         after(() => {

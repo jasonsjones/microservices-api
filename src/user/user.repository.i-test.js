@@ -34,7 +34,7 @@ describe('User repository integration tests', () => {
         dropCollection(dbConnection, 'avatars');
     });
 
-    context('signUpUser()', () => {
+    context('createUser()', () => {
         after(() => {
             dropCollection(dbConnection, 'users');
         });
@@ -45,7 +45,7 @@ describe('User repository integration tests', () => {
                 email: 'barry@starlabs.com',
                 password: '123456'
             };
-            return Repository.signUpUser(newUser).then(response => {
+            return Repository.createUser(newUser).then(response => {
                 expectUserShape(response);
                 // ensure the password is hashed
                 expect(response.password).to.not.equal(newUser.password);
@@ -53,7 +53,7 @@ describe('User repository integration tests', () => {
         });
 
         it('returns an error if the user data is not provided', () => {
-            return Repository.signUpUser().catch(error => {
+            return Repository.createUser().catch(error => {
                 expect(error).to.exist;
                 expect(error.message).to.contain('user data is required');
             });
@@ -72,7 +72,7 @@ describe('User repository integration tests', () => {
 
         let userId;
         before(() => {
-            return Repository.signUpUser(users[1]).then(response => {
+            return Repository.createUser(users[1]).then(response => {
                 userId = response._id;
             });
         });
@@ -117,11 +117,11 @@ describe('User repository integration tests', () => {
         };
 
         before(() => {
-            return Repository.signUpUser(users[0])
+            return Repository.createUser(users[0])
                 .then(user => {
                     barryId = user._id;
                     barryHashedPwd = user.password;
-                    return Repository.signUpUser(users[1]);
+                    return Repository.createUser(users[1]);
                 })
                 .then(user => {
                     oliverId = user._id;

@@ -181,7 +181,7 @@ export function uploadUserAvatar(req) {
         });
 }
 
-export function signupUser(req) {
+export function createUser(req) {
     if (!req || !req.body) {
         return Promise.reject({
             success: false,
@@ -189,7 +189,7 @@ export function signupUser(req) {
             error: new Error('request parameter is required')
         });
     }
-    return UserRepository.signUpUser(req.body)
+    return UserRepository.createUser(req.body)
         .then(user => {
             return {
                 success: true,

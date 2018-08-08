@@ -141,7 +141,7 @@ export function changePassword(userData) {
     });
 }
 
-export function signUpUser(userData) {
+export function createUser(userData) {
     if (!userData) {
         return Promise.reject(new Error('user data is required'));
     }
