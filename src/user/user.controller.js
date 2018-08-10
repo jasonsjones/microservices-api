@@ -311,8 +311,8 @@ export const forgotPassword = req => {
     if (!req.body || !req.body.email) {
         return Promise.reject({
             success: false,
-            message: 'email is required',
-            error: new Error('email is required')
+            message: 'user email is required',
+            error: new Error('user email is required')
         });
     }
 
@@ -324,14 +324,22 @@ export const forgotPassword = req => {
             }
         })
         .then(data => {
-            return Promise.resolve({
-                success: true,
-                message: `reset email sent to ${data.email}`,
-                payload: {
-                    email: data.email,
-                    info: data.info
-                }
-            });
+            if (data && data.email) {
+                return Promise.resolve({
+                    success: true,
+                    message: `reset email sent to ${data.email}`,
+                    payload: {
+                        email: data.email,
+                        info: data.info
+                    }
+                });
+            } else {
+                return Promise.resolve({
+                    success: false,
+                    message: 'user not found',
+                    payload: null
+                });
+            }
         })
         .catch(error => {
             return Promise.reject({

@@ -712,7 +712,21 @@ describe('User controller', () => {
             });
         });
 
-        it('resolves with an object with success and message property', () => {
+        it('resolves with an object with success (false) and message property if user is not found', () => {
+            req.body = {
+                email: 'notfound@email.com'
+            };
+            stub.resolves(null);
+            const promise = Controller.forgotPassword(req);
+            expect(promise).to.be.a('Promise');
+            return promise.then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response.success).to.be.false;
+            });
+        });
+
+        it('resolves with an object with success (true) and message property if user is found', () => {
             let mockTransporter = {
                 sendMail: (data, cb) => {
                     cb(null, {
