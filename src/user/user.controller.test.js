@@ -715,7 +715,9 @@ describe('User controller', () => {
         it('resolves with an object with success and message property', () => {
             let mockTransporter = {
                 sendMail: (data, cb) => {
-                    cb(null, { messageId: '<abcdef12345>@etherreal.mail.com' });
+                    cb(null, {
+                        messageId: '<1b519020-5bfe-4078-cd5e-7351a09bd766@sandboxapi.com>'
+                    });
                 }
             };
 
