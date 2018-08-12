@@ -364,20 +364,7 @@ export const getRandomUser = () => {
 
 const sendPasswordResetEmail = (user, resetUrl) => {
     return new Promise((resolve, reject) => {
-        let mailOptions = {
-            from: '"Sandbox API" <support@sandboxapi.com>', // sender address
-            to: `"${user.name}" <${user.email}>`, // list of receivers
-            subject: 'Password Reset', // Subject line
-            text: 'Password reset...', // plain text body
-            html: `
-            <div style="font-family: sans-serif; font-size: 18px; margin: 0 100px">
-                <p>You are receiving this because you (or someone else) have requested the reset of the password for your account</p>
-                <p>Please click on the following link, or paste into browser address bar to complete the process:</p>
-                <p><a href="${resetUrl}">${resetUrl}</a></p>
-                <p>If you did not request this, please disregard this email and your password will remain unchanged</p>
-            </div>
-            `
-        };
+        let mailOptions = getMailOptions(user, resetUrl);
         let transporter = getMailTransporter();
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
@@ -389,4 +376,21 @@ const sendPasswordResetEmail = (user, resetUrl) => {
             resolve({ email: user.email, info });
         });
     });
+};
+
+const getMailOptions = (user, resetUrl) => {
+    return {
+        from: '"Sandbox API" <support@sandboxapi.com>', // sender address
+        to: `"${user.name}" <${user.email}>`, // list of receivers
+        subject: 'Password Reset', // Subject line
+        text: 'Password reset...', // plain text body
+        html: `
+            <div style="font-family: sans-serif; font-size: 18px; margin: 0 100px">
+                <p>You are receiving this because you (or someone else) have requested the reset of the password for your account</p>
+                <p>Please click on the following link, or paste into browser address bar to complete the process:</p>
+                <p><a href="${resetUrl}">${resetUrl}</a></p>
+                <p>If you did not request this, please disregard this email and your password will remain unchanged</p>
+            </div>
+            `
+    };
 };
