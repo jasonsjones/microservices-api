@@ -48,11 +48,60 @@ const loginUser = userCreds => {
 };
 
 describe('User acceptance tests', () => {
+    describe('forgot password', () => {
+        beforeEach(() => {
+            dropCollection(dbConnection, 'users');
+            return createUserUtil(oliver);
+        });
+
+        afterEach(() => {
+            dropCollection(dbConnection, 'users');
+        });
+
+        it('responds with 500 status if user email is not provided', () => {
+            return request(app)
+                .post('/api/users/forgotpassword')
+                .send({})
+                .expect(500)
+                .then(res => {
+                    expect(res.body).to.have.property('success');
+                    expect(res.body.success).to.be.false;
+                    expect(res.body).to.have.property('message');
+                });
+        });
+
+        it('responds with appropriate message if the user cannot be found', () => {
+            return request(app)
+                .post('/api/users/forgotpassword')
+                .send({ email: 'notfound@email.com' })
+                .expect(200)
+                .then(res => {
+                    expect(res.body).to.have.property('success');
+                    expect(res.body.success).to.be.false;
+                    expect(res.body).to.have.property('message');
+                });
+        });
+
+        it('sends password reset email', () => {
+            return request(app)
+                .post('/api/users/forgotpassword')
+                .send({ email: oliver.email })
+                .expect(200)
+                .then(res => {
+                    expect(res.body).to.have.property('success');
+                    expect(res.body.success).to.be.true;
+                    expect(res.body).to.have.property('message');
+                    expect(res.body).to.have.property('payload');
+                    expect(res.body.payload.email).to.be.a('string');
+                    expect(res.body.payload.info).to.be.a('object');
+                });
+        }).timeout(8000);
+    });
+
     context('has routes to', () => {
         let oliverId;
 
         before(() => {
-            dropCollection(dbConnection, 'users');
             dropCollection(dbConnection, 'avatars');
         });
 

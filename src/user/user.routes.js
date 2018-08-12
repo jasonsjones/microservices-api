@@ -104,5 +104,11 @@ export default () => {
             .catch(handleError(res));
     });
 
+    UserRouter.post('/forgotpassword', (req, res) => {
+        UserController.forgotPassword(req)
+            .then(handleSuccess(res))
+            .catch(handleError(res));
+    });
+
     return UserRouter;
 };

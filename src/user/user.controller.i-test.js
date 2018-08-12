@@ -1,4 +1,6 @@
 import fs from 'fs';
+import nodemailer from 'nodemailer';
+import sinon from 'sinon';
 import { expect } from 'chai';
 
 import * as Controller from './user.controller';
@@ -354,6 +356,62 @@ describe('User controller integration tests', () => {
                     expect(response.success).to.be.true;
                     expectUserShape(response.payload.user);
                     expect(response.payload.user._id).to.eql(barryId);
+                });
+            });
+        });
+    });
+
+    context('forgotPassword()', () => {
+        it('returns an error if the request parameter is not provided', () => {
+            return Controller.forgotPassword().catch(error => {
+                expectErrorResponse(error, 'request parameter is required');
+            });
+        });
+
+        it('returns an error if the required user data is not provided', () => {
+            const req = {};
+            return Controller.forgotPassword(req).catch(error => {
+                expectErrorResponse(error, 'user email is required');
+            });
+        });
+
+        it('resolves with object with success (false) and message properity if user is not found', () => {
+            const req = {
+                body: {
+                    email: 'notfound@email.com'
+                }
+            };
+            return Controller.forgotPassword(req).then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response.success).to.be.false;
+            });
+        });
+
+        it('sends an email to the user with a link to reset password', () => {
+            let mockTransporter = {
+                sendMail: (data, cb) => {
+                    cb(null, {
+                        messageId: '<1b519020-5bfe-4078-cd5e-7351a09bd766@sandboxapi.com>'
+                    });
+                }
+            };
+
+            let mailerStub = sinon.stub(nodemailer, 'createTransport').returns(mockTransporter);
+            const req = {
+                body: {
+                    email: 'oliver@qc.com'
+                }
+            };
+            return Controller.createUser({ body: users[1] }).then(() => {
+                return Controller.forgotPassword(req).then(response => {
+                    expect(response).to.have.property('success');
+                    expect(response).to.have.property('message');
+                    expect(response).to.have.property('payload');
+                    expect(response.payload).to.have.property('email');
+                    expect(response.payload).to.have.property('info');
+                    expect(response.success).to.be.true;
+                    mailerStub.restore();
                 });
             });
         });
