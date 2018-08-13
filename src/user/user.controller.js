@@ -189,11 +189,12 @@ export function uploadUserAvatar(req) {
 }
 
 export function createUser(req) {
-    if (!req || !req.body) {
+    if (!req || !req.body || !req.body.name || !req.body.email || !req.body.password) {
+        const errorMsg = 'unable to create new user; user data is required';
         return Promise.reject({
             success: false,
-            message: 'request parameter is required',
-            error: new Error('request parameter is required')
+            message: errorMsg,
+            error: new Error(errorMsg)
         });
     }
     return UserRepository.createUser(req.body)

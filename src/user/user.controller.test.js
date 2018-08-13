@@ -498,7 +498,7 @@ describe('User controller', () => {
             req = {};
         });
 
-        it('returns a promise that resolves to some user data after signup', () => {
+        it('resolves with the data for the newly created user', () => {
             req.body = {
                 name: 'Roy Harper',
                 email: 'roy@qc.com',
@@ -517,7 +517,7 @@ describe('User controller', () => {
             });
         });
 
-        it('returns a promise that has the token in the payload for the new user', () => {
+        it('resolves with the token for the newly created user', () => {
             req.body = {
                 name: 'Roy Harper',
                 email: 'roy@qc.com',
@@ -535,13 +535,13 @@ describe('User controller', () => {
             });
         });
 
-        it('rejects with error if something goes wrong signing up the user', () => {
+        it('rejects with error if something goes wrong creating the user', () => {
             req.body = {
                 name: 'Roy Harper',
                 email: 'roy@qc.com',
                 password: 'arsenal'
             };
-            stub.rejects(new Error('Oops, something went wrong when signing up'));
+            stub.rejects(new Error('Oops, something went wrong when creating the user'));
             const promise = Controller.createUser(req);
             expect(promise).to.be.a('Promise');
 
@@ -552,6 +552,45 @@ describe('User controller', () => {
 
         it('rejects with error if req parameter is not provided', () => {
             const promise = Controller.createUser();
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if this users name is not provided', () => {
+            req.body = {
+                email: 'roy@qc.com',
+                password: 'arsenal'
+            };
+            const promise = Controller.createUser(req);
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if this users email is not provided', () => {
+            req.body = {
+                name: 'Roy Harper',
+                password: 'arsenal'
+            };
+            const promise = Controller.createUser(req);
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if this users password is not provided', () => {
+            req.body = {
+                name: 'Roy Harper',
+                email: 'roy@qc.com'
+            };
+            const promise = Controller.createUser(req);
             expect(promise).to.be.a('Promise');
 
             return promise.catch(response => {
