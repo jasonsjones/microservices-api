@@ -27,11 +27,17 @@ export default () => {
     let UserRouter = express.Router();
     const upload = multer({ dest: './uploads/' });
 
-    UserRouter.route('/').get(verifyToken, (req, res) => {
-        UserController.getUsers()
-            .then(handleSuccess(res))
-            .catch(handleError(res));
-    });
+    UserRouter.route('/')
+        .post((req, res) => {
+            UserController.createUser(req)
+                .then(handleSuccess(res))
+                .catch(handleError(res));
+        })
+        .get(verifyToken, (req, res) => {
+            UserController.getUsers()
+                .then(handleSuccess(res))
+                .catch(handleError(res));
+        });
 
     UserRouter.route('/:id([0-9a-zA-Z]{24})')
         .get((req, res) => {
@@ -52,12 +58,6 @@ export default () => {
 
     UserRouter.get('/unlinksfdc', (req, res) => {
         UserController.unlinkSFDCAccount(req)
-            .then(handleSuccess(res))
-            .catch(handleError(res));
-    });
-
-    UserRouter.post('/signup', (req, res) => {
-        UserController.createUser(req)
             .then(handleSuccess(res))
             .catch(handleError(res));
     });

@@ -8,7 +8,7 @@ import { expectJSONShape } from '../utils/testUtils';
 describe('Authentication acceptance tests', () => {
     before(() => {
         return request(app)
-            .post('/api/users/signup')
+            .post('/api/users')
             .send({
                 name: 'Oliver Queen',
                 email: 'oliver@qc.com',
