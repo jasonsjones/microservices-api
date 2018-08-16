@@ -639,7 +639,7 @@ describe('User repository', () => {
         });
     });
 
-    describe('getRandomUser()', () => {
+    describe.skip('getRandomUser()', () => {
         it('returns a promise', () => {
             expect(Repository.getRandomUser()).to.be.a('Promise');
         });

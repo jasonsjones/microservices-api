@@ -685,8 +685,14 @@ describe('User controller', () => {
     });
 
     describe('forgotPassword()', () => {
-        let req, stub, resolvedUser;
+        let req, stub, resolvedUser, mailerStub;
+        before(() => {
+            // ensure the mail transporter is cleared from other tests...
+            clearMailTransporterCache();
+        });
+
         beforeEach(() => {
+            mailerStub = sinon.stub(nodemailer, 'createTransport');
             stub = sinon.stub(Repository, 'generateAndSetResetToken');
             req = {};
             resolvedUser = new User(mockUsers[1]);
@@ -695,9 +701,11 @@ describe('User controller', () => {
         });
 
         afterEach(() => {
+            mailerStub.restore();
             stub.restore();
             req = {};
             resolvedUser = null;
+            clearMailTransporterCache();
         });
 
         it('rejects with error if req parameter is not provided', () => {
@@ -736,7 +744,7 @@ describe('User controller', () => {
                 }
             };
 
-            let mailerStub = sinon.stub(nodemailer, 'createTransport').returns(mockTransporter);
+            mailerStub.returns(mockTransporter);
 
             req.body = {
                 email: 'oliver@qc.com'
@@ -746,8 +754,6 @@ describe('User controller', () => {
             expect(promise).to.be.a('Promise');
             return promise.catch(response => {
                 expectErrorResponse(response);
-                clearMailTransporterCache();
-                mailerStub.restore();
             });
         });
 
@@ -774,7 +780,7 @@ describe('User controller', () => {
                 }
             };
 
-            let mailerStub = sinon.stub(nodemailer, 'createTransport').returns(mockTransporter);
+            mailerStub.returns(mockTransporter);
 
             req.body = {
                 email: 'oliver@qc.com'
@@ -789,8 +795,6 @@ describe('User controller', () => {
                 expect(response.payload.email).to.be.a('string');
                 expect(response.payload.info.messageId).to.be.a('string');
                 expect(response.success).to.be.true;
-                clearMailTransporterCache();
-                mailerStub.restore();
             });
         });
     });

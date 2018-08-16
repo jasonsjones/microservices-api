@@ -5,6 +5,7 @@ import { expect } from 'chai';
 
 import * as Controller from './user.controller';
 import { dbConnection, dropCollection } from '../utils/dbTestUtils';
+import { clearMailTransporterCache } from '../common/mailer';
 
 const users = [
     {
@@ -329,6 +330,14 @@ describe('User controller integration tests', () => {
     });
 
     context('forgotPassword()', () => {
+        before(() => {
+            clearMailTransporterCache();
+        });
+
+        afterEach(() => {
+            clearMailTransporterCache();
+        });
+
         it('returns an error if the request parameter is not provided', () => {
             return Controller.forgotPassword().catch(error => {
                 expectErrorResponse(error, 'request parameter is required');

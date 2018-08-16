@@ -23,7 +23,7 @@
         "security-check": "nsp check",
         "lt": "lt --port 3000 --subdomain sandboxapi",
         "lint": "eslint src/**/*.js src/*.js",
-        "test:unit:all": "DEBUG=test nyc mocha --exit --reporter landing src/utils/testSetup.js src/**/*.test.js",
+        "test:unit:all": "nyc mocha --exit --reporter landing src/utils/testSetup.js src/**/*.test.js",
         "test:unit:avatar": "DEBUG=test nodemon --exec 'mocha src/utils/testSetup.js src/avatar/*.test.js'",
         "test:unit:common": "DEBUG=test nodemon --exec 'mocha src/utils/testSetup.js src/common/*.test.js'",
         "test:unit:user": "DEBUG=test nodemon --exec 'mocha src/utils/testSetup.js src/user/*.test.js'",
