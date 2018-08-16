@@ -6,7 +6,7 @@ import { getMailTransporter } from '../common/mailer';
 import * as UserRepository from './user.repository';
 import * as AuthUtils from '../common/auth.utils';
 
-const log = debug('test');
+const log = debug('mailer');
 
 const buildError = msg => {
     return {
