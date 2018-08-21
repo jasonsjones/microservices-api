@@ -1,6 +1,6 @@
 {
     "name": "microservices-api",
-    "version": "0.2.9",
+    "version": "0.2.10",
     "description": "A sandbox API built on microservices",
     "nyc": {
         "exclude": [
