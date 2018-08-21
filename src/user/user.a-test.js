@@ -4,7 +4,7 @@ import request from 'supertest';
 import app from '../config/app';
 import { dbConnection, dropCollection } from '../utils/dbTestUtils';
 import { expectJSONShape } from '../utils/testUtils';
-import { createUser } from '../utils/userTestUtils';
+import { createUserUtil } from '../utils/userTestUtils';
 
 const barry = {
     name: 'Barry Allen',
@@ -20,7 +20,7 @@ const oliver = {
 };
 
 const signupAndLogin = userData => {
-    return createUser(userData).then(() => {
+    return createUserUtil(userData).then(() => {
         return request(app)
             .post('/api/login')
             .send({
@@ -48,65 +48,49 @@ const loginUser = userCreds => {
 };
 
 describe('User acceptance tests', () => {
-    context('has routes to', () => {
-        let oliverId;
+    before(() => {
+        dropCollection(dbConnection, 'users');
+        dropCollection(dbConnection, 'avatars');
+    });
 
-        before(() => {
-            dropCollection(dbConnection, 'users');
-            dropCollection(dbConnection, 'avatars');
-        });
+    afterEach(() => {
+        dropCollection(dbConnection, 'users');
+        dropCollection(dbConnection, 'avatars');
+    });
 
-        afterEach(() => {
-            dropCollection(dbConnection, 'users');
-            dropCollection(dbConnection, 'avatars');
-        });
-
-        it('signup a new user', () => {
+    context('POST /api/users', () => {
+        it('returns status code 200 and json payload when creating a new user', () => {
             return request(app)
-                .post('/api/users/signup')
+                .post('/api/users/')
                 .send(oliver)
                 .expect(200)
                 .then(res => {
                     expectJSONShape(res.body, 'user');
                     expectJSONShape(res.body, 'token');
                     expect(res.body.success).to.be.true;
-                    oliverId = res.body.payload.user._id;
                 });
         });
 
-        it('upload custom avatar image for user', () => {
-            return createUser(oliver)
-                .then(user => {
-                    return request(app)
+        it('returns status code 500 and json payload if user data is not provided', () => {
+            return request(app)
+                .post('/api/users/')
+                .send({})
+                .expect(500)
+                .then(res => {
+                    expect(res.body).to.have.property('success');
+                    expect(res.body.success).to.be.false;
+                    expect(res.body).to.have.property('message');
+                });
+        });
+    });
+
+    context('POST /api/users/:id/avatar', () => {
+        it('uploads a custom user avatar (profile pic)', () => {
+            return createUserUtil(oliver)
+                .then(user =>
+                    request(app)
                         .post(`/api/users/${user._id}/avatar`)
                         .attach('avatar', `${__dirname}/../../assets/male3.png`)
-                        .expect(200);
-                })
-                .then(res => {
-                    const { user } = res.body.payload;
-                    expectJSONShape(res.body, 'user');
-                    expect(res.body.success).to.be.true;
-                    expect(user).to.have.property('_id');
-                    expect(user).to.have.property('name');
-                    expect(user).to.have.property('email');
-                    expect(user).to.have.property('avatarUrl');
-                    expect(user.avatarUrl).not.to.contain('default');
-                });
-        });
-
-        it('verify the user has been added', () => {
-            let userId;
-            return createUser(oliver)
-                .then(user => {
-                    userId = user._id;
-                    return request(app)
-                        .post(`/api/users/${userId}/avatar`)
-                        .attach('avatar', `${__dirname}/../../assets/male3.png`)
-                        .expect(200);
-                })
-                .then(() =>
-                    request(app)
-                        .get(`/api/users/${userId}`)
                         .expect(200)
                 )
                 .then(res => {
@@ -119,35 +103,83 @@ describe('User acceptance tests', () => {
                     expect(user).to.have.property('avatarUrl');
                     expect(user.avatarUrl).not.to.contain('default');
                 });
-        });
+        }).timeout(3000);
     });
 
-    context('has routes to', () => {
-        let barryId, oliverId;
+    context('POST /api/users/forgotpassword', () => {
+        beforeEach(() => {
+            return createUserUtil(oliver);
+        });
 
-        before(() => {
-            dropCollection(dbConnection, 'users');
-            return createUser(barry)
-                .then(user => {
-                    barryId = user._id;
-                    return createUser(oliver);
-                })
-                .then(user => {
-                    oliverId = user._id;
-                    return;
+        it('responds with 500 status if user email is not provided', () => {
+            return request(app)
+                .post('/api/users/forgotpassword')
+                .send({})
+                .expect(500)
+                .then(res => {
+                    expect(res.body).to.have.property('success');
+                    expect(res.body.success).to.be.false;
+                    expect(res.body).to.have.property('message');
                 });
         });
 
-        after(() => {
-            dropCollection(dbConnection, 'users');
+        it('responds with appropriate message if the user cannot be found', () => {
+            return request(app)
+                .post('/api/users/forgotpassword')
+                .send({ email: 'notfound@email.com' })
+                .expect(200)
+                .then(res => {
+                    expect(res.body).to.have.property('success');
+                    expect(res.body.success).to.be.false;
+                    expect(res.body).to.have.property('message');
+                });
         });
 
-        it('get all the users', () => {
-            let token;
-            return loginUser(oliver)
-                .then(resToken => (token = resToken))
-                .then(() => {
-                    return request(app)
+        it('sends password reset email', () => {
+            return request(app)
+                .post('/api/users/forgotpassword')
+                .send({ email: oliver.email })
+                .expect(200)
+                .then(res => {
+                    expect(res.body).to.have.property('success');
+                    expect(res.body.success).to.be.true;
+                    expect(res.body).to.have.property('message');
+                    expect(res.body).to.have.property('payload');
+                    expect(res.body.payload.email).to.be.a('string');
+                    expect(res.body.payload.info).to.be.a('object');
+                });
+        }).timeout(8000);
+    });
+
+    context('POST /api/users/changepassword', () => {
+        it('changes the user password', () => {
+            const payload = {
+                email: barry.email,
+                currentPassword: barry.password,
+                newPassword: 'test1234'
+            };
+            return createUserUtil(barry).then(() =>
+                request(app)
+                    .post('/api/users/changepassword')
+                    .send(payload)
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).to.be.an('Object');
+                        expect(res.body).to.have.property('success');
+                        expect(res.body).to.have.property('message');
+                        expect(res.body.success).to.be.true;
+                        expect(res.body.message).to.contain('user password changed');
+                    })
+            );
+        });
+    });
+
+    context('GET /api/users/', () => {
+        it('returns all the users if logged in as an admin', () => {
+            return createUserUtil(barry)
+                .then(() => signupAndLogin(oliver))
+                .then(token =>
+                    request(app)
                         .get('/api/users')
                         .set('x-access-token', token)
                         .expect(200)
@@ -156,180 +188,88 @@ describe('User acceptance tests', () => {
                             expect(res.body.success).to.be.true;
                             expect(res.body.payload.users).to.be.an('Array');
                             expect(res.body.payload.users.length).to.equal(2);
-                        });
-                });
-        });
-
-        it('get me', () => {
-            let token;
-            return loginUser(oliver)
-                .then(resToken => (token = resToken))
-                .then(() => {
-                    return request(app)
-                        .get('/api/users/me')
-                        .set('x-access-token', token)
-                        .expect(200)
-                        .then(res => {
-                            expect(res.body.success).to.be.true;
-                            expect(res.body.payload.user.email).to.eql(oliver.email);
                         })
-                        .catch(err => console.log(err));
-                });
-        });
-
-        it('get barry user by id', () => {
-            return request(app)
-                .get(`/api/users/${barryId}`)
-                .expect(200)
-                .then(res => {
-                    expectJSONShape(res.body, 'user');
-                    expect(res.body.success).to.be.true;
-                    expect(res.body.payload.user).to.have.property('_id');
-                    expect(res.body.payload.user).to.have.property('name');
-                    expect(res.body.payload.user).to.have.property('email');
-                    expect(res.body.payload.user).to.have.property('avatarUrl');
-                    expect(res.body.payload.user.name).to.equal(barry.name);
-                });
-        });
-
-        it('get oliver user by id', () => {
-            return request(app)
-                .get(`/api/users/${oliverId}`)
-                .expect(200)
-                .then(res => {
-                    expectJSONShape(res.body, 'user');
-                    expect(res.body.success).to.be.true;
-                    expect(res.body.payload.user).to.have.property('_id');
-                    expect(res.body.payload.user).to.have.property('name');
-                    expect(res.body.payload.user).to.have.property('email');
-                    expect(res.body.payload.user).to.have.property('avatarUrl');
-                    expect(res.body.payload.user.name).to.equal(oliver.name);
-                });
+                );
         });
     });
 
-    context('has route to', () => {
-        let barryId;
-        const barry = {
-            name: 'Barry Allen',
-            email: 'barry@starlabs.com',
-            password: '123456'
-        };
-
-        before(() => {
-            dropCollection(dbConnection, 'users');
-            return createUser(barry).then(user => {
-                barryId = user._id;
-            });
+    context('GET /api/users/me', () => {
+        it('returns the logged in user', () => {
+            return signupAndLogin(oliver).then(token =>
+                request(app)
+                    .get('/api/users/me')
+                    .set('x-access-token', token)
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body.success).to.be.true;
+                        expect(res.body.payload.user.email).to.eql(oliver.email);
+                    })
+                    .catch(err => console.log(err))
+            );
         });
+    });
 
-        after(() => {
-            dropCollection(dbConnection, 'users');
+    context('GET /api/users/:id', () => {
+        it('returns the user with the given id', () => {
+            return createUserUtil(barry).then(user =>
+                request(app)
+                    .get(`/api/users/${user._id}`)
+                    .expect(200)
+                    .then(res => {
+                        expectJSONShape(res.body, 'user');
+                        expect(res.body.success).to.be.true;
+                        expect(res.body.payload.user).to.have.property('_id');
+                        expect(res.body.payload.user).to.have.property('name');
+                        expect(res.body.payload.user).to.have.property('email');
+                        expect(res.body.payload.user).to.have.property('avatarUrl');
+                        expect(res.body.payload.user.name).to.equal(barry.name);
+                    })
+            );
         });
+    });
 
-        it('update user data', () => {
+    context('PUT /api/users/:id', () => {
+        it('updates the user with the provided data', () => {
             const updatedUserData = {
                 name: 'The Flash',
                 email: 'flash@starlabs.com'
             };
-
-            return request(app)
-                .put(`/api/users/${barryId}`)
-                .send(updatedUserData)
-                .expect(200)
-                .then(res => {
-                    expectJSONShape(res.body, 'user');
-                    expect(res.body.success).to.be.true;
-                    expect(res.body.payload.user).to.have.property('_id');
-                    expect(res.body.payload.user).to.have.property('name');
-                    expect(res.body.payload.user).to.have.property('email');
-                    expect(res.body.payload.user.name).to.equal(updatedUserData.name);
-                    expect(res.body.payload.user.email).to.equal(updatedUserData.email);
-                });
+            return createUserUtil(barry).then(user =>
+                request(app)
+                    .put(`/api/users/${user._id}`)
+                    .send(updatedUserData)
+                    .expect(200)
+                    .then(res => {
+                        expectJSONShape(res.body, 'user');
+                        expect(res.body.success).to.be.true;
+                        expect(res.body.payload.user).to.have.property('_id');
+                        expect(res.body.payload.user).to.have.property('name');
+                        expect(res.body.payload.user).to.have.property('email');
+                        expect(res.body.payload.user.name).to.equal(updatedUserData.name);
+                        expect(res.body.payload.user.email).to.equal(updatedUserData.email);
+                    })
+            );
         });
     });
 
-    context('has route to', () => {
-        let barryId;
-        const barry = {
-            name: 'Barry Allen',
-            email: 'barry@starlabs.com',
-            password: '123456'
-        };
-
-        before(() => {
-            dropCollection(dbConnection, 'users');
-            return createUser(barry).then(user => {
-                barryId = user._id;
-            });
-        });
-
-        after(() => {
-            dropCollection(dbConnection, 'users');
-        });
-
-        it('delete a user', () => {
-            const url = `/api/users/${barryId}`;
-
-            return request(app)
-                .delete(url)
-                .expect(200)
-                .then(res => {
-                    expectJSONShape(res.body, 'user');
-                    expect(res.body.success).to.be.true;
-                    expect(res.body.payload).to.be.an('Object');
-                    expect(res.body.payload.user.name).to.equal(barry.name);
-                    return request(app)
-                        .get(url)
-                        .expect(200);
-                })
-                .then(res => {
-                    expectJSONShape(res.body);
-                    expect(res.body.success).to.be.true;
-                    expect(res.body.payload).to.be.an('Object');
-                    expect(res.body.payload.user).to.equal(null);
-                });
+    context('DELETE /api/users/:id', () => {
+        it('deletes the user with the given id', () => {
+            return createUserUtil(barry).then(user =>
+                request(app)
+                    .delete(`/api/users/${user._id}`)
+                    .expect(200)
+                    .then(res => {
+                        expectJSONShape(res.body, 'user');
+                        expect(res.body.success).to.be.true;
+                        expect(res.body.payload).to.be.an('Object');
+                        expect(res.body.payload.user.name).to.equal(barry.name);
+                    })
+            );
         });
     });
 
-    context('has route to', () => {
-        const barry = {
-            name: 'Barry Allen',
-            email: 'barry@starlabs.com',
-            password: '123456'
-        };
-
-        before(() => {
-            dropCollection(dbConnection, 'users');
-            return createUser(barry);
-        });
-
-        after(() => {
-            dropCollection(dbConnection, 'users');
-        });
-
-        it("change a user's password", () => {
-            const payload = {
-                email: barry.email,
-                currentPassword: barry.password,
-                newPassword: 'test1234'
-            };
-            return request(app)
-                .post('/api/users/changepassword')
-                .send(payload)
-                .expect(200)
-                .then(res => {
-                    expect(res.body).to.be.an('Object');
-                    expect(res.body).to.have.property('success');
-                    expect(res.body).to.have.property('message');
-                    expect(res.body.success).to.be.true;
-                    expect(res.body.message).to.contain('user password changed');
-                });
-        });
-    });
-
-    context('has route to', () => {
-        it('get a random user', () => {
+    context('GET /api/users/randomuser', () => {
+        it('returns a random user', () => {
             return request(app)
                 .get('/api/users/randomuser')
                 .expect(200)
@@ -340,7 +280,7 @@ describe('User acceptance tests', () => {
         });
     });
 
-    context('has helper to', () => {
+    context('private utility function to', () => {
         after(() => {
             dropCollection(dbConnection, 'users');
         });

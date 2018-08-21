@@ -1,4 +1,4 @@
-import { signUpUser } from '../user/user.repository';
+import { createUser } from '../user/user.repository';
 
 export const mockUsersWithAvatar = [
     {
@@ -150,6 +150,6 @@ export const mockRandomUser = {
     nat: 'US'
 };
 
-export const createUser = userData => {
-    return signUpUser(userData);
+export const createUserUtil = userData => {
+    return createUser(userData);
 };

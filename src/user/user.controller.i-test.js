@@ -1,8 +1,11 @@
 import fs from 'fs';
+import nodemailer from 'nodemailer';
+import sinon from 'sinon';
 import { expect } from 'chai';
 
 import * as Controller from './user.controller';
 import { dbConnection, dropCollection } from '../utils/dbTestUtils';
+import { clearMailTransporterCache } from '../common/mailer';
 
 const users = [
     {
@@ -62,22 +65,27 @@ const expectErrorResponse = (errorResponse, errMsg) => {
 };
 
 describe('User controller integration tests', () => {
-    context('signUpUser()', () => {
-        after(() => {
+    before(() => {
+        dropCollection(dbConnection, 'users');
+        dropCollection(dbConnection, 'avatars');
+    });
+
+    context('createUser()', () => {
+        afterEach(() => {
             dropCollection(dbConnection, 'users');
         });
 
         it('returns error payload if the user data is not provided', () => {
-            return Controller.signupUser().catch(error => {
-                expectErrorResponse(error, 'request parameter is required');
+            return Controller.createUser().catch(error => {
+                expectErrorResponse(error, 'unable to create new user; user data is required');
             });
         });
 
-        it('creates a new user', () => {
+        it('resolves with user data and token for newly created user', () => {
             let req = {
                 body: users[0]
             };
-            return Controller.signupUser(req).then(response => {
+            return Controller.createUser(req).then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
                 expect(response.success).to.be.true;
@@ -87,14 +95,138 @@ describe('User controller integration tests', () => {
         });
     });
 
+    context('getUsers()', () => {
+        afterEach(() => {
+            dropCollection(dbConnection, 'users');
+        });
+
+        it('returns all the users', () => {
+            return Controller.createUser({ body: users[0] })
+                .then(() => Controller.createUser({ body: users[1] }))
+                .then(() => Controller.getUsers())
+                .then(response => {
+                    expect(response).to.have.property('success');
+                    expect(response).to.have.property('message');
+                    expect(response).to.have.property('payload');
+                    expect(response.success).to.be.true;
+                    expect(response.payload.users).to.be.an('array');
+                    expectUserShape(response.payload.users[0]);
+                    expectUserShape(response.payload.users[1]);
+                });
+        });
+    });
+
+    context('getUser()', () => {
+        afterEach(() => {
+            dropCollection(dbConnection, 'users');
+        });
+
+        it('returns a payload with the user with the given id', () => {
+            return Controller.createUser({ body: users[1] })
+                .then(response => response.payload.user._id)
+                .then(id => Controller.getUser({ params: { id } }))
+                .then(response => {
+                    expect(response).to.have.property('success');
+                    expect(response).to.have.property('message');
+                    expect(response).to.have.property('payload');
+                    expect(response.success).to.be.true;
+                });
+        });
+
+        it('returns a payload with the user and includes the avatar model', () => {
+            const avatar = getCopyOfAvatar();
+            return Controller.createUser({ body: users[1] })
+                .then(response => response.payload.user._id)
+                .then(id => Controller.uploadUserAvatar({ params: { id }, file: avatar }))
+                .then(response =>
+                    Controller.getUser({
+                        params: { id: response.payload.user._id },
+                        query: { includeAvatar: 'true' }
+                    })
+                )
+                .then(response => {
+                    expect(response).to.have.property('success');
+                    expect(response).to.have.property('message');
+                    expect(response).to.have.property('payload');
+                    expect(response.success).to.be.true;
+                    expect(response.payload.user.avatar).to.exist;
+                    expect(response.payload.user.avatar).to.be.an('object');
+                    expect(response.payload.user.avatar).to.have.property('_id');
+                    expect(response.payload.user.avatar).to.have.property('contentType');
+                    expect(response.payload.user.avatar).to.have.property('defaultImg');
+                });
+        });
+    });
+
+    context('unlinkSFDCAccount()', () => {
+        afterEach(() => {
+            dropCollection(dbConnection, 'users');
+        });
+
+        it('returns an error if the user does not have a linked SFDC profile', () => {
+            return Controller.createUser({ body: users[1] })
+                .then(response => response.payload.user._id)
+                .then(id => Controller.getUser({ params: { id } }))
+                .then(response => Controller.unlinkSFDCAccount({ user: response.payload.user }))
+                .then(response => expectErrorResponse(response, 'error unlinking the user'));
+        });
+    });
+
+    context('updateUser()', () => {
+        afterEach(() => {
+            dropCollection(dbConnection, 'users');
+        });
+
+        it('updates the user with the provided data', () => {
+            return Controller.createUser({ body: users[1] })
+                .then(response => response.payload.user._id)
+                .then(id =>
+                    Controller.updateUser({
+                        params: { id },
+                        body: {
+                            name: 'The Flash',
+                            email: 'flash@starlabs.com'
+                        }
+                    })
+                )
+                .then(response => {
+                    expect(response).to.have.property('success');
+                    expect(response).to.have.property('message');
+                    expect(response).to.have.property('payload');
+                    expect(response.success).to.be.true;
+                    expectClientJSONUserShape(response.payload.user);
+                    expect(response.payload.user.name).to.not.equal(users[0].name);
+                    expect(response.payload.user.email).to.not.equal(users[0].email);
+                });
+        });
+    });
+
+    context('deleteUser()', () => {
+        afterEach(() => {
+            dropCollection(dbConnection, 'users');
+        });
+
+        it('returns the a payload with the user that was just deleted', () => {
+            return Controller.createUser({ body: users[1] })
+                .then(response => response.payload.user._id)
+                .then(id => Controller.deleteUser({ params: { id } }))
+                .then(response => {
+                    expect(response).to.have.property('success');
+                    expect(response).to.have.property('message');
+                    expect(response).to.have.property('payload');
+                    expect(response.success).to.be.true;
+                    expectUserShape(response.payload.user);
+                });
+        });
+    });
+
     context('uploadUserAvatar()', () => {
         let barryId;
         before(() => {
-            return Controller.signupUser({ body: users[0] }).then(response => {
+            return Controller.createUser({ body: users[0] }).then(response => {
                 barryId = response.payload.user._id;
             });
         });
-
         after(() => {
             dropCollection(dbConnection, 'users');
             dropCollection(dbConnection, 'avatars');
@@ -150,9 +282,9 @@ describe('User controller integration tests', () => {
     context('changePassword()', () => {
         let barryId;
         before(() => {
-            return Controller.signupUser({ body: users[0] }).then(response => {
+            return Controller.createUser({ body: users[0] }).then(response => {
                 barryId = response.payload.user._id;
-                Controller.signupUser({ body: users[1] });
+                Controller.createUser({ body: users[1] });
             });
         });
 
@@ -197,163 +329,65 @@ describe('User controller integration tests', () => {
         });
     });
 
-    context('user fetching and mutating related tests', () => {
-        let barryId;
+    context('forgotPassword()', () => {
         before(() => {
-            return Controller.signupUser({ body: users[0] }).then(response => {
-                barryId = response.payload.user._id;
-                Controller.signupUser({ body: users[1] });
+            clearMailTransporterCache();
+        });
+
+        afterEach(() => {
+            clearMailTransporterCache();
+        });
+
+        it('returns an error if the request parameter is not provided', () => {
+            return Controller.forgotPassword().catch(error => {
+                expectErrorResponse(error, 'request parameter is required');
             });
         });
 
-        after(() => {
-            dropCollection(dbConnection, 'users');
-            dropCollection(dbConnection, 'avatars');
-        });
-
-        context('getUsers()', () => {
-            it('returns all the users', () => {
-                return Controller.getUsers().then(response => {
-                    expect(response).to.have.property('success');
-                    expect(response).to.have.property('message');
-                    expect(response).to.have.property('payload');
-                    expect(response.success).to.be.true;
-                    expect(response.payload.users).to.be.an('array');
-                    expectUserShape(response.payload.users[0]);
-                    expectUserShape(response.payload.users[1]);
-                });
+        it('returns an error if the required user data is not provided', () => {
+            const req = {};
+            return Controller.forgotPassword(req).catch(error => {
+                expectErrorResponse(error, 'user email is required');
             });
         });
 
-        context('getUser()', () => {
-            it('returns a payload with the user of the given id', () => {
-                return Controller.getUser({ params: { id: barryId } }).then(response => {
-                    expect(response).to.have.property('success');
-                    expect(response).to.have.property('message');
-                    expect(response).to.have.property('payload');
-                    expect(response.success).to.be.true;
-                });
+        it('resolves with object with success (false) and message properity if user is not found', () => {
+            const req = {
+                body: {
+                    email: 'notfound@email.com'
+                }
+            };
+            return Controller.forgotPassword(req).then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response.success).to.be.false;
             });
+        });
 
-            it('returns a payload with the user and includes the avatar model', () => {
-                const avatar = getCopyOfAvatar();
-                const req = {
-                    params: {
-                        id: barryId
-                    },
-                    file: avatar,
-                    query: {
-                        includeAvatar: 'true'
-                    }
-                };
-                return Controller.uploadUserAvatar(req)
-                    .then(() => Controller.getUser(req))
-                    .then(response => {
-                        expectUserShape(response.payload.user);
-                        expect(response.payload.user.avatar).to.exist;
-                        expect(response.payload.user.avatar).to.be.an('object');
-                        expect(response.payload.user.avatar).to.have.property('_id');
-                        expect(response.payload.user.avatar).to.have.property('contentType');
-                        expect(response.payload.user.avatar).to.have.property('defaultImg');
+        it('sends an email to the user with a link to reset password', () => {
+            let mockTransporter = {
+                sendMail: (data, cb) => {
+                    cb(null, {
+                        messageId: '<1b519020-5bfe-4078-cd5e-7351a09bd766@sandboxapi.com>'
                     });
-            });
+                }
+            };
 
-            it('returns error payload if the request is not provided', () => {
-                return Controller.getUser().catch(error => {
-                    expectErrorResponse(error, 'request parameter is required');
-                });
-            });
-        });
-
-        context('unlinkSFDCAccount()', () => {
-            it('returns an error if the user does not have a linked SFDC profile', () => {
-                let req = {
-                    params: {
-                        id: barryId
-                    }
-                };
-                return Controller.getUser(req)
-                    .then(response => {
-                        req.user = response.payload.user;
-                        return Controller.unlinkSFDCAccount(req);
-                    })
-                    .then(response => {
-                        expectErrorResponse(response, 'error unlinking the user');
-                    });
-            });
-        });
-
-        context('updateUser()', () => {
-            it('updates the user with the provided data', () => {
-                const req = {
-                    params: {
-                        id: barryId
-                    },
-                    body: {
-                        name: 'The Flash',
-                        email: 'flash@starlabs.com'
-                    }
-                };
-                return Controller.updateUser(req).then(response => {
+            let mailerStub = sinon.stub(nodemailer, 'createTransport').returns(mockTransporter);
+            const req = {
+                body: {
+                    email: 'oliver@qc.com'
+                }
+            };
+            return Controller.createUser({ body: users[1] }).then(() => {
+                return Controller.forgotPassword(req).then(response => {
                     expect(response).to.have.property('success');
                     expect(response).to.have.property('message');
                     expect(response).to.have.property('payload');
+                    expect(response.payload).to.have.property('email');
+                    expect(response.payload).to.have.property('info');
                     expect(response.success).to.be.true;
-                    expectClientJSONUserShape(response.payload.user);
-                    expect(response.payload.user.name).to.not.equal(users[0].name);
-                    expect(response.payload.user.email).to.not.equal(users[0].email);
-                });
-            });
-
-            it('returns an error if the request parameter is not provided', () => {
-                return Controller.updateUser().catch(error => {
-                    expectErrorResponse(error, 'request parameter is required');
-                });
-            });
-
-            it('returns an error if the user id is not provided', () => {
-                const req = {
-                    body: {
-                        name: 'The Flash'
-                    }
-                };
-                return Controller.updateUser(req).catch(error => {
-                    expectErrorResponse(error, 'user id is required');
-                });
-            });
-
-            it('returns an error if the new user data is not provided', () => {
-                const req = {
-                    params: {
-                        id: barryId
-                    }
-                };
-                return Controller.updateUser(req).catch(error => {
-                    expectErrorResponse(error, 'user data is required');
-                });
-            });
-        });
-
-        context('deleteUser()', () => {
-            it('returns error payload if the request is not provided', () => {
-                return Controller.deleteUser().catch(error => {
-                    expectErrorResponse(error, 'request parameter is required');
-                });
-            });
-
-            it('returns the a payload with the user that was just deleted', () => {
-                const req = {
-                    params: {
-                        id: barryId
-                    }
-                };
-                return Controller.deleteUser(req).then(response => {
-                    expect(response).to.have.property('success');
-                    expect(response).to.have.property('message');
-                    expect(response).to.have.property('payload');
-                    expect(response.success).to.be.true;
-                    expectUserShape(response.payload.user);
-                    expect(response.payload.user._id).to.eql(barryId);
+                    mailerStub.restore();
                 });
             });
         });

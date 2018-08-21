@@ -1,11 +1,13 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
+import nodemailer from 'nodemailer';
 
 import * as Repository from './user.repository';
 import * as Controller from './user.controller';
 import User from './user.model';
 import { mockUsers, mockUsersWithAvatar, mockRandomUser } from '../utils/userTestUtils';
 import { normalizeRandomUserData } from '../utils/userUtils';
+import { clearMailTransporterCache } from '../common/mailer';
 
 describe('User controller', () => {
     describe('getUsers()', () => {
@@ -484,10 +486,10 @@ describe('User controller', () => {
         });
     });
 
-    describe('signUpUser()', () => {
+    describe('createUser()', () => {
         let req, stub;
         beforeEach(() => {
-            stub = sinon.stub(Repository, 'signUpUser');
+            stub = sinon.stub(Repository, 'createUser');
             req = {};
         });
 
@@ -496,14 +498,14 @@ describe('User controller', () => {
             req = {};
         });
 
-        it('returns a promise that resolves to some user data after signup', () => {
+        it('resolves with the data for the newly created user', () => {
             req.body = {
                 name: 'Roy Harper',
                 email: 'roy@qc.com',
                 password: 'arsenal'
             };
             stub.resolves(new User(mockUsers[0]));
-            const promise = Controller.signupUser(req);
+            const promise = Controller.createUser(req);
             expect(promise).to.be.a('Promise');
 
             return promise.then(response => {
@@ -515,14 +517,14 @@ describe('User controller', () => {
             });
         });
 
-        it('returns a promise that has the token in the payload for the new user', () => {
+        it('resolves with the token for the newly created user', () => {
             req.body = {
                 name: 'Roy Harper',
                 email: 'roy@qc.com',
                 password: 'arsenal'
             };
             stub.resolves(new User(mockUsers[0]));
-            const promise = Controller.signupUser(req);
+            const promise = Controller.createUser(req);
             expect(promise).to.be.a('Promise');
 
             return promise.then(response => {
@@ -533,14 +535,14 @@ describe('User controller', () => {
             });
         });
 
-        it('rejects with error if something goes wrong signing up the user', () => {
+        it('rejects with error if something goes wrong creating the user', () => {
             req.body = {
                 name: 'Roy Harper',
                 email: 'roy@qc.com',
                 password: 'arsenal'
             };
-            stub.rejects(new Error('Oops, something went wrong when signing up'));
-            const promise = Controller.signupUser(req);
+            stub.rejects(new Error('Oops, something went wrong when creating the user'));
+            const promise = Controller.createUser(req);
             expect(promise).to.be.a('Promise');
 
             return promise.catch(response => {
@@ -549,7 +551,46 @@ describe('User controller', () => {
         });
 
         it('rejects with error if req parameter is not provided', () => {
-            const promise = Controller.signupUser();
+            const promise = Controller.createUser();
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if this users name is not provided', () => {
+            req.body = {
+                email: 'roy@qc.com',
+                password: 'arsenal'
+            };
+            const promise = Controller.createUser(req);
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if this users email is not provided', () => {
+            req.body = {
+                name: 'Roy Harper',
+                password: 'arsenal'
+            };
+            const promise = Controller.createUser(req);
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if this users password is not provided', () => {
+            req.body = {
+                name: 'Roy Harper',
+                email: 'roy@qc.com'
+            };
+            const promise = Controller.createUser(req);
             expect(promise).to.be.a('Promise');
 
             return promise.catch(response => {
@@ -639,6 +680,121 @@ describe('User controller', () => {
             promise.then(response => {
                 expectUserResponse(response);
                 expect(response).to.have.property('message');
+            });
+        });
+    });
+
+    describe('forgotPassword()', () => {
+        let req, stub, resolvedUser, mailerStub;
+        before(() => {
+            // ensure the mail transporter is cleared from other tests...
+            clearMailTransporterCache();
+        });
+
+        beforeEach(() => {
+            mailerStub = sinon.stub(nodemailer, 'createTransport');
+            stub = sinon.stub(Repository, 'generateAndSetResetToken');
+            req = {};
+            resolvedUser = new User(mockUsers[1]);
+            resolvedUser.passwordResetToken = '562835a1c7c63581ee81f15bad8bbc851123b581';
+            resolvedUser.passwordResetTokenExpiresAt = Date.now() + 3600000;
+        });
+
+        afterEach(() => {
+            mailerStub.restore();
+            stub.restore();
+            req = {};
+            resolvedUser = null;
+            clearMailTransporterCache();
+        });
+
+        it('rejects with error if req parameter is not provided', () => {
+            const promise = Controller.forgotPassword();
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if req.body is not provided', () => {
+            const promise = Controller.forgotPassword(req);
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if req.body.email is not provided', () => {
+            req.body = {};
+            const promise = Controller.forgotPassword(req);
+            expect(promise).to.be.a('Promise');
+
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('rejects with error if there is an error sending the email', () => {
+            let mockTransporter = {
+                sendMail: (data, cb) => {
+                    const err = new Error('Oops, there was an error sending the message');
+                    cb(err, null);
+                }
+            };
+
+            mailerStub.returns(mockTransporter);
+
+            req.body = {
+                email: 'oliver@qc.com'
+            };
+            stub.resolves(resolvedUser);
+            const promise = Controller.forgotPassword(req);
+            expect(promise).to.be.a('Promise');
+            return promise.catch(response => {
+                expectErrorResponse(response);
+            });
+        });
+
+        it('resolves with an object with success (false) and message property if user is not found', () => {
+            req.body = {
+                email: 'notfound@email.com'
+            };
+            stub.resolves(null);
+            const promise = Controller.forgotPassword(req);
+            expect(promise).to.be.a('Promise');
+            return promise.then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response.success).to.be.false;
+            });
+        });
+
+        it('resolves with an object with success (true) and message property if user is found', () => {
+            let mockTransporter = {
+                sendMail: (data, cb) => {
+                    cb(null, {
+                        messageId: '<1b519020-5bfe-4078-cd5e-7351a09bd766@sandboxapi.com>'
+                    });
+                }
+            };
+
+            mailerStub.returns(mockTransporter);
+
+            req.body = {
+                email: 'oliver@qc.com'
+            };
+            stub.resolves(resolvedUser);
+            const promise = Controller.forgotPassword(req);
+            expect(promise).to.be.a('Promise');
+            return promise.then(response => {
+                expect(response).to.have.property('success');
+                expect(response).to.have.property('message');
+                expect(response.payload).to.be.an('object');
+                expect(response.payload.email).to.be.a('string');
+                expect(response.payload.info.messageId).to.be.a('string');
+                expect(response.success).to.be.true;
             });
         });
     });

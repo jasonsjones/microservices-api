@@ -34,7 +34,7 @@ describe('User repository integration tests', () => {
         dropCollection(dbConnection, 'avatars');
     });
 
-    context('signUpUser()', () => {
+    context('createUser()', () => {
         after(() => {
             dropCollection(dbConnection, 'users');
         });
@@ -45,7 +45,7 @@ describe('User repository integration tests', () => {
                 email: 'barry@starlabs.com',
                 password: '123456'
             };
-            return Repository.signUpUser(newUser).then(response => {
+            return Repository.createUser(newUser).then(response => {
                 expectUserShape(response);
                 // ensure the password is hashed
                 expect(response.password).to.not.equal(newUser.password);
@@ -53,7 +53,7 @@ describe('User repository integration tests', () => {
         });
 
         it('returns an error if the user data is not provided', () => {
-            return Repository.signUpUser().catch(error => {
+            return Repository.createUser().catch(error => {
                 expect(error).to.exist;
                 expect(error.message).to.contain('user data is required');
             });
@@ -72,7 +72,7 @@ describe('User repository integration tests', () => {
 
         let userId;
         before(() => {
-            return Repository.signUpUser(users[1]).then(response => {
+            return Repository.createUser(users[1]).then(response => {
                 userId = response._id;
             });
         });
@@ -117,11 +117,11 @@ describe('User repository integration tests', () => {
         };
 
         before(() => {
-            return Repository.signUpUser(users[0])
+            return Repository.createUser(users[0])
                 .then(user => {
                     barryId = user._id;
                     barryHashedPwd = user.password;
-                    return Repository.signUpUser(users[1]);
+                    return Repository.createUser(users[1]);
                 })
                 .then(user => {
                     oliverId = user._id;
@@ -196,6 +196,12 @@ describe('User repository integration tests', () => {
                 return Repository.lookupUserByEmail(users[0].email).then(response => {
                     expectUserShape(response);
                     expect(response.name).to.equal('Barry Allen');
+                });
+            });
+
+            it('returns null when user email is not found', () => {
+                return Repository.lookupUserByEmail('notfound@email.com').then(response => {
+                    expect(response).to.be.null;
                 });
             });
 
@@ -280,6 +286,36 @@ describe('User repository integration tests', () => {
                 return Repository.changePassword(userData).catch(error => {
                     expect(error).to.exist;
                     expect(error.message).to.contain('user new password is required');
+                });
+            });
+        });
+
+        context('generateAndSetResetToken()', () => {
+            it('returns an error if the users email is not provided', () => {
+                return Repository.generateAndSetResetToken().catch(error => {
+                    expect(error).to.exist;
+                    expect(error).to.be.an('Error');
+                });
+            });
+
+            it('returns null if the user is not found', () => {
+                return Repository.generateAndSetResetToken('notfound@email.com').then(response => {
+                    expect(response).to.be.null;
+                });
+            });
+
+            it('updates the user model with the reset token added', () => {
+                return Repository.generateAndSetResetToken(users[0].email).then(response => {
+                    expect(response.passwordResetToken).to.exist;
+                    expect(response.passwordResetToken).to.be.a('string');
+                    expect(response.passwordResetToken.length).to.equal(40);
+                });
+            });
+
+            it('updates the user model with the reset token expiration date set', () => {
+                return Repository.generateAndSetResetToken(users[0].email).then(response => {
+                    expect(response.passwordResetTokenExpiresAt).to.exist;
+                    expect(response.passwordResetTokenExpiresAt).to.be.a('Date');
                 });
             });
         });

@@ -3,6 +3,7 @@ import fetch from 'node-fetch';
 import User from './user.model';
 import { normalizeRandomUserData } from '../utils/userUtils';
 import { deleteAvatar, makeAvatarModel } from '../avatar/avatar.repository';
+import { generateRandomToken } from '../common/auth.utils';
 
 const baseUrl = 'http://localhost:3000';
 
@@ -140,7 +141,7 @@ export function changePassword(userData) {
     });
 }
 
-export function signUpUser(userData) {
+export function createUser(userData) {
     if (!userData) {
         return Promise.reject(new Error('user data is required'));
     }
@@ -174,4 +175,17 @@ export const getRandomUser = (sendRawData = false) => {
             let randomUser = data.results[0];
             return normalizeRandomUserData(randomUser);
         });
+};
+
+export const generateAndSetResetToken = email => {
+    if (!email) {
+        return Promise.reject(new Error('email is required'));
+    }
+    return lookupUserByEmail(email).then(user => {
+        if (!user) return Promise.resolve(null);
+        const token = generateRandomToken();
+        user.passwordResetToken = token;
+        user.passwordResetTokenExpiresAt = Date.now() + 60 * 60 * 1000; // 1 hr
+        return user.save();
+    });
 };
