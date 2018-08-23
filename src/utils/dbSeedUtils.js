@@ -94,9 +94,10 @@ const seedDefaultUserAPI = () => {
 const seedDefaultUserDb = () => {
     return getUsers().then(users => {
         if (users.length === 0) {
-            log('adding user...');
-            // only seed oliver for now...
-            return seedUser(initialUsers[0]);
+            log('adding users...');
+            let seedOliver = seedUser(initialUsers[0]);
+            let seedDiggle = seedUser(initialUsers[1]);
+            return Promise.all([seedOliver, seedDiggle]);
         } else {
             log('user(s) already in db...');
             return Promise.resolve('users not required');
