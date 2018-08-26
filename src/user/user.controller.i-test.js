@@ -5,7 +5,7 @@ import { expect } from 'chai';
 
 import * as Controller from './user.controller';
 import { dbConnection, dropCollection } from '../utils/dbTestUtils';
-import { clearMailTransporterCache } from '../common/mailer';
+import { clearMailTransporterCache } from '../mailer/mailer';
 
 const users = [
     {

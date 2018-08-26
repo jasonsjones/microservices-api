@@ -21,12 +21,26 @@ const getUrl = (env, port) => {
     }
 };
 
+const emailAcct = {
+    host: 'smtp.ethereal.email',
+    port: 587,
+    secure: false,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWD
+    }
+};
+
+const emailAddr = '"Sandbox API" <support@sandboxapi.com>';
+
 let configBase = {
     version,
     env,
     port,
     token_secret,
     session_secret,
+    emailAcct,
+    emailAddr,
     url: getUrl(env, port),
     dbUrl: 'mongodb://mongo:27017/sandboxapi-default'
 };
