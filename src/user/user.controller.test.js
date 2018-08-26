@@ -7,7 +7,7 @@ import * as Controller from './user.controller';
 import User from './user.model';
 import { mockUsers, mockUsersWithAvatar, mockRandomUser } from '../utils/userTestUtils';
 import { normalizeRandomUserData } from '../utils/userUtils';
-import { clearMailTransporterCache } from '../common/mailer';
+import { clearMailTransporterCache } from '../mailer/mailer';
 
 describe('User controller', () => {
     describe('getUsers()', () => {
