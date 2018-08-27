@@ -19,7 +19,9 @@ jobs:
                       # fallback to using the latest cache if no exact match is found
                       - v1-dependencies-
 
-            - run: yarn install
+            - run:
+                  name: Install dependencies
+                  command: yarn install
 
             - save_cache:
                   key: v1-dependencies-{{ checksum "package.json" }}
@@ -27,12 +29,11 @@ jobs:
                       - 'node_modules'
 
             - run:
-                  name: Run the code linter
+                  name: Lint code
                   command: yarn lint
 
-            # run tests!
             - run:
-                  name: Run all the tests
+                  name: Run tests
                   command: yarn test:unit
 
     deploy:
