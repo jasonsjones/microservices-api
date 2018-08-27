@@ -15,4 +15,6 @@ if [ -z $1 ]
 fi
 
 NODE_ENV=test DEBUG=db:connection,test npx mocha --exit $SRC_SETUP $SRC
+TEST_STATUS=$?
 echo "Tests complete!"
+exit $TEST_STATUS

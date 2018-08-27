@@ -15,4 +15,6 @@ if [ -z $1 ]
 fi
 
 DEBUG=test npx nodemon --exec "mocha $SRC_SETUP $SRC"
+TEST_STATUS=$?
 echo "Tests complete!"
+exit $TEST_STATUS

@@ -9,7 +9,7 @@ REPORTER='--reporter spec'
 if [ -z $1 ]
     then
         SRC='src/**/*.test.js'
-        REPORTER='--reporter landing'
+        REPORTER='--reporter spec'
         echo -e "\nNo feature or module supplied\n"
     else
         SRC="src/**/$1*.test.js"
@@ -17,4 +17,6 @@ if [ -z $1 ]
 fi
 
 NODE_ENV=test DEBUG=test npx mocha --exit $REPORTER $SRC_SETUP $SRC
+TEST_STATUS=$?
 echo "Tests complete!"
+exit $TEST_STATUS
