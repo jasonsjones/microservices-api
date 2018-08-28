@@ -7,6 +7,8 @@ export const mockUsersWithAvatar = [
         createdAt: '2017-09-21T23:38:43.338Z',
         name: 'Roy Harper',
         email: 'roy@qc.com',
+        isEmailVerified: false,
+        emailVerificationToken: '75c2efd8b3b65d29f7d35e21471bb50919f21662',
         password: '$2a$12$DyizVZatjn.zMHeOhQI5nuIX64417O2zuRKXe/Ae0f06bLupmZ/d6',
         passwordLastUpdatedAt: '2018-01-21T16:24:16.413Z',
         __v: 0,
@@ -28,6 +30,8 @@ export const mockUsersWithAvatar = [
         createdAt: '2017-09-21T23:38:43.337Z',
         name: 'Oliver Queen',
         email: 'oliver@qc.com',
+        isEmailVerified: false,
+        emailVerificationToken: '85c2efd8b3b65d29f7d35e21471bb50919f21662',
         password: '$2a$12$wwUJRxZdDzpZ5uK2u.7eNelWp6y4HT/WE/zzZ6e2L4VVvv/tJE2dK',
         passwordLastUpdatedAt: '2018-01-23T16:24:16.413Z',
         __v: 0,
@@ -49,6 +53,8 @@ export const mockUsersWithAvatar = [
         createdAt: '2017-09-23T20:24:55.748Z',
         name: 'Jason Jones',
         email: 'jsjones96@gmail.com',
+        isEmailVerified: false,
+        emailVerificationToken: '95c2efd8b3b65d29f7d35e21471bb50919f21662',
         password: '$2a$12$5GCSOcQgHZ1tJHaMiOvvXOcFCoOoZCmjkQfD9hd/vIrF/dm0zrXa2',
         passwordLastUpdatedAt: '2018-03-27T16:24:16.413Z',
         __v: 0,
@@ -57,7 +63,6 @@ export const mockUsersWithAvatar = [
         roles: ['user']
     }
 ];
-
 export const mockUsers = [
     {
         _id: '59c44d83f2943200228467b3',
@@ -65,6 +70,8 @@ export const mockUsers = [
         createdAt: '2017-09-21T23:38:43.338Z',
         name: 'Roy Harper',
         email: 'roy@qc.com',
+        isEmailVerified: false,
+        emailVerificationToken: '75c2efd8b3b65d29f7d35e21471bb50919f21662',
         password: '$2a$12$DyizVZatjn.zMHeOhQI5nuIX64417O2zuRKXe/Ae0f06bLupmZ/d6',
         passwordLastUpdatedAt: '2018-01-21T16:24:16.413Z',
         avatar: '59e4062a4c3bc800574e895f',
@@ -77,6 +84,8 @@ export const mockUsers = [
         createdAt: '2017-09-21T23:38:43.337Z',
         name: 'Oliver Queen',
         email: 'oliver@qc.com',
+        isEmailVerified: false,
+        emailVerificationToken: '85c2efd8b3b65d29f7d35e21471bb50919f21662',
         password: '$2a$12$wwUJRxZdDzpZ5uK2u.7eNelWp6y4HT/WE/zzZ6e2L4VVvv/tJE2dK',
         passwordLastUpdatedAt: '2018-01-23T16:24:16.413Z',
         avatar: '59c44d85f2943200228467b4',
@@ -89,6 +98,8 @@ export const mockUsers = [
         createdAt: '2017-09-23T20:24:55.748Z',
         name: 'Jason Jones',
         email: 'jsjones96@gmail.com',
+        isEmailVerified: false,
+        emailVerificationToken: '95c2efd8b3b65d29f7d35e21471bb50919f21662',
         password: '$2a$12$5GCSOcQgHZ1tJHaMiOvvXOcFCoOoZCmjkQfD9hd/vIrF/dm0zrXa2',
         passwordLastUpdatedAt: '2018-03-27T16:24:16.413Z',
         avatar: null,

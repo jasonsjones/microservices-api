@@ -145,6 +145,7 @@ export function createUser(userData) {
         return Promise.reject(new Error('user data is required'));
     }
     let newUser = new User(userData);
+    newUser.emailVerificationToken = generateRandomToken();
     return newUser.save();
 }
 
