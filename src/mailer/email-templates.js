@@ -10,11 +10,12 @@ export const passwordResetEmailHTML = resetUrl => {
 };
 
 export const passwordResetEmailPlainText = resetUrl => {
-    return `You are receiving this because you (or someone else) have requested the reset of the password for your account
-        Please click on the following link, or paste into browser address bar to complete the process:
+    return `
+    You are receiving this because you (or someone else) have requested the reset of the password for your account
+    Please click on the following link, or paste into browser address bar to complete the process:
 
-        ${resetUrl}
+    ${resetUrl}
 
-        If you did not request this, please disregard this email and your password will remain unchanged
+    If you did not request this, please disregard this email and your password will remain unchanged
     `;
 };
