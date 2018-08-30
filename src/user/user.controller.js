@@ -1,7 +1,7 @@
 import config from '../config/config';
 import * as UserRepository from './user.repository';
 import * as AuthUtils from '../common/auth.utils';
-import { sendPasswordResetEmail } from '../mailer/mailer-utils';
+import { sendPasswordResetEmail, sendEmailVerificationEmail } from '../mailer/mailer-utils';
 
 const buildError = msg => {
     return {
@@ -315,17 +315,16 @@ export const forgotPassword = req => {
     return UserRepository.generateAndSetResetToken(req.body.email)
         .then(user => {
             if (user) {
-                const resetUrl = `${config.url}/reset/${user.passwordResetToken}`;
-                return sendPasswordResetEmail(user, resetUrl);
+                return sendPasswordResetEmail(user);
             }
         })
         .then(data => {
-            if (data && data.email) {
+            if (data && data.user && data.user.email) {
                 return Promise.resolve({
                     success: true,
-                    message: `reset email sent to ${data.email}`,
+                    message: `reset email sent to ${data.user.email}`,
                     payload: {
-                        email: data.email,
+                        email: data.user.email,
                         info: data.info
                     }
                 });
@@ -357,3 +356,5 @@ export const getRandomUser = () => {
         };
     });
 };
+
+export const sendEmailVerification = user => sendEmailVerificationEmail(user);
