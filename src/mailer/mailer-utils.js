@@ -26,7 +26,7 @@ export const sendPasswordResetEmail = user => {
 
 export const sendEmailVerificationEmail = user => {
     return new Promise((resolve, reject) => {
-        const verifyUrl = `${config.url}/reset/${user.emailVerificationToken}`;
+        const verifyUrl = `${config.url}/verify/${user.emailVerificationToken}`;
         let mailOptions = getMailOptionsForEmailVerification(user, verifyUrl);
         let transporter = getMailTransporter();
         transporter.sendMail(mailOptions, (error, info) => {
