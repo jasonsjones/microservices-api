@@ -4,17 +4,15 @@ import request from 'supertest';
 import app from '../config/app';
 import { dbConnection, dropCollection } from '../utils/dbTestUtils';
 import { expectJSONShape } from '../utils/testUtils';
+import { createUserUtil } from '../utils/userTestUtils';
 
 describe('Authentication acceptance tests', () => {
-    before(async () => {
-        await request(app)
-            .post('/api/users')
-            .send({
-                name: 'Oliver Queen',
-                email: 'oliver@qc.com',
-                password: '123456'
-            })
-            .expect(200);
+    before(() => {
+        return createUserUtil({
+            name: 'Oliver Queen',
+            email: 'oliver@qc.com',
+            password: '123456'
+        });
     });
 
     after(() => {
