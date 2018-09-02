@@ -1,4 +1,5 @@
 import config from '../config/config';
+import User from './user.model';
 import * as UserRepository from './user.repository';
 import * as AuthUtils from '../common/auth.utils';
 import { sendPasswordResetEmail, sendEmailVerificationEmail } from '../mailer/mailer-utils';
@@ -192,7 +193,14 @@ export function createUser(req) {
             error: new Error(errorMsg)
         });
     }
-    return UserRepository.createUser(req.body)
+
+    let createUserMethod;
+    if (req.query && req.query.verifyEmail === 'false') {
+        createUserMethod = noSendEmailAfterCreateUser(req.body);
+    } else {
+        createUserMethod = sendEmailAfterCreateUser(req.body);
+    }
+    return createUserMethod
         .then(user => {
             return {
                 success: true,
@@ -357,4 +365,10 @@ export const getRandomUser = () => {
     });
 };
 
-export const sendEmailVerification = user => sendEmailVerificationEmail(user);
+const sendEmailAfterCreateUser = user => {
+    return UserRepository.createUser(user)
+        .then(user => sendEmailVerificationEmail(user))
+        .then(({ user }) => new User(user));
+};
+
+const noSendEmailAfterCreateUser = user => UserRepository.createUser(user);

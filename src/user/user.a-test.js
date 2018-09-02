@@ -69,7 +69,7 @@ describe('User acceptance tests', () => {
                     expectJSONShape(res.body, 'token');
                     expect(res.body.success).to.be.true;
                 });
-        });
+        }).timeout(8000);
 
         it('returns status code 500 and json payload if user data is not provided', () => {
             return request(app)

@@ -499,10 +499,15 @@ describe('User controller', () => {
         });
 
         it('resolves with the data for the newly created user', () => {
-            req.body = {
-                name: 'Roy Harper',
-                email: 'roy@qc.com',
-                password: 'arsenal'
+            req = {
+                body: {
+                    name: 'Roy Harper',
+                    email: 'roy@qc.com',
+                    password: 'arsenal'
+                },
+                query: {
+                    verifyEmail: 'false'
+                }
             };
             stub.resolves(new User(mockUsers[0]));
             const promise = Controller.createUser(req);
@@ -518,10 +523,15 @@ describe('User controller', () => {
         });
 
         it('resolves with the token for the newly created user', () => {
-            req.body = {
-                name: 'Roy Harper',
-                email: 'roy@qc.com',
-                password: 'arsenal'
+            req = {
+                body: {
+                    name: 'Roy Harper',
+                    email: 'roy@qc.com',
+                    password: 'arsenal'
+                },
+                query: {
+                    verifyEmail: 'false'
+                }
             };
             stub.resolves(new User(mockUsers[0]));
             const promise = Controller.createUser(req);

@@ -84,8 +84,12 @@ describe('User controller integration tests', () => {
 
         it('resolves with user data and token for newly created user', () => {
             let req = {
-                body: users[0]
+                body: users[0],
+                query: {
+                    verifyEmail: 'false'
+                }
             };
+
             return Controller.createUser(req).then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
