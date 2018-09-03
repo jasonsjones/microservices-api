@@ -7,6 +7,7 @@
             "src/**/*test.js",
             "src/**/*.routes.js",
             "src/utils/*.js",
+            "src/common/external-api.js",
             "src/config",
             "src/graphql",
             "src/server.js"

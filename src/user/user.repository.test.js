@@ -5,7 +5,8 @@ import 'sinon-mongoose';
 import User from './user.model';
 import Avatar from '../avatar/avatar.model';
 import * as Repository from './user.repository';
-import { mockUsers, mockUsersWithAvatar } from '../utils/userTestUtils';
+import { mockUsers, mockUsersWithAvatar, mockRandomUser } from '../utils/userTestUtils';
+import * as ApiUtils from '../common/external-api';
 
 describe('User repository', () => {
     let UserMock;
@@ -639,9 +640,22 @@ describe('User repository', () => {
         });
     });
 
-    describe.skip('getRandomUser()', () => {
+    describe('getRandomUser()', () => {
+        let randomUserStub;
+
+        before(() => {
+            randomUserStub = sinon
+                .stub(ApiUtils, 'fetchRandomUsers')
+                .resolves({ results: [mockRandomUser] });
+        });
+
+        after(() => {
+            randomUserStub.restore();
+        });
+
         it('returns a promise', () => {
-            expect(Repository.getRandomUser()).to.be.a('Promise');
+            let promise = Repository.getRandomUser();
+            expect(promise).to.be.a('Promise');
         });
 
         it('returns a promise that resolves to a random user with raw data when sendRawData is true', () => {
