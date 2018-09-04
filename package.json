@@ -27,7 +27,7 @@
         "test:unit:watch": "scripts/test-unit-watch.sh",
         "test:acceptance": "scripts/test-acceptance.sh",
         "test:integration": "scripts/test-integration.sh",
-        "test:all": "NODE_ENV=test DEBUG=db:connection,test nyc mocha --exit src/utils/dbTestSetup.js src/**/*.*test.js",
+        "test": "scripts/test-all.sh",
         "up:dev": "docker-compose up node-server",
         "up:test:acceptance": "docker-compose up node-test",
         "up:test:integration": "docker-compose run --rm node-test yarn test:integration",
