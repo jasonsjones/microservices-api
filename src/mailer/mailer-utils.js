@@ -9,7 +9,7 @@ const log = debug('mailer');
 
 export const sendPasswordResetEmail = user => {
     return new Promise((resolve, reject) => {
-        const resetUrl = `${config.url}/reset/${user.passwordResetToken}`;
+        const resetUrl = `${config.url}/api/users/reset-password/${user.passwordResetToken}`;
         let mailOptions = getMailOptionsForPasswordReset(user, resetUrl);
         let transporter = getMailTransporter();
         transporter.sendMail(mailOptions, (error, info) => {
@@ -26,7 +26,7 @@ export const sendPasswordResetEmail = user => {
 
 export const sendEmailVerificationEmail = user => {
     return new Promise((resolve, reject) => {
-        const verifyUrl = `${config.url}/verify/${user.emailVerificationToken}`;
+        const verifyUrl = `${config.url}/api/users/verify-email/${user.emailVerificationToken}`;
         let mailOptions = getMailOptionsForEmailVerification(user, verifyUrl);
         let transporter = getMailTransporter();
         transporter.sendMail(mailOptions, (error, info) => {
@@ -44,8 +44,8 @@ export const sendEmailVerificationEmail = user => {
 const getMailOptionsForPasswordReset = (user, url) => {
     return {
         from: config.emailAddr,
-        to: `"${user.name}" <${user.email}>`, // list of receivers
-        subject: 'Password Reset', // Subject line
+        to: `"${user.name}" <${user.email}>`,
+        subject: 'Password Reset -- Sandbox API',
         text: templates.passwordResetEmailPlainText(url),
         html: templates.passwordResetEmailHTML(url)
     };
@@ -54,9 +54,9 @@ const getMailOptionsForPasswordReset = (user, url) => {
 const getMailOptionsForEmailVerification = (user, url) => {
     return {
         from: config.emailAddr,
-        to: `"${user.name}" <${user.email}>`, // list of receivers
-        subject: 'Email Verification', // Subject line
-        text: 'text email',
-        html: `<p>html email</p><p>${url}</p>`
+        to: `"${user.name}" <${user.email}>`,
+        subject: 'Email Verification -- Sandbox API',
+        text: templates.verifyEmailPlainText(url),
+        html: templates.verifyEmailHTML(url)
     };
 };
