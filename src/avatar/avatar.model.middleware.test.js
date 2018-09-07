@@ -29,7 +29,7 @@ describe('Avatar model middleware', () => {
     });
 
     describe('removeAvatarRefFromUser()', () => {
-        it('removes the avatar ref and avatarUrl from user model', () => {
+        it('removes the avatar ref and avatarUrl from user model', async () => {
             const expectedAvatarUrl = 'http://localhost:3000/api/avatar/default';
 
             stub = sinon.stub(User.prototype, 'save');
@@ -44,28 +44,25 @@ describe('Avatar model middleware', () => {
             expect(user.avatar).not.to.be.null;
             expect(user.avatarUrl).not.to.equal(expectedAvatarUrl);
 
-            const promise = AvatarMiddleware.removeAvatarRefFromUser(avatar);
+            const data = await AvatarMiddleware.removeAvatarRefFromUser(avatar);
 
-            expect(promise).to.be.a('Promise');
-            promise.then(data => {
-                expect(data.avatar).to.be.null;
-                expect(data.avatarUrl).to.equal(expectedAvatarUrl);
-            });
+            expect(data.avatar).to.be.null;
+            expect(data.avatarUrl).to.equal(expectedAvatarUrl);
         });
 
-        it('rejects with error if something goes wrong', () => {
+        it('rejects with error if something goes wrong', async () => {
             UserMock = sinon.mock(User);
             UserMock.expects('findById')
                 .withArgs(avatar.user)
                 .chain('exec')
                 .resolves(new Error('Ooops...something went wrong!'));
 
-            const promise = AvatarMiddleware.removeAvatarRefFromUser(avatar);
-            expect(promise).to.be.a('Promise');
-            return promise.catch(err => {
-                expect(err).to.exist;
-                expect(err).to.be.an('Error');
-            });
+            try {
+                await AvatarMiddleware.removeAvatarRefFromUser(avatar);
+            } catch (error) {
+                expect(error).to.exist;
+                expect(error).to.be.an('Error');
+            }
         });
     });
 });
