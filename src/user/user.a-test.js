@@ -106,7 +106,7 @@ describe('User acceptance tests', () => {
         }).timeout(3000);
     });
 
-    context.skip('POST /api/users/forgotpassword', () => {
+    context('POST /api/users/forgotpassword', () => {
         beforeEach(() => {
             return createUserUtil(oliver);
         });
@@ -277,7 +277,7 @@ describe('User acceptance tests', () => {
                     expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
                 });
-        });
+        }).timeout(4000);
     });
 
     context('private utility function to', () => {
