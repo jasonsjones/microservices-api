@@ -33,7 +33,7 @@ jobs:
                   command: yarn lint
 
             - run:
-                  name: Run tests
+                  name: Run unit tests
                   command: yarn test:unit
 
     deploy:
