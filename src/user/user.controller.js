@@ -1,7 +1,8 @@
 import config from '../config/config';
+import User from './user.model';
 import * as UserRepository from './user.repository';
 import * as AuthUtils from '../common/auth.utils';
-import { sendPasswordResetEmail } from '../mailer/mailer-utils';
+import { sendPasswordResetEmail, sendEmailVerificationEmail } from '../mailer/mailer-utils';
 
 const buildError = msg => {
     return {
@@ -192,7 +193,14 @@ export function createUser(req) {
             error: new Error(errorMsg)
         });
     }
-    return UserRepository.createUser(req.body)
+
+    let createUserMethod;
+    if (req.query && req.query.verifyEmail === 'false') {
+        createUserMethod = noSendEmailAfterCreateUser(req.body);
+    } else {
+        createUserMethod = sendEmailAfterCreateUser(req.body);
+    }
+    return createUserMethod
         .then(user => {
             return {
                 success: true,
@@ -315,17 +323,16 @@ export const forgotPassword = req => {
     return UserRepository.generateAndSetResetToken(req.body.email)
         .then(user => {
             if (user) {
-                const resetUrl = `${config.url}/reset/${user.passwordResetToken}`;
-                return sendPasswordResetEmail(user, resetUrl);
+                return sendPasswordResetEmail(user);
             }
         })
         .then(data => {
-            if (data && data.email) {
+            if (data && data.user && data.user.email) {
                 return Promise.resolve({
                     success: true,
-                    message: `reset email sent to ${data.email}`,
+                    message: `reset email sent to ${data.user.email}`,
                     payload: {
-                        email: data.email,
+                        email: data.user.email,
                         info: data.info
                     }
                 });
@@ -357,3 +364,11 @@ export const getRandomUser = () => {
         };
     });
 };
+
+const sendEmailAfterCreateUser = user => {
+    return UserRepository.createUser(user)
+        .then(user => sendEmailVerificationEmail(user))
+        .then(({ user }) => new User(user));
+};
+
+const noSendEmailAfterCreateUser = user => UserRepository.createUser(user);

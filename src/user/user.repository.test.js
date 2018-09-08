@@ -750,6 +750,8 @@ const expectUserProperties = user => {
     expect(user).to.be.an('Object');
     expect(user).to.have.property('name');
     expect(user).to.have.property('email');
+    expect(user).to.have.property('isEmailVerified');
+    expect(user).to.have.property('emailVerificationToken');
     expect(user).to.have.property('avatarUrl');
     expect(user).to.have.property('roles');
     expect(user).to.have.property('avatar');
