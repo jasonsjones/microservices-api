@@ -18,24 +18,26 @@ describe('Avatar controller', () => {
             stub.restore();
         });
 
-        it('sends a payload with an array of all avatars', () => {
+        it('sends a payload with an array of all avatars', async () => {
             stub.resolves(mockAvatars);
 
-            return Controller.getAvatars().then(response => {
-                expect(response).to.have.property('success');
-                expect(response).to.have.property('payload');
-                expect(response.payload).to.have.property('avatars');
-                expect(response.success).to.be.true;
-                expect(response.payload.avatars).to.be.an('Array');
-            });
+            const response = await Controller.getAvatars();
+
+            expect(response).to.have.property('success');
+            expect(response).to.have.property('payload');
+            expect(response.payload).to.have.property('avatars');
+            expect(response.success).to.be.true;
+            expect(response.payload.avatars).to.be.an('Array');
         });
 
-        it('sends a success false and message when error occurs', () => {
+        it('sends a success false and message when error occurs', async () => {
             stub.rejects(new Error('Oops, something went wrong...'));
 
-            return Controller.getAvatars().catch(response => {
-                expectErrorResponse(response);
-            });
+            try {
+                await Controller.getAvatars();
+            } catch (error) {
+                expectErrorResponse(error);
+            }
         });
     });
 
@@ -51,37 +53,41 @@ describe('Avatar controller', () => {
             req = {};
         });
 
-        it('sends the avatar data in the response', () => {
+        it('sends the avatar data in the response', async () => {
             stub.withArgs('default').resolves(mockAvatars[0]);
             req.params = {
                 id: 'default'
             };
-            return Controller.getAvatar(req).then(response => {
-                expect(response).to.have.property('contentType');
-                expect(response).to.have.property('payload');
-                expect(response.payload).to.be.an('Object');
-            });
+            const response = await Controller.getAvatar(req);
+
+            expect(response).to.have.property('contentType');
+            expect(response).to.have.property('payload');
+            expect(response.payload).to.be.an('Object');
         });
 
-        it('sends a success false and message when error occurs', () => {
+        it('sends a success false and message when error occurs', async () => {
             stub.withArgs(mockAvatars[1]._id).rejects(new Error('Oops, something went wrong...'));
 
             req.params = {
                 id: mockAvatars[1]._id
             };
 
-            return Controller.getAvatar(req).catch(response => {
-                expectErrorResponse(response);
-            });
+            try {
+                await Controller.getAvatar(req);
+            } catch (error) {
+                expectErrorResponse(error);
+            }
         });
 
-        it('rejects with error when avatar id is not provided', () => {
-            return Controller.getAvatar().catch(response => {
-                expectErrorResponse(response);
-            });
+        it('rejects with error when avatar id is not provided', async () => {
+            try {
+                await Controller.getAvatar();
+            } catch (error) {
+                expectErrorResponse(error);
+            }
         });
 
-        it('rejects with error when avatar id is not provided', () => {
+        it('rejects with error when avatar id is not provided', async () => {
             const badId = '59c44d83f2943200228467b9';
             stub.withArgs(badId).resolves(null);
 
@@ -89,9 +95,11 @@ describe('Avatar controller', () => {
                 id: badId
             };
 
-            return Controller.getAvatar(req).catch(response => {
-                expectErrorResponse(response);
-            });
+            try {
+                await Controller.getAvatar(req);
+            } catch (error) {
+                expectErrorResponse(error);
+            }
         });
     });
 
@@ -107,36 +115,40 @@ describe('Avatar controller', () => {
             req = {};
         });
 
-        it('sends the avatar data in the response', () => {
+        it('sends the avatar data in the response', async () => {
             stub.withArgs(0).resolves(mockAvatars[0]);
 
             req.params = {
                 index: 0
             };
 
-            return Controller.getDefaultAvatar(req).then(response => {
-                expect(response).to.have.property('contentType');
-                expect(response).to.have.property('payload');
-                expect(response.payload).to.be.an('Object');
-            });
+            const response = await Controller.getDefaultAvatar(req);
+
+            expect(response).to.have.property('contentType');
+            expect(response).to.have.property('payload');
+            expect(response.payload).to.be.an('Object');
         });
 
-        it('sends a success false and message when error occurs', () => {
+        it('sends a success false and message when error occurs', async () => {
             stub.withArgs(0).rejects(new Error('Oops, something went wrong...'));
 
             req.params = {
                 index: 0
             };
 
-            return Controller.getDefaultAvatar(req).catch(response => {
-                expectErrorResponse(response);
-            });
+            try {
+                await Controller.getDefaultAvatar(req);
+            } catch (error) {
+                expectErrorResponse(error);
+            }
         });
 
-        it('rejects with error when index is not provided', () => {
-            return Controller.getDefaultAvatar().catch(response => {
-                expectErrorResponse(response);
-            });
+        it('rejects with error when index is not provided', async () => {
+            try {
+                await Controller.getDefaultAvatar();
+            } catch (error) {
+                expectErrorResponse(error);
+            }
         });
     });
 
@@ -152,7 +164,7 @@ describe('Avatar controller', () => {
             req = {};
         });
 
-        it('deletes an avatar when called with avatar id', () => {
+        it('deletes an avatar when called with avatar id', async () => {
             const modelStub = sinon.stub(Avatar.prototype, 'remove');
             modelStub.resolves(new Avatar(mockAvatars[1]));
 
@@ -162,36 +174,40 @@ describe('Avatar controller', () => {
                 id: mockAvatars[1]._id
             };
 
-            return Controller.deleteAvatar(req).then(response => {
-                expect(response).to.have.property('success');
-                expect(response).to.have.property('message');
-                expect(response).to.have.property('payload');
-                expect(response.success).to.be.true;
-                expect(response.payload).to.be.an('Object');
-                expect(response.payload).to.have.property('_id');
-                expect(response.payload).to.have.property('contentType');
-                expect(response.payload).to.have.property('user');
-                expect(response.payload).to.have.property('fileSize');
-                modelStub.restore();
-            });
+            const response = await Controller.deleteAvatar(req);
+
+            expect(response).to.have.property('success');
+            expect(response).to.have.property('message');
+            expect(response).to.have.property('payload');
+            expect(response.success).to.be.true;
+            expect(response.payload).to.be.an('Object');
+            expect(response.payload).to.have.property('_id');
+            expect(response.payload).to.have.property('contentType');
+            expect(response.payload).to.have.property('user');
+            expect(response.payload).to.have.property('fileSize');
+            modelStub.restore();
         });
 
-        it('sends a success false and message when error occurs', () => {
+        it('sends a success false and message when error occurs', async () => {
             stub.withArgs(mockAvatars[1]._id).rejects(new Error('Oops, something went wrong...'));
 
             req.params = {
                 id: mockAvatars[1]._id
             };
 
-            return Controller.deleteAvatar(req).catch(response => {
-                expectErrorResponse(response);
-            });
+            try {
+                await Controller.deleteAvatar(req);
+            } catch (error) {
+                expectErrorResponse(error);
+            }
         });
 
-        it('rejects with error when req is not provided', () => {
-            return Controller.deleteAvatar().catch(response => {
-                expectErrorResponse(response);
-            });
+        it('rejects with error when req is not provided', async () => {
+            try {
+                await Controller.deleteAvatar();
+            } catch (error) {
+                expectErrorResponse(error);
+            }
         });
     });
 
@@ -217,32 +233,36 @@ describe('Avatar controller', () => {
             req = {};
         });
 
-        it('returns the avatar in payload when successfully uploaded', () => {
+        it('returns the avatar in payload when successfully uploaded', async () => {
             const avatar = Repository.makeAvatarModel(req.file, mockAvatars[1].user, false);
             stub.withArgs(req.file, req.params.userId).resolves(avatar);
 
-            return Controller.uploadAvatar(req).then(response => {
-                expect(response).to.have.property('success');
-                expect(response).to.have.property('message');
-                expect(response).to.have.property('payload');
-                expect(response.success).to.be.true;
-            });
+            const response = await Controller.uploadAvatar(req);
+
+            expect(response).to.have.property('success');
+            expect(response).to.have.property('message');
+            expect(response).to.have.property('payload');
+            expect(response.success).to.be.true;
         });
 
-        it('sends a success false and message when error occurs', () => {
+        it('sends a success false and message when error occurs', async () => {
             stub.withArgs(req.file, req.params.userId).rejects(
                 new Error('Oops, something went wrong uploading the image...')
             );
 
-            return Controller.uploadAvatar(req).catch(response => {
-                expectErrorResponse(response);
-            });
+            try {
+                await Controller.uploadAvatar(req);
+            } catch (error) {
+                expectErrorResponse(error);
+            }
         });
 
-        it('rejects with error when req.file is not provided', () => {
-            return Controller.uploadAvatar().catch(response => {
-                expectErrorResponse(response);
-            });
+        it('rejects with error when req.file is not provided', async () => {
+            try {
+                await Controller.uploadAvatar();
+            } catch (error) {
+                expectErrorResponse(error);
+            }
         });
     });
 
@@ -265,34 +285,38 @@ describe('Avatar controller', () => {
             req = {};
         });
 
-        it('returns the default avatar in payload when successfully uploaded', () => {
+        it('returns the default avatar in payload when successfully uploaded', async () => {
             const avatar = Repository.makeAvatarModel(req.file, null, false, true);
             stub.withArgs(req.file).resolves(avatar);
 
-            return Controller.uploadDefaultAvatar(req).then(response => {
-                expect(response).to.have.property('success');
-                expect(response).to.have.property('message');
-                expect(response).to.have.property('payload');
-                expect(response.success).to.be.true;
-                expect(response.payload.defaultImg).to.be.true;
-                expect(response.payload.user).to.be.undefined;
-            });
+            const response = await Controller.uploadDefaultAvatar(req);
+
+            expect(response).to.have.property('success');
+            expect(response).to.have.property('message');
+            expect(response).to.have.property('payload');
+            expect(response.success).to.be.true;
+            expect(response.payload.defaultImg).to.be.true;
+            expect(response.payload.user).to.be.undefined;
         });
 
-        it('sends a success false and message when error occurs', () => {
+        it('sends a success false and message when error occurs', async () => {
             stub.withArgs(req.file).rejects(
                 new Error('Oops, something went wrong uploading the image...')
             );
 
-            return Controller.uploadDefaultAvatar(req).catch(response => {
-                expectErrorResponse(response);
-            });
+            try {
+                await Controller.uploadDefaultAvatar(req);
+            } catch (error) {
+                expectErrorResponse(error);
+            }
         });
 
-        it('rejects with error when req.file is not provided', () => {
-            return Controller.uploadDefaultAvatar().catch(response => {
-                expectErrorResponse(response);
-            });
+        it('rejects with error when req.file is not provided', async () => {
+            try {
+                await Controller.uploadDefaultAvatar();
+            } catch (error) {
+                expectErrorResponse(error);
+            }
         });
     });
 });

@@ -14,70 +14,68 @@ const uploadDefaultAvatar = fileName => {
         .expect(200)
         .then(res => Promise.resolve(res.body.payload));
 };
+
+const getAvatarId = response => {
+    let parts = response.body.payload.user.avatarUrl.split('/');
+    return parts[parts.length - 1];
+};
+
 describe('Avatar acceptence tests', () => {
     afterEach(() => {
         dropCollection(dbConnection, 'avatars');
     });
 
     context('POST /api/avatars/default', () => {
-        it('uploads a default user avatar', () => {
-            return request(app)
+        it('uploads a default user avatar', async () => {
+            const res = await request(app)
                 .post(`/api/avatars/default`)
                 .attach('avatar', `${__dirname}/../../assets/sfdc_default_avatar.png`)
-                .expect(200)
-                .then(res => {
-                    expectJSONShape(res.body);
-                    expect(res.body.success).to.be.true;
-                    expectAvatarShape(res.body.payload, true);
-                    expect(res.body.payload.defaultImg).to.be.true;
-                });
+                .expect(200);
+
+            expectJSONShape(res.body);
+            expect(res.body.success).to.be.true;
+            expectAvatarShape(res.body.payload, true);
+            expect(res.body.payload.defaultImg).to.be.true;
         });
     });
 
     context('GET /api/avatars', () => {
-        it('returns all the user avatars', () => {
-            return uploadDefaultAvatar('sfdc_default_avatar.png')
-                .then(() => uploadDefaultAvatar('default_avatar.png'))
-                .then(() =>
-                    request(app)
-                        .get('/api/avatars')
-                        .expect(200)
-                )
-                .then(res => {
-                    expectJSONShape(res.body);
-                    expect(res.body.success).to.be.true;
-                    expect(res.body.payload.avatars).to.be.an('array');
-                    expectAvatarShape(res.body.payload.avatars[0], false);
-                    expectAvatarShape(res.body.payload.avatars[1], false);
-                });
+        it('returns all the user avatars', async () => {
+            await uploadDefaultAvatar('sfdc_default_avatar.png');
+            await uploadDefaultAvatar('default_avatar.png');
+            const res = await request(app)
+                .get('/api/avatars')
+                .expect(200);
+
+            expectJSONShape(res.body);
+            expect(res.body.success).to.be.true;
+            expect(res.body.payload.avatars).to.be.an('array');
+            expectAvatarShape(res.body.payload.avatars[0], false);
+            expectAvatarShape(res.body.payload.avatars[1], false);
         });
     });
 
     context('GET /api/avatars/default/:index', () => {
-        it('returns the first default avatar', () => {
-            return uploadDefaultAvatar('sfdc_default_avatar.png')
-                .then(() =>
-                    request(app)
-                        .get('/api/avatars/default/0')
-                        .expect(200)
-                )
-                .then(res => {
-                    expect(res.body).to.exist;
-                    expect(typeof res.body === 'object').to.be.true;
-                });
+        it('returns the first default avatar', async () => {
+            await uploadDefaultAvatar('sfdc_default_avatar.png');
+            const res = await request(app)
+                .get('/api/avatars/default/0')
+                .expect(200);
+
+            expect(res.body).to.exist;
+            expect(typeof res.body === 'object').to.be.true;
         });
 
-        it('returns an error if requesting a default avatar that does not exist', () => {
-            return request(app)
+        it('returns an error if requesting a default avatar that does not exist', async () => {
+            const res = await request(app)
                 .get('/api/avatars/default/1')
-                .expect(500)
-                .then(res => {
-                    expect(res.body).to.be.an('object');
-                    expect(res.body).to.have.property('success');
-                    expect(res.body).to.have.property('message');
-                    expect(res.body).to.have.property('error');
-                    expect(res.body.success).to.be.false;
-                });
+                .expect(500);
+
+            expect(res.body).to.be.an('object');
+            expect(res.body).to.have.property('success');
+            expect(res.body).to.have.property('message');
+            expect(res.body).to.have.property('error');
+            expect(res.body.success).to.be.false;
         });
     });
 
@@ -86,36 +84,29 @@ describe('Avatar acceptence tests', () => {
             dropCollection(dbConnection, 'users');
         });
 
-        it('returns an avatar with the given id', () => {
+        it('returns an avatar with the given id', async () => {
             // create a new user
-            return (
-                createUserUtil({
-                    name: 'Oliver Queen',
-                    email: 'oliver@qc.com',
-                    password: '123456'
-                })
-                    // upload a custom avatar for the new user
-                    .then(user =>
-                        request(app)
-                            .post(`/api/users/${user._id}/avatar`)
-                            .attach('avatar', `${__dirname}/../../assets/male3.png`)
-                            .expect(200)
-                    )
-                    // get the avatar id
-                    .then(res => {
-                        let parts = res.body.payload.user.avatarUrl.split('/');
-                        return parts[parts.length - 1];
-                    })
-                    .then(id =>
-                        request(app)
-                            .get(`/api/avatars/${id}`)
-                            .expect(200)
-                    )
-                    .then(res => {
-                        expect(res.body).to.exist;
-                        expect(typeof res.body === 'object').to.be.true;
-                    })
-            );
+            const user = await createUserUtil({
+                name: 'Oliver Queen',
+                email: 'oliver@qc.com',
+                password: '123456'
+            });
+
+            // upload a custom avatar for the new user
+            const uploadResponse = await request(app)
+                .post(`/api/users/${user._id}/avatar`)
+                .attach('avatar', `${__dirname}/../../assets/male3.png`)
+                .expect(200);
+
+            // get the avatar id
+            let id = getAvatarId(uploadResponse);
+
+            const res = await request(app)
+                .get(`/api/avatars/${id}`)
+                .expect(200);
+
+            expect(res.body).to.exist;
+            expect(typeof res.body === 'object').to.be.true;
         });
     });
 
@@ -123,78 +114,65 @@ describe('Avatar acceptence tests', () => {
         afterEach(() => {
             dropCollection(dbConnection, 'users');
         });
-        it('deletes a custom avatar with the given id', () => {
+
+        it('deletes a custom avatar with the given id', async () => {
             // create a new user
-            return (
-                createUserUtil({
-                    name: 'Oliver Queen',
-                    email: 'oliver@qc.com',
-                    password: '123456'
-                })
-                    // upload a custom avatar for the new user
-                    .then(user =>
-                        request(app)
-                            .post(`/api/users/${user._id}/avatar`)
-                            .attach('avatar', `${__dirname}/../../assets/male3.png`)
-                            .expect(200)
-                    )
-                    // get the avatar id
-                    .then(res => {
-                        let parts = res.body.payload.user.avatarUrl.split('/');
-                        return parts[parts.length - 1];
-                    })
-                    .then(id =>
-                        request(app)
-                            .delete(`/api/avatars/${id}`)
-                            .expect(200)
-                    )
-                    .then(res => {
-                        expectJSONShape(res.body);
-                        expect(res.body.success).to.be.true;
-                        expectAvatarShape(res.body.payload, true);
-                    })
-            );
+            const user = await createUserUtil({
+                name: 'Oliver Queen',
+                email: 'oliver@qc.com',
+                password: '123456'
+            });
+
+            // upload a custom avatar for the new user
+            const uploadResponse = await request(app)
+                .post(`/api/users/${user._id}/avatar`)
+                .attach('avatar', `${__dirname}/../../assets/male3.png`)
+                .expect(200);
+
+            // get the avatar id
+            let id = getAvatarId(uploadResponse);
+
+            const res = await request(app)
+                .delete(`/api/avatars/${id}`)
+                .expect(200);
+
+            expectJSONShape(res.body);
+            expect(res.body.success).to.be.true;
+            expectAvatarShape(res.body.payload, true);
         });
 
-        it('verifies avatar is reset to default when custom avatar is deleted', () => {
-            return (
-                // create new user
-                createUserUtil({
-                    name: 'Oliver Queen',
-                    email: 'oliver@qc.com',
-                    password: '123456'
-                })
-                    // upload a custom avatar for the new user
-                    .then(user =>
-                        request(app)
-                            .post(`/api/users/${user._id}/avatar`)
-                            .attach('avatar', `${__dirname}/../../assets/male3.png`)
-                            .expect(200)
-                    )
-                    // get the avatar id
-                    .then(res => {
-                        let parts = res.body.payload.user.avatarUrl.split('/');
-                        return parts[parts.length - 1];
-                    })
-                    // delete the custom avatar
-                    .then(id =>
-                        request(app)
-                            .delete(`/api/avatars/${id}`)
-                            .expect(200)
-                    )
-                    .then(res => res.body.payload.user)
-                    .then(id =>
-                        request(app)
-                            .get(`/api/users/${id}`)
-                            .expect(200)
-                    )
-                    .then(res => {
-                        const { avatarUrl, avatar } = res.body.payload.user;
-                        expectJSONShape(res.body, 'user');
-                        expect(avatarUrl).contains('default');
-                        expect(avatar).to.equal(null);
-                    })
-            );
+        it('verifies avatar is reset to default when custom avatar is deleted', async () => {
+            // create a new user
+            const user = await createUserUtil({
+                name: 'Oliver Queen',
+                email: 'oliver@qc.com',
+                password: '123456'
+            });
+
+            // upload a custom avatar for the new user
+            const uploadResponse = await request(app)
+                .post(`/api/users/${user._id}/avatar`)
+                .attach('avatar', `${__dirname}/../../assets/male3.png`)
+                .expect(200);
+
+            // get the avatar id
+            let avatarId = getAvatarId(uploadResponse);
+
+            // delete the custom avatar
+            const deleteResponse = await request(app)
+                .delete(`/api/avatars/${avatarId}`)
+                .expect(200);
+
+            const userId = deleteResponse.body.payload.user;
+
+            const res = await request(app)
+                .get(`/api/users/${userId}`)
+                .expect(200);
+
+            const { avatarUrl, avatar } = res.body.payload.user;
+            expectJSONShape(res.body, 'user');
+            expect(avatarUrl).contains('default');
+            expect(avatar).to.equal(null);
         });
     });
 });

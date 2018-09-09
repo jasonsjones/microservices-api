@@ -21,6 +21,8 @@ const expectUserShape = res => {
     expect(res).to.have.property('_id');
     expect(res).to.have.property('name');
     expect(res).to.have.property('email');
+    expect(res).to.have.property('isEmailVerified');
+    expect(res).to.have.property('emailVerificationToken');
     expect(res).to.have.property('password');
     expect(res).to.have.property('roles');
     expect(res).to.have.property('avatarUrl');

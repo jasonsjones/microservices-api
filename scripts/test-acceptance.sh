@@ -1,18 +1,21 @@
 #!/bin/bash
+source $(pwd)/scripts/colors.sh
+source $(pwd)/scripts/functions.sh
 
-# colors
-RESTORE='\033[0m'
-CYAN='\033[00;36m'
 SRC_SETUP='src/utils/dbTestSetup.js'
 
 if [ -z $1 ]
     then
         SRC='src/**/*.a-test.js'
-        echo -e "\nNo feature or module supplied\n"
+        echo -e "${YELLOW}No feature or module supplied...running the full suite of acceptance tests${RESTORE}"
     else
         SRC="src/**/$1.a-test.js"
         echo -e "${CYAN}*** Running acceptance tests for $1 feature and/or module ***${RESTORE}"
 fi
 
 NODE_ENV=test DEBUG=db:connection,test npx mocha --exit $SRC_SETUP $SRC
-echo "Tests complete!"
+TEST_STATUS=$?
+
+process_exit_status $TEST_STATUS
+
+exit $TEST_STATUS

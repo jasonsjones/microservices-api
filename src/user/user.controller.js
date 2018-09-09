@@ -1,12 +1,8 @@
-import debug from 'debug';
-import nodemailer from 'nodemailer';
-
 import config from '../config/config';
-import { getMailTransporter } from '../common/mailer';
+import User from './user.model';
 import * as UserRepository from './user.repository';
 import * as AuthUtils from '../common/auth.utils';
-
-const log = debug('mailer');
+import { sendPasswordResetEmail, sendEmailVerificationEmail } from '../mailer/mailer-utils';
 
 const buildError = msg => {
     return {
@@ -197,7 +193,14 @@ export function createUser(req) {
             error: new Error(errorMsg)
         });
     }
-    return UserRepository.createUser(req.body)
+
+    let createUserMethod;
+    if (req.query && req.query.verifyEmail === 'false') {
+        createUserMethod = noSendEmailAfterCreateUser(req.body);
+    } else {
+        createUserMethod = sendEmailAfterCreateUser(req.body);
+    }
+    return createUserMethod
         .then(user => {
             return {
                 success: true,
@@ -320,17 +323,16 @@ export const forgotPassword = req => {
     return UserRepository.generateAndSetResetToken(req.body.email)
         .then(user => {
             if (user) {
-                const resetUrl = `${config.url}/reset/${user.passwordResetToken}`;
-                return sendPasswordResetEmail(user, resetUrl);
+                return sendPasswordResetEmail(user);
             }
         })
         .then(data => {
-            if (data && data.email) {
+            if (data && data.user && data.user.email) {
                 return Promise.resolve({
                     success: true,
-                    message: `reset email sent to ${data.email}`,
+                    message: `reset email sent to ${data.user.email}`,
                     payload: {
-                        email: data.email,
+                        email: data.user.email,
                         info: data.info
                     }
                 });
@@ -363,35 +365,10 @@ export const getRandomUser = () => {
     });
 };
 
-const sendPasswordResetEmail = (user, resetUrl) => {
-    return new Promise((resolve, reject) => {
-        let mailOptions = getMailOptions(user, resetUrl);
-        let transporter = getMailTransporter();
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                reject(error);
-            }
-            log('Message sent: %s', info.messageId);
-            // Preview only available when sending through an Ethereal account
-            log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-            resolve({ email: user.email, info });
-        });
-    });
+const sendEmailAfterCreateUser = user => {
+    return UserRepository.createUser(user)
+        .then(user => sendEmailVerificationEmail(user))
+        .then(({ user }) => new User(user));
 };
 
-const getMailOptions = (user, resetUrl) => {
-    return {
-        from: '"Sandbox API" <support@sandboxapi.com>', // sender address
-        to: `"${user.name}" <${user.email}>`, // list of receivers
-        subject: 'Password Reset', // Subject line
-        text: 'Password reset...', // plain text body
-        html: `
-            <div style="font-family: sans-serif; font-size: 18px; margin: 0 100px">
-                <p>You are receiving this because you (or someone else) have requested the reset of the password for your account</p>
-                <p>Please click on the following link, or paste into browser address bar to complete the process:</p>
-                <p><a href="${resetUrl}">${resetUrl}</a></p>
-                <p>If you did not request this, please disregard this email and your password will remain unchanged</p>
-            </div>
-            `
-    };
-};
+const noSendEmailAfterCreateUser = user => UserRepository.createUser(user);

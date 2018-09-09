@@ -4,8 +4,9 @@ import sinon from 'sinon';
 import { expect } from 'chai';
 
 import * as Controller from './user.controller';
+import { createUserUtil } from '../utils/userTestUtils';
 import { dbConnection, dropCollection } from '../utils/dbTestUtils';
-import { clearMailTransporterCache } from '../common/mailer';
+import { clearMailTransporterCache } from '../mailer/mailer';
 
 const users = [
     {
@@ -83,8 +84,12 @@ describe('User controller integration tests', () => {
 
         it('resolves with user data and token for newly created user', () => {
             let req = {
-                body: users[0]
+                body: users[0],
+                query: {
+                    verifyEmail: 'false'
+                }
             };
+
             return Controller.createUser(req).then(response => {
                 expect(response).to.have.property('success');
                 expect(response).to.have.property('message');
@@ -101,8 +106,8 @@ describe('User controller integration tests', () => {
         });
 
         it('returns all the users', () => {
-            return Controller.createUser({ body: users[0] })
-                .then(() => Controller.createUser({ body: users[1] }))
+            return createUserUtil(users[0])
+                .then(() => createUserUtil(users[1]))
                 .then(() => Controller.getUsers())
                 .then(response => {
                     expect(response).to.have.property('success');
@@ -122,9 +127,8 @@ describe('User controller integration tests', () => {
         });
 
         it('returns a payload with the user with the given id', () => {
-            return Controller.createUser({ body: users[1] })
-                .then(response => response.payload.user._id)
-                .then(id => Controller.getUser({ params: { id } }))
+            return createUserUtil(users[1])
+                .then(user => Controller.getUser({ params: { id: user._id } }))
                 .then(response => {
                     expect(response).to.have.property('success');
                     expect(response).to.have.property('message');
@@ -135,9 +139,10 @@ describe('User controller integration tests', () => {
 
         it('returns a payload with the user and includes the avatar model', () => {
             const avatar = getCopyOfAvatar();
-            return Controller.createUser({ body: users[1] })
-                .then(response => response.payload.user._id)
-                .then(id => Controller.uploadUserAvatar({ params: { id }, file: avatar }))
+            return createUserUtil(users[1])
+                .then(user =>
+                    Controller.uploadUserAvatar({ params: { id: user._id }, file: avatar })
+                )
                 .then(response =>
                     Controller.getUser({
                         params: { id: response.payload.user._id },
@@ -164,9 +169,8 @@ describe('User controller integration tests', () => {
         });
 
         it('returns an error if the user does not have a linked SFDC profile', () => {
-            return Controller.createUser({ body: users[1] })
-                .then(response => response.payload.user._id)
-                .then(id => Controller.getUser({ params: { id } }))
+            return createUserUtil(users[1])
+                .then(user => Controller.getUser({ params: { id: user._id } }))
                 .then(response => Controller.unlinkSFDCAccount({ user: response.payload.user }))
                 .then(response => expectErrorResponse(response, 'error unlinking the user'));
         });
@@ -178,11 +182,10 @@ describe('User controller integration tests', () => {
         });
 
         it('updates the user with the provided data', () => {
-            return Controller.createUser({ body: users[1] })
-                .then(response => response.payload.user._id)
-                .then(id =>
+            return createUserUtil(users[1])
+                .then(user =>
                     Controller.updateUser({
-                        params: { id },
+                        params: { id: user._id },
                         body: {
                             name: 'The Flash',
                             email: 'flash@starlabs.com'
@@ -207,9 +210,8 @@ describe('User controller integration tests', () => {
         });
 
         it('returns the a payload with the user that was just deleted', () => {
-            return Controller.createUser({ body: users[1] })
-                .then(response => response.payload.user._id)
-                .then(id => Controller.deleteUser({ params: { id } }))
+            return createUserUtil(users[1])
+                .then(user => Controller.deleteUser({ params: { id: user._id } }))
                 .then(response => {
                     expect(response).to.have.property('success');
                     expect(response).to.have.property('message');
@@ -223,10 +225,11 @@ describe('User controller integration tests', () => {
     context('uploadUserAvatar()', () => {
         let barryId;
         before(() => {
-            return Controller.createUser({ body: users[0] }).then(response => {
-                barryId = response.payload.user._id;
+            return createUserUtil(users[0]).then(user => {
+                barryId = user._id;
             });
         });
+
         after(() => {
             dropCollection(dbConnection, 'users');
             dropCollection(dbConnection, 'avatars');
@@ -282,9 +285,9 @@ describe('User controller integration tests', () => {
     context('changePassword()', () => {
         let barryId;
         before(() => {
-            return Controller.createUser({ body: users[0] }).then(response => {
-                barryId = response.payload.user._id;
-                Controller.createUser({ body: users[1] });
+            return createUserUtil(users[0]).then(user => {
+                barryId = user._id;
+                return createUserUtil(users[1]);
             });
         });
 
@@ -379,7 +382,7 @@ describe('User controller integration tests', () => {
                     email: 'oliver@qc.com'
                 }
             };
-            return Controller.createUser({ body: users[1] }).then(() => {
+            return createUserUtil(users[1]).then(() => {
                 return Controller.forgotPassword(req).then(response => {
                     expect(response).to.have.property('success');
                     expect(response).to.have.property('message');

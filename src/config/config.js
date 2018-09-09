@@ -3,7 +3,7 @@ import configDev from './configDev';
 import configTest from './configTest';
 dotenv.config();
 
-const version = '0.2.10';
+const version = '0.2.11';
 const env = process.env.NODE_ENV || 'development';
 const port = process.env.PORT || 3000;
 const token_secret = process.env.JWT_SECRET;
@@ -21,12 +21,26 @@ const getUrl = (env, port) => {
     }
 };
 
+const emailAcct = {
+    host: 'smtp.ethereal.email',
+    port: 587,
+    secure: false,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWD
+    }
+};
+
+const emailAddr = '"Sandbox API" <support@sandboxapi.com>';
+
 let configBase = {
     version,
     env,
     port,
     token_secret,
     session_secret,
+    emailAcct,
+    emailAddr,
     url: getUrl(env, port),
     dbUrl: 'mongodb://mongo:27017/sandboxapi-default'
 };
