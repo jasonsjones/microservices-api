@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import configDev from './configDev';
 import configTest from './configTest';
+import configProd from './configProd';
 dotenv.config();
 
 const version = '0.2.11';
@@ -41,7 +42,7 @@ let configBase = {
     session_secret,
     emailAcct,
     emailAddr,
-    url: getUrl(env, port),
+    url: 'localhost:3000',
     dbUrl: 'mongodb://mongo:27017/sandboxapi-default'
 };
 
@@ -49,6 +50,9 @@ let config;
 switch (env) {
     case 'development':
         config = Object.assign({}, configBase, configDev);
+        break;
+    case 'production':
+        config = Object.assign({}, configBase, configProd);
         break;
     case 'test':
         config = Object.assign({}, configBase, configTest);
