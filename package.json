@@ -16,6 +16,7 @@
         "instrument": false
     },
     "scripts": {
+        "prebuild": "yarn clean",
         "build": "babel src -d build",
         "predev": "npm run dbSeed",
         "dev": "NODE_ENV=development DEBUG=db*,app nodemon src/server.js --inspect=0.0.0.0:5858 --watch src/ --exec babel-node",
@@ -32,7 +33,9 @@
         "up:test:acceptance": "docker-compose up node-test",
         "up:test:integration": "docker-compose run --rm node-test yarn test:integration",
         "up:test:all": "docker-compose run --rm node-test yarn test:all",
-        "down": "docker-compose down"
+        "down": "docker-compose down",
+        "prestart": "yarn build",
+        "start": "NODE_ENV=production node build/server.js"
     },
     "repository": {
         "type": "git",
