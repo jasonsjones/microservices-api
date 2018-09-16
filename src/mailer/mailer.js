@@ -14,3 +14,19 @@ export const getMailTransporter = () => {
 export const clearMailTransporterCache = () => {
     _transporter = null;
 };
+
+export const createTestAccount = () => {
+    return new Promise((resolve, reject) => {
+        nodemailer.createTestAccount((err, account) => {
+            if (err) {
+                reject(err);
+            }
+            const rawAccount = account;
+            const smtpMailConfig = {
+                ...account.smtp,
+                auth: { user: account.user, pass: account.pass }
+            };
+            resolve({ rawAccount, smtpMailConfig });
+        });
+    });
+};
