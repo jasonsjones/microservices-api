@@ -695,15 +695,30 @@ describe('User controller', () => {
     });
 
     describe('forgotPassword()', () => {
-        let req, stub, resolvedUser, mailerStub;
+        const mockTestAccountResponse = {
+            user: 'test-account@ethereal.email',
+            pass: 'u6XKFA5qGUjhgzrBaw',
+            smtp: { host: 'smtp.ethereal.email', port: 587, secure: false },
+            imap: { host: 'imap.ethereal.email', port: 993, secure: true },
+            pop3: { host: 'pop3.ethereal.email', port: 995, secure: true },
+            web: 'https://ethereal.email'
+        };
+
+        let req,
+            generateAndSetResetTokenStub,
+            resolvedUser,
+            createTransportStub,
+            createTestAccountStub;
+
         before(() => {
             // ensure the mail transporter is cleared from other tests...
             clearMailTransporterCache();
         });
 
         beforeEach(() => {
-            mailerStub = sinon.stub(nodemailer, 'createTransport');
-            stub = sinon.stub(Repository, 'generateAndSetResetToken');
+            createTransportStub = sinon.stub(nodemailer, 'createTransport');
+            createTestAccountStub = sinon.stub(nodemailer, 'createTestAccount');
+            generateAndSetResetTokenStub = sinon.stub(Repository, 'generateAndSetResetToken');
             req = {};
             resolvedUser = new User(mockUsers[1]);
             resolvedUser.passwordResetToken = '562835a1c7c63581ee81f15bad8bbc851123b581';
@@ -711,8 +726,9 @@ describe('User controller', () => {
         });
 
         afterEach(() => {
-            mailerStub.restore();
-            stub.restore();
+            createTransportStub.restore();
+            createTestAccountStub.restore();
+            generateAndSetResetTokenStub.restore();
             req = {};
             resolvedUser = null;
             clearMailTransporterCache();
@@ -747,19 +763,23 @@ describe('User controller', () => {
         });
 
         it('rejects with error if there is an error sending the email', () => {
-            let mockTransporter = {
+            const testAccountFake = cb => {
+                cb(null, mockTestAccountResponse);
+            };
+            createTestAccountStub.callsFake(testAccountFake);
+
+            const mockTransporter = {
                 sendMail: (data, cb) => {
                     const err = new Error('Oops, there was an error sending the message');
                     cb(err, null);
                 }
             };
-
-            mailerStub.returns(mockTransporter);
+            createTransportStub.returns(mockTransporter);
 
             req.body = {
                 email: 'oliver@qc.com'
             };
-            stub.resolves(resolvedUser);
+            generateAndSetResetTokenStub.resolves(resolvedUser);
             const promise = Controller.forgotPassword(req);
             expect(promise).to.be.a('Promise');
             return promise.catch(response => {
@@ -768,10 +788,14 @@ describe('User controller', () => {
         });
 
         it('resolves with an object with success (false) and message property if user is not found', () => {
+            const accountFake = cb => {
+                cb(null, mockTestAccountResponse);
+            };
+            createTestAccountStub.callsFake(accountFake);
             req.body = {
                 email: 'notfound@email.com'
             };
-            stub.resolves(null);
+            generateAndSetResetTokenStub.resolves(null);
             const promise = Controller.forgotPassword(req);
             expect(promise).to.be.a('Promise');
             return promise.then(response => {
@@ -782,6 +806,10 @@ describe('User controller', () => {
         });
 
         it('resolves with an object with success (true) and message property if user is found', () => {
+            const accountFake = cb => {
+                cb(null, mockTestAccountResponse);
+            };
+            createTestAccountStub.callsFake(accountFake);
             let mockTransporter = {
                 sendMail: (data, cb) => {
                     cb(null, {
@@ -790,12 +818,12 @@ describe('User controller', () => {
                 }
             };
 
-            mailerStub.returns(mockTransporter);
+            createTransportStub.returns(mockTransporter);
 
             req.body = {
                 email: 'oliver@qc.com'
             };
-            stub.resolves(resolvedUser);
+            generateAndSetResetTokenStub.resolves(resolvedUser);
             const promise = Controller.forgotPassword(req);
             expect(promise).to.be.a('Promise');
             return promise.then(response => {

@@ -6,9 +6,12 @@ let _transporter = null;
 
 export const getMailTransporter = () => {
     if (!_transporter) {
-        _transporter = nodemailer.createTransport(config.emailAcct);
+        return getEmailAcctConfig().then(creds => {
+            _transporter = nodemailer.createTransport(creds);
+            return _transporter;
+        });
     }
-    return _transporter;
+    return Promise.resolve(_transporter);
 };
 
 export const clearMailTransporterCache = () => {
@@ -29,4 +32,10 @@ export const createTestAccount = () => {
             resolve({ rawAccount, smtpMailConfig });
         });
     });
+};
+
+const getEmailAcctConfig = () => {
+    if (process.env.NODE_ENV != 'production') {
+        return createTestAccount().then(creds => creds.smtpMailConfig);
+    }
 };
