@@ -3,15 +3,7 @@ import sinon from 'sinon';
 import nodemailer from 'nodemailer';
 
 import { getMailTransporter, clearMailTransporterCache, createTestAccount } from './mailer';
-
-const mockTestAccountResponse = {
-    user: 'test-account@ethereal.email',
-    pass: 'u6XKFA5qGUjhgzrBaw',
-    smtp: { host: 'smtp.ethereal.email', port: 587, secure: false },
-    imap: { host: 'imap.ethereal.email', port: 993, secure: true },
-    pop3: { host: 'pop3.ethereal.email', port: 995, secure: true },
-    web: 'https://ethereal.email'
-};
+import { mockTestAccountResponse } from '../utils/mockData';
 
 describe('Mailer', () => {
     describe('getMailTransporter()', () => {

@@ -6,6 +6,7 @@ import * as Repository from './user.repository';
 import * as Controller from './user.controller';
 import User from './user.model';
 import { mockUsers, mockUsersWithAvatar, mockRandomUser } from '../utils/userTestUtils';
+import { mockTestAccountResponse } from '../utils/mockData';
 import { normalizeRandomUserData } from '../utils/userUtils';
 import { clearMailTransporterCache } from '../mailer/mailer';
 
@@ -695,15 +696,6 @@ describe('User controller', () => {
     });
 
     describe('forgotPassword()', () => {
-        const mockTestAccountResponse = {
-            user: 'test-account@ethereal.email',
-            pass: 'u6XKFA5qGUjhgzrBaw',
-            smtp: { host: 'smtp.ethereal.email', port: 587, secure: false },
-            imap: { host: 'imap.ethereal.email', port: 993, secure: true },
-            pop3: { host: 'pop3.ethereal.email', port: 995, secure: true },
-            web: 'https://ethereal.email'
-        };
-
         let req,
             generateAndSetResetTokenStub,
             resolvedUser,

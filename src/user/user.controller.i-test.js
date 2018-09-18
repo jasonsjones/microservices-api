@@ -5,6 +5,7 @@ import { expect } from 'chai';
 
 import * as Controller from './user.controller';
 import { createUserUtil } from '../utils/userTestUtils';
+import { mockTestAccountResponse } from '../utils/mockData';
 import { dbConnection, dropCollection } from '../utils/dbTestUtils';
 import { clearMailTransporterCache } from '../mailer/mailer';
 
@@ -368,14 +369,6 @@ describe('User controller integration tests', () => {
         });
 
         it('sends an email to the user with a link to reset password', () => {
-            const mockTestAccountResponse = {
-                user: 'test-account@ethereal.email',
-                pass: 'u6XKFA5qGUjhgzrBaw',
-                smtp: { host: 'smtp.ethereal.email', port: 587, secure: false },
-                imap: { host: 'imap.ethereal.email', port: 993, secure: true },
-                pop3: { host: 'pop3.ethereal.email', port: 995, secure: true },
-                web: 'https://ethereal.email'
-            };
             const createTestAccountStub = sinon.stub(nodemailer, 'createTestAccount');
             const testAccountFake = cb => {
                 cb(null, mockTestAccountResponse);
