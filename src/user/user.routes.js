@@ -86,7 +86,9 @@ export default () => {
     );
 
     UserRouter.get('/randomuser', (req, res) => {
-        UserController.getRandomUser().then(handleSuccess(res));
+        UserController.getRandomUser()
+            .then(handleSuccess(res))
+            .catch(handleError(res));
     });
 
     // TODO: add middleware to protect the route
