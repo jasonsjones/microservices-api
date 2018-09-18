@@ -277,7 +277,7 @@ describe('User acceptance tests', () => {
                     expectJSONShape(res.body, 'user');
                     expect(res.body.success).to.be.true;
                 });
-        }).timeout(4000);
+        }).timeout(8000);
     });
 
     context('private utility function to', () => {
