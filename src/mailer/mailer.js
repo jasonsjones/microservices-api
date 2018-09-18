@@ -1,7 +1,9 @@
+import debug from 'debug';
 import nodemailer from 'nodemailer';
 
 import config from '../config/config';
 
+const log = debug('mailer');
 let _transporter = null;
 
 export const getMailTransporter = () => {
@@ -22,8 +24,10 @@ export const createTestAccount = () => {
     return new Promise((resolve, reject) => {
         nodemailer.createTestAccount((err, account) => {
             if (err) {
-                reject(err);
+                return reject(err);
             }
+            log('Test account user: %s', account.user);
+            log('Test account password: %s', account.pass);
             const rawAccount = account;
             const smtpMailConfig = {
                 ...account.smtp,
