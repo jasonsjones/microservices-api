@@ -29,10 +29,9 @@ export const createTestAccount = () => {
             log('Test account user: %s', account.user);
             log('Test account password: %s', account.pass);
             const rawAccount = account;
-            const smtpMailConfig = {
-                ...account.smtp,
+            const smtpMailConfig = Object.assign({}, account.smtp, {
                 auth: { user: account.user, pass: account.pass }
-            };
+            });
             resolve({ rawAccount, smtpMailConfig });
         });
     });
