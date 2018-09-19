@@ -18,7 +18,7 @@
     "scripts": {
         "prebuild": "yarn clean",
         "build": "babel src -d build",
-        "predev": "npm run dbSeed",
+        "predev": "yarn dbSeed",
         "dev": "NODE_ENV=development DEBUG=db*,app nodemon src/server.js --inspect=0.0.0.0:5858 --watch src/ --exec babel-node",
         "clean": "rm -rf .v8flags* uploads/* build",
         "dbSeed": "babel-node src/utils/dbSeed.js",
