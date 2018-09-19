@@ -20,7 +20,7 @@ let configBase = {
     session_secret,
     emailAddr,
     apiUrl: 'http://localhost:3000',
-    clienUrl: 'http://localhost:4200',
+    clientUrl: 'http://localhost:4200',
     dbUrl: 'mongodb://mongo:27017/sandboxapi-default'
 };
 
