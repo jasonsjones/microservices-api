@@ -9,7 +9,7 @@ const log = debug('mailer');
 
 export const sendPasswordResetEmail = user => {
     return new Promise((resolve, reject) => {
-        const resetUrl = `${config.url}/api/users/reset-password/${user.passwordResetToken}`;
+        const resetUrl = `${config.clientUrl}/api/users/reset-password/${user.passwordResetToken}`;
         let mailOptions = getMailOptionsForPasswordReset(user, resetUrl);
         getMailTransporter().then(transporter => {
             transporter.sendMail(mailOptions, (error, info) => {
@@ -27,7 +27,9 @@ export const sendPasswordResetEmail = user => {
 
 export const sendEmailVerificationEmail = user => {
     return new Promise((resolve, reject) => {
-        const verifyUrl = `${config.url}/api/users/verify-email/${user.emailVerificationToken}`;
+        const verifyUrl = `${config.clientUrl}/api/users/verify-email/${
+            user.emailVerificationToken
+        }`;
         let mailOptions = getMailOptionsForEmailVerification(user, verifyUrl);
         getMailTransporter().then(transporter => {
             transporter.sendMail(mailOptions, (error, info) => {

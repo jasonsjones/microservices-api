@@ -6,7 +6,7 @@ import config from '../config/config';
 
 const log = debug('db:seed');
 
-const url = config.url;
+const url = config.apiUrl;
 const assetPath = `${__dirname}/../../assets`;
 const defaultAvatarFile = `${assetPath}/sfdc_default_avatar.png`;
 const initialUsers = [

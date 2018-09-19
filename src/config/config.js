@@ -10,18 +10,6 @@ const port = process.env.PORT || 3000;
 const token_secret = process.env.JWT_SECRET;
 const session_secret = process.env.SESSION_SECRET;
 
-const getUrl = (env, port) => {
-    switch (env) {
-        case 'development':
-        case 'test':
-            return `http://localhost:${port}`;
-        case 'production':
-            return process.env.PROD_URL;
-        default:
-            break;
-    }
-};
-
 const emailAddr = '"Sandbox API" <support@sandboxapi.com>';
 
 let configBase = {
@@ -31,7 +19,8 @@ let configBase = {
     token_secret,
     session_secret,
     emailAddr,
-    url: 'localhost:3000',
+    apiUrl: 'http://localhost:3000',
+    clienUrl: 'http://localhost:4200',
     dbUrl: 'mongodb://mongo:27017/sandboxapi-default'
 };
 

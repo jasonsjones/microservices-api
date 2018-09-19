@@ -1,10 +1,11 @@
+import config from '../config/config';
 import User from './user.model';
 import { normalizeRandomUserData } from '../utils/userUtils';
 import { deleteAvatar, makeAvatarModel } from '../avatar/avatar.repository';
 import { generateRandomToken } from '../common/auth.utils';
 import { fetchRandomUsers } from '../common/external-api';
 
-const baseUrl = 'http://localhost:3000';
+const baseUrl = config.apiUrl;
 
 export function getUsers(queryCondition = {}, inclAvatars = false) {
     let query;

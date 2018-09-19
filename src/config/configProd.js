@@ -5,6 +5,7 @@ const dockerDbUri = 'mongodb://mongo:27017/sandboxapi';
 
 export default {
     logging: false,
-    url: process.env.PROD_URL,
+    apiUrl: 'https://j2sandbox-api.herokuapp.com',
+    clienUrl: 'https://j2sandbox.herokupap.com',
     dbUrl: process.env.MLAB_DB_URI
 };
