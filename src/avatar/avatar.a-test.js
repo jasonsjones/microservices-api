@@ -87,7 +87,10 @@ describe('Avatar acceptence tests', () => {
         it('returns an avatar with the given id', async () => {
             // create a new user
             const user = await createUserUtil({
-                name: 'Oliver Queen',
+                name: {
+                    first: 'Oliver',
+                    last: 'Queen'
+                },
                 email: 'oliver@qc.com',
                 password: '123456'
             });
@@ -118,7 +121,10 @@ describe('Avatar acceptence tests', () => {
         it('deletes a custom avatar with the given id', async () => {
             // create a new user
             const user = await createUserUtil({
-                name: 'Oliver Queen',
+                name: {
+                    first: 'Oliver',
+                    last: 'Queen'
+                },
                 email: 'oliver@qc.com',
                 password: '123456'
             });
@@ -144,7 +150,10 @@ describe('Avatar acceptence tests', () => {
         it('verifies avatar is reset to default when custom avatar is deleted', async () => {
             // create a new user
             const user = await createUserUtil({
-                name: 'Oliver Queen',
+                name: {
+                    first: 'Oliver',
+                    last: 'Queen'
+                },
                 email: 'oliver@qc.com',
                 password: '123456'
             });
