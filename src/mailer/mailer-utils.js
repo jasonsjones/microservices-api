@@ -48,7 +48,7 @@ export const sendEmailVerificationEmail = user => {
 const getMailOptionsForPasswordReset = (user, url) => {
     return {
         from: config.emailAddr,
-        to: `"${user.name}" <${user.email}>`,
+        to: `"${user.name.first} ${user.name.last}" <${user.email}>`,
         subject: 'Password Reset -- Sandbox API',
         text: templates.passwordResetEmailPlainText(url),
         html: templates.passwordResetEmailHTML(url)
@@ -58,7 +58,7 @@ const getMailOptionsForPasswordReset = (user, url) => {
 const getMailOptionsForEmailVerification = (user, url) => {
     return {
         from: config.emailAddr,
-        to: `"${user.name}" <${user.email}>`,
+        to: `"${user.name.first} ${user.name.last}" <${user.email}>`,
         subject: 'Email Verification -- Sandbox API',
         text: templates.verifyEmailPlainText(url),
         html: templates.verifyEmailHTML(url)
