@@ -16,9 +16,12 @@ export const sendPasswordResetEmail = user => {
                 if (error) {
                     return reject(error);
                 }
-                log('Message sent: %s', info.messageId);
-                // Preview only available when sending through an Ethereal account
-                log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                const messageUrl = nodemailer.getTestMessageUrl(info);
+                if (messageUrl) {
+                    log('Message sent: %s', info.messageId);
+                    // Preview only available when sending through an Ethereal account
+                    log('Preview URL: %s', messageUrl);
+                }
                 resolve({ user, info });
             });
         });
@@ -36,9 +39,12 @@ export const sendEmailVerificationEmail = user => {
                 if (error) {
                     return reject(error);
                 }
-                log('Message sent: %s', info.messageId);
-                // Preview only available when sending through an Ethereal account
-                log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                const messageUrl = nodemailer.getTestMessageUrl(info);
+                if (messageUrl) {
+                    log('Message sent: %s', info.messageId);
+                    // Preview only available when sending through an Ethereal account
+                    log('Preview URL: %s', messageUrl);
+                }
                 resolve({ user, info });
             });
         });

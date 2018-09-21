@@ -26,8 +26,10 @@ export const createTestAccount = () => {
             if (err) {
                 return reject(err);
             }
-            log('Test account user: %s', account.user);
-            log('Test account password: %s', account.pass);
+            if (!account.user.includes('test-account')) {
+                log('Test account user: %s', account.user);
+                log('Test account password: %s', account.pass);
+            }
             const rawAccount = account;
             const smtpMailConfig = Object.assign({}, account.smtp, {
                 auth: { user: account.user, pass: account.pass }
