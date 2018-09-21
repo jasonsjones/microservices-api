@@ -311,7 +311,10 @@ describe('User repository', () => {
     describe('updateUser()', () => {
         it('resolves with user.save()', () => {
             const updatedData = {
-                name: 'Roy (red hood) Harper',
+                name: {
+                    first: 'Roy (red hood)',
+                    last: ' Harper'
+                },
                 email: 'arsenal@qc.com'
             };
             const stub = sinon.stub(User.prototype, 'save');
@@ -324,7 +327,7 @@ describe('User repository', () => {
             expect(promise).to.be.a('Promise');
             return promise.then(user => {
                 expectUserProperties(user);
-                expect(user.name).to.equal(updatedData.name);
+                expect(user.name.first).to.equal(updatedData.name.first);
                 expect(user.email).to.equal(updatedData.email);
                 stub.restore();
             });
@@ -332,7 +335,10 @@ describe('User repository', () => {
 
         it('rejects with error if something goes wrong', () => {
             const updatedData = {
-                name: 'Roy (red hood) Harper',
+                name: {
+                    first: 'Roy (red hood)',
+                    last: ' Harper'
+                },
                 email: 'arsenal@qc.com'
             };
             UserMock.expects('findById')
@@ -349,7 +355,10 @@ describe('User repository', () => {
 
         it('rejects with error if the id param is not provided', () => {
             const updatedData = {
-                name: 'Roy (red hood) Harper',
+                name: {
+                    first: 'Roy (red hood)',
+                    last: ' Harper'
+                },
                 email: 'arsenal@qc.com'
             };
             const promise = Repository.updateUser(null, updatedData);
@@ -749,6 +758,8 @@ describe('User repository', () => {
 const expectUserProperties = user => {
     expect(user).to.be.an('Object');
     expect(user).to.have.property('name');
+    expect(user.name).to.have.property('first');
+    expect(user.name).to.have.property('last');
     expect(user).to.have.property('email');
     expect(user).to.have.property('isEmailVerified');
     expect(user).to.have.property('emailVerificationToken');

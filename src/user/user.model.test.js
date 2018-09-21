@@ -6,14 +6,31 @@ import * as middleware from './user.model.middleware';
 mongoose.Promise = global.Promise;
 
 describe('User model', () => {
-    it('is invalid if name is empty', done => {
+    it('is invalid if first name is empty', done => {
         let user = new User({
-            /* no name */
+            name: {
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: 'arrow'
         });
         user.validate(err => {
-            expect(err.errors.name).to.exist;
+            expect(err.errors['name.first']).to.exist;
+            expect(err.name).to.equal('ValidationError');
+            done();
+        });
+    });
+
+    it('is invalid if last name is empty', done => {
+        let user = new User({
+            name: {
+                first: 'Oliver'
+            },
+            email: 'oliver@qc.com',
+            password: 'arrow'
+        });
+        user.validate(err => {
+            expect(err.errors['name.last']).to.exist;
             expect(err.name).to.equal('ValidationError');
             done();
         });
@@ -21,7 +38,10 @@ describe('User model', () => {
 
     it('is invalid if email is empty', done => {
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             /* no email */
             password: 'arrow'
         });
@@ -34,7 +54,10 @@ describe('User model', () => {
 
     it('is invalid if password is empty', done => {
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com'
             /* no password */
         });
@@ -47,7 +70,10 @@ describe('User model', () => {
 
     it('it is valid if password is missing but there is a sfdc id', done => {
         let user = new User({
-            name: 'Parker Harris',
+            name: {
+                first: 'Parker',
+                last: 'Harris'
+            },
             email: 'parker@salesforce.com',
             /* no password */
             sfdc: {
@@ -62,7 +88,10 @@ describe('User model', () => {
 
     it('isAdmin() is true if user has an admin role', () => {
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: 'arrow',
             roles: ['admin', 'user']
@@ -72,7 +101,10 @@ describe('User model', () => {
 
     it('isAdmin() is false if user does not have an admin role', () => {
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: 'arrow'
         });
@@ -82,7 +114,10 @@ describe('User model', () => {
     it('verifies a correct password', done => {
         const ORIG_PWD = 'arrow';
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: ORIG_PWD,
             isModified: () => {
@@ -100,7 +135,10 @@ describe('User model', () => {
     it('does not verify an incorrect password', done => {
         const ORIG_PWD = 'arrow';
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: ORIG_PWD,
             isModified: () => {
@@ -118,7 +156,10 @@ describe('User model', () => {
     it('does not verify an empty password', done => {
         const ORIG_PWD = 'arrow';
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: ORIG_PWD,
             isModified: () => {
@@ -136,7 +177,10 @@ describe('User model', () => {
     it('does not verify a password of null', done => {
         const ORIG_PWD = 'arrow';
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: ORIG_PWD,
             isModified: () => {
@@ -154,7 +198,10 @@ describe('User model', () => {
     it('does not verify a password of undefined', done => {
         const ORIG_PWD = 'arrow';
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: ORIG_PWD,
             isModified: () => {
@@ -171,7 +218,10 @@ describe('User model', () => {
 
     it('adds a valid role to a user', () => {
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: 'arrow',
             roles: ['user']
@@ -184,7 +234,10 @@ describe('User model', () => {
 
     it('does not add an invalid role to a user', () => {
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: 'arrow',
             roles: ['user']
@@ -197,7 +250,10 @@ describe('User model', () => {
 
     it('does not add an empty role to a user', () => {
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: 'arrow',
             roles: ['user']
@@ -209,7 +265,10 @@ describe('User model', () => {
 
     it('removes a valid role from a user', () => {
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: 'arrow',
             roles: ['user', 'admin', 'dev']
@@ -222,7 +281,10 @@ describe('User model', () => {
 
     it('ignores removing an invalid role from a user', () => {
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: 'arrow',
             roles: ['user', 'admin', 'dev']
@@ -234,7 +296,10 @@ describe('User model', () => {
 
     it('ignores removing a valid role the user does not have', () => {
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: 'arrow',
             roles: ['user', 'dev']
@@ -246,7 +311,10 @@ describe('User model', () => {
 
     it('toClientJSON() returns correctly shaped json when sfdc profile is not present', () => {
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: 'arrow',
             roles: ['user', 'dev']
@@ -255,6 +323,8 @@ describe('User model', () => {
         expect(clientJSON).to.be.an('object');
         expect(clientJSON).to.have.property('_id');
         expect(clientJSON).to.have.property('name');
+        expect(clientJSON.name).to.have.property('first');
+        expect(clientJSON.name).to.have.property('last');
         expect(clientJSON).to.have.property('email');
         expect(clientJSON).to.have.property('avatarUrl');
         expect(clientJSON).to.have.property('roles');
@@ -264,7 +334,10 @@ describe('User model', () => {
 
     it('toClientJSON() returns correctly shaped json when sfdc profile is present', () => {
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: 'arrow',
             roles: ['user', 'dev'],
@@ -290,7 +363,10 @@ describe('User model', () => {
 
     it('hasCustomAvatar() returns false if user has default avatar', () => {
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: 'arrow',
             roles: ['user', 'dev']
@@ -300,7 +376,10 @@ describe('User model', () => {
 
     it('hasCustomAvatar() returns true if user has a custom avatar', () => {
         let user = new User({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: 'arrow',
             avatar: '5a4672606d106200aef2defb', // needs to be a valid mongo id

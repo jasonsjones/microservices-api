@@ -11,29 +11,44 @@ const assetPath = `${__dirname}/../../assets`;
 const defaultAvatarFile = `${assetPath}/sfdc_default_avatar.png`;
 const initialUsers = [
     {
-        name: 'Oliver Queen',
+        name: {
+            first: 'Oliver',
+            last: 'Queen'
+        },
         email: 'oliver@qc.com',
         roles: ['admin', 'user'],
         password: 'arrow'
     },
     {
-        name: 'John Diggle',
+        name: {
+            first: 'John',
+            last: 'Diggle'
+        },
         email: 'dig@qc.com',
         password: 'spartan'
     },
     {
-        name: 'Felicity Smoak',
+        name: {
+            first: 'Felicity',
+            last: 'Smoak'
+        },
         email: 'felicity@qc.com',
         roles: ['admin', 'user'],
         password: 'felicity'
     },
     {
-        name: 'Roy Harper',
+        name: {
+            first: 'Roy',
+            last: 'Harper'
+        },
         email: 'roy@qc.com',
         password: 'arsenal'
     },
     {
-        name: 'Thea Queen',
+        name: {
+            first: 'Thea',
+            last: 'Queen'
+        },
         email: 'thea@qc.com',
         password: 'thea'
     }
