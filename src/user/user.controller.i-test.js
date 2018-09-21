@@ -11,12 +11,18 @@ import { clearMailTransporterCache } from '../mailer/mailer';
 
 const users = [
     {
-        name: 'Barry Allen',
+        name: {
+            first: 'Barry',
+            last: 'Allen'
+        },
         email: 'barry@starlabs.com',
         password: '123456'
     },
     {
-        name: 'Oliver Queen',
+        name: {
+            first: 'Oliver',
+            last: 'Queen'
+        },
         email: 'oliver@qc.com',
         password: '123456'
     }
@@ -40,6 +46,8 @@ const getCopyOfAvatar = () => {
 const expectUserShape = res => {
     expect(res).to.have.property('_id');
     expect(res).to.have.property('name');
+    expect(res.name).to.have.property('first');
+    expect(res.name).to.have.property('last');
     expect(res).to.have.property('email');
     expect(res).to.have.property('password');
     expect(res).to.have.property('roles');
@@ -51,6 +59,8 @@ const expectUserShape = res => {
 const expectClientJSONUserShape = res => {
     expect(res).to.have.property('_id');
     expect(res).to.have.property('name');
+    expect(res.name).to.have.property('first');
+    expect(res.name).to.have.property('last');
     expect(res).to.have.property('email');
     expect(res).to.have.property('roles');
     expect(res).to.have.property('avatarUrl');
@@ -188,7 +198,10 @@ describe('User controller integration tests', () => {
                     Controller.updateUser({
                         params: { id: user._id },
                         body: {
-                            name: 'The Flash',
+                            name: {
+                                first: 'The',
+                                last: 'Flash'
+                            },
                             email: 'flash@starlabs.com'
                         }
                     })
@@ -199,7 +212,8 @@ describe('User controller integration tests', () => {
                     expect(response).to.have.property('payload');
                     expect(response.success).to.be.true;
                     expectClientJSONUserShape(response.payload.user);
-                    expect(response.payload.user.name).to.not.equal(users[0].name);
+                    expect(response.payload.user.name.first).to.not.equal(users[0].name.first);
+                    expect(response.payload.user.name.last).to.not.equal(users[0].name.last);
                     expect(response.payload.user.email).to.not.equal(users[0].email);
                 });
         });
