@@ -9,7 +9,10 @@ import { createUserUtil } from '../utils/userTestUtils';
 describe('Authentication acceptance tests', () => {
     before(() => {
         return createUserUtil({
-            name: 'Oliver Queen',
+            name: {
+                first: 'Oliver',
+                last: 'Queen'
+            },
             email: 'oliver@qc.com',
             password: '123456'
         });
