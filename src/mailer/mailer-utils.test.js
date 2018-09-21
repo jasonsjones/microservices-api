@@ -5,6 +5,7 @@ import nodemailer from 'nodemailer';
 import { sendPasswordResetEmail, sendEmailVerificationEmail } from './mailer-utils';
 import { mockUsers } from '../utils/userTestUtils';
 import { clearMailTransporterCache } from './mailer';
+import { mockTestAccountResponse } from '../utils/mockData';
 
 const sendMailFake = (options, cb) => {
     cb(null, {
@@ -19,13 +20,20 @@ const mockTransporter = {
 
 describe('Mailer utils', () => {
     let mailerStub, sendMailStub;
+    let createTestAccountStub;
 
     beforeEach(() => {
         mailerStub = sinon.stub(nodemailer, 'createTransport');
+        createTestAccountStub = sinon.stub(nodemailer, 'createTestAccount');
+        const accountFake = cb => {
+            cb(null, mockTestAccountResponse);
+        };
+        createTestAccountStub.callsFake(accountFake);
     });
 
     afterEach(() => {
         mailerStub.restore();
+        createTestAccountStub.restore();
         clearMailTransporterCache();
     });
 

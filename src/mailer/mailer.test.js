@@ -48,13 +48,20 @@ describe('Mailer', () => {
 
     describe('clearMailTransporterCache()', () => {
         let nodemailerSpy;
+        let createTestAccountStub;
 
         before(() => {
             nodemailerSpy = sinon.spy(nodemailer, 'createTransport');
+            createTestAccountStub = sinon.stub(nodemailer, 'createTestAccount');
+            const accountFake = cb => {
+                cb(null, mockTestAccountResponse);
+            };
+            createTestAccountStub.callsFake(accountFake);
         });
 
         after(() => {
             nodemailerSpy.restore();
+            createTestAccountStub.restore();
         });
 
         it('resets the mail transporter', () => {
