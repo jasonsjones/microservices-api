@@ -383,20 +383,20 @@ describe('User controller integration tests', () => {
         });
 
         it('sends an email to the user with a link to reset password', () => {
-            const createTestAccountStub = sinon.stub(nodemailer, 'createTestAccount');
-            const testAccountFake = cb => {
-                cb(null, mockTestAccountResponse);
-            };
-            createTestAccountStub.callsFake(testAccountFake);
-            let mockTransporter = {
-                sendMail: (data, cb) => {
-                    cb(null, {
-                        messageId: '<1b519020-5bfe-4078-cd5e-7351a09bd766@sandboxapi.com>'
-                    });
-                }
+            const info = {
+                messageId: '<1b519020-5bfe-4078-cd5e-7351a09bd766@sandboxapi.com>'
             };
 
+            let mockTransporter = {
+                sendMail: sinon.stub().yieldsRight(null, info)
+            };
+
+            const createTestAccountStub = sinon
+                .stub(nodemailer, 'createTestAccount')
+                .yields(null, mockTestAccountResponse);
+
             let mailerStub = sinon.stub(nodemailer, 'createTransport').returns(mockTransporter);
+
             const req = {
                 body: {
                     email: 'oliver@qc.com'

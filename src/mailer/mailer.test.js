@@ -12,11 +12,9 @@ describe('Mailer', () => {
 
         before(() => {
             clearMailTransporterCache();
-            createTestAccountStub = sinon.stub(nodemailer, 'createTestAccount');
-            const accountFake = cb => {
-                cb(null, mockTestAccountResponse);
-            };
-            createTestAccountStub.callsFake(accountFake);
+            createTestAccountStub = sinon
+                .stub(nodemailer, 'createTestAccount')
+                .yields(null, mockTestAccountResponse);
             nodemailerSpy = sinon.spy(nodemailer, 'createTransport');
         });
 
@@ -52,11 +50,9 @@ describe('Mailer', () => {
 
         before(() => {
             nodemailerSpy = sinon.spy(nodemailer, 'createTransport');
-            createTestAccountStub = sinon.stub(nodemailer, 'createTestAccount');
-            const accountFake = cb => {
-                cb(null, mockTestAccountResponse);
-            };
-            createTestAccountStub.callsFake(accountFake);
+            createTestAccountStub = sinon
+                .stub(nodemailer, 'createTestAccount')
+                .yields(null, mockTestAccountResponse);
         });
 
         after(() => {
@@ -88,10 +84,8 @@ describe('Mailer', () => {
         });
 
         it('returns a raw account and smtpConfig', async () => {
-            const accountFake = cb => {
-                cb(null, mockTestAccountResponse);
-            };
-            createTestAccountStub.callsFake(accountFake);
+            createTestAccountStub.yields(null, mockTestAccountResponse);
+
             const account = await createTestAccount();
 
             expect(account).to.have.property('rawAccount');
@@ -101,10 +95,11 @@ describe('Mailer', () => {
         });
 
         it('returns error if something wrong with nodemailer createTestAccount', async () => {
-            const accountFake = cb => {
-                cb(new Error('Oops, nodemailer was not able to create account'), null);
-            };
-            createTestAccountStub.callsFake(accountFake);
+            createTestAccountStub.yields(
+                new Error('Oops, nodemailer was not able to create account'),
+                null
+            );
+
             try {
                 await createTestAccount();
             } catch (error) {

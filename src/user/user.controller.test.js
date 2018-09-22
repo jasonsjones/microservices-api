@@ -755,16 +755,11 @@ describe('User controller', () => {
         });
 
         it('rejects with error if there is an error sending the email', () => {
-            const testAccountFake = cb => {
-                cb(null, mockTestAccountResponse);
-            };
-            createTestAccountStub.callsFake(testAccountFake);
+            createTestAccountStub.yields(null, mockTestAccountResponse);
+            const err = new Error('Oops, there was an error sending the message');
 
             const mockTransporter = {
-                sendMail: (data, cb) => {
-                    const err = new Error('Oops, there was an error sending the message');
-                    cb(err, null);
-                }
+                sendMail: sinon.stub().yieldsRight(err, null)
             };
             createTransportStub.returns(mockTransporter);
 
@@ -780,10 +775,7 @@ describe('User controller', () => {
         });
 
         it('resolves with an object with success (false) and message property if user is not found', () => {
-            const accountFake = cb => {
-                cb(null, mockTestAccountResponse);
-            };
-            createTestAccountStub.callsFake(accountFake);
+            createTestAccountStub.yields(null, mockTestAccountResponse);
             req.body = {
                 email: 'notfound@email.com'
             };
@@ -798,18 +790,14 @@ describe('User controller', () => {
         });
 
         it('resolves with an object with success (true) and message property if user is found', () => {
-            const accountFake = cb => {
-                cb(null, mockTestAccountResponse);
-            };
-            createTestAccountStub.callsFake(accountFake);
-            let mockTransporter = {
-                sendMail: (data, cb) => {
-                    cb(null, {
-                        messageId: '<1b519020-5bfe-4078-cd5e-7351a09bd766@sandboxapi.com>'
-                    });
-                }
+            createTestAccountStub.yields(null, mockTestAccountResponse);
+            const info = {
+                messageId: '<1b519020-5bfe-4078-cd5e-7351a09bd766@sandboxapi.com>'
             };
 
+            const mockTransporter = {
+                sendMail: sinon.stub().yieldsRight(null, info)
+            };
             createTransportStub.returns(mockTransporter);
 
             req.body = {
