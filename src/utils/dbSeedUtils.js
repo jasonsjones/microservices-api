@@ -2,6 +2,7 @@ import debug from 'debug';
 import fetch from 'node-fetch';
 import request from 'supertest';
 import { getUsers } from '../user/user.repository';
+import { getAvatars } from '../avatar/avatar.repository';
 import config from '../config/config';
 
 const log = debug('db:seed');
@@ -74,14 +75,14 @@ const seedUser = userData => {
     }).then(response => response.json());
 };
 
-const getDefaultAvatars = data => {
-    return data.payload.avatars.filter(image => image.defaultImg);
+const getDefaultAvatars = avatars => {
+    return avatars.filter(image => image.defaultImg);
 };
 
 const seedDefaultAvatarAPI = () => {
     return getResource('/api/avatars').then(data => {
         if (data.success) {
-            const defaults = getDefaultAvatars(data);
+            const defaults = getDefaultAvatars(data.payload.avatars);
             if (defaults.length === 0) {
                 log('adding default avatar...');
                 return seedAvatarImage(defaultAvatarFile);
@@ -89,6 +90,19 @@ const seedDefaultAvatarAPI = () => {
                 log('default avatar(s) already in db');
                 return Promise.resolve('avatar not required');
             }
+        }
+    });
+};
+
+const seedDefaultAvatarDb = () => {
+    return getAvatars().then(avatars => {
+        const defaults = getDefaultAvatars(avatars);
+        if (defaults.length === 0) {
+            log('adding default avatar...');
+            return seedAvatarImage(defaultAvatarFile);
+        } else {
+            log('default avatar(s) already in db');
+            return Promise.resolve('avatar not required');
         }
     });
 };
@@ -122,6 +136,6 @@ const seedDefaultUserDb = () => {
 
 export const seedData = () => {
     const userPromise = seedDefaultUserDb();
-    const avatarPromise = seedDefaultAvatarAPI();
+    const avatarPromise = seedDefaultAvatarDb();
     return Promise.all([userPromise, avatarPromise]);
 };
