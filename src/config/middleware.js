@@ -3,9 +3,18 @@ import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import session from 'express-session';
 import cors from 'cors';
+import FileStoreFactory from 'session-file-store';
 
 import config from './config';
 import { generateRandomToken } from '../common/auth.utils';
+
+const FileStore = FileStoreFactory(session);
+
+const getSessionFilePath = () => {
+    if (config.env === 'test') {
+        return { path: './test-sessions' };
+    }
+};
 
 export default (app, passport) => {
     app.set('view engine', 'ejs');
@@ -16,6 +25,7 @@ export default (app, passport) => {
     app.use(
         session({
             genid: () => generateRandomToken(),
+            store: new FileStore(getSessionFilePath()),
             cookie: {
                 secure: false
             },

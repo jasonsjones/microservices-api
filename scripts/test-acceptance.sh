@@ -18,4 +18,8 @@ TEST_STATUS=$?
 
 process_exit_status $TEST_STATUS
 
+if [ -d "test-sessions" ]; then
+    rm -rf test-sessions
+fi
+
 exit $TEST_STATUS

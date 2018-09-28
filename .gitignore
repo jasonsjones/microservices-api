@@ -5,6 +5,7 @@ uploads/
 public/
 npm-debug.log
 yarn-error.log
+sessions/
 .config/
 .cache/
 .yarn/
