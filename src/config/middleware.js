@@ -5,6 +5,7 @@ import session from 'express-session';
 import cors from 'cors';
 
 import config from './config';
+import { generateRandomToken } from '../common/auth.utils';
 
 export default (app, passport) => {
     app.set('view engine', 'ejs');
@@ -14,6 +15,7 @@ export default (app, passport) => {
     app.use(cors());
     app.use(
         session({
+            genid: () => generateRandomToken(),
             cookie: {
                 secure: false
             },
