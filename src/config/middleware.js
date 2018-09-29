@@ -10,16 +10,26 @@ import { generateRandomToken } from '../common/auth.utils';
 
 const FileStore = FileStoreFactory(session);
 
+const getSessionFilePath = () => {
+    if (config.env === 'test') {
+        return { path: './test-sessions' };
+    }
+};
+
 const corsOptions = {
     origin: 'http://localhost:4200',
     credentials: true
 };
 
-const getSessionFilePath = () => {
-    if (config.env === 'test') {
-        return { path: './test-sessions' };
-    }
-    return { path: './sessions' };
+const sessionOptions = {
+    genid: () => generateRandomToken(),
+    store: new FileStore(Object.assign({}, { retries: 2 }, getSessionFilePath())),
+    cookie: {
+        secure: false
+    },
+    secret: config.session_secret,
+    resave: false,
+    saveUninitialized: true
 };
 
 export default (app, passport) => {
@@ -28,18 +38,7 @@ export default (app, passport) => {
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(cors(corsOptions));
-    app.use(
-        session({
-            genid: () => generateRandomToken(),
-            store: new FileStore(Object.assign({}, { retries: 2 }, getSessionFilePath())),
-            cookie: {
-                secure: false
-            },
-            secret: config.session_secret,
-            resave: false,
-            saveUninitialized: true
-        })
-    );
+    app.use(session(sessionOptions));
     app.use(passport.initialize());
     app.use(passport.session());
 
