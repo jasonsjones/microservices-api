@@ -14,6 +14,7 @@ const getSessionFilePath = () => {
     if (config.env === 'test') {
         return { path: './test-sessions' };
     }
+    return { path: './sessions' };
 };
 
 export default (app, passport) => {
@@ -21,11 +22,11 @@ export default (app, passport) => {
     app.use(express.static('public'));
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: false }));
-    app.use(cors());
+    app.use(cors({ origin: 'http://localhost:4200', credentials: true }));
     app.use(
         session({
             genid: () => generateRandomToken(),
-            store: new FileStore(getSessionFilePath()),
+            store: new FileStore(Object.assign({}, { retries: 2 }, getSessionFilePath())),
             cookie: {
                 secure: false
             },
