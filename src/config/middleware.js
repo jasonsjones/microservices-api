@@ -10,6 +10,11 @@ import { generateRandomToken } from '../common/auth.utils';
 
 const FileStore = FileStoreFactory(session);
 
+const corsOptions = {
+    origin: 'http://localhost:4200',
+    credentials: true
+};
+
 const getSessionFilePath = () => {
     if (config.env === 'test') {
         return { path: './test-sessions' };
@@ -22,7 +27,7 @@ export default (app, passport) => {
     app.use(express.static('public'));
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: false }));
-    app.use(cors({ origin: 'http://localhost:4200', credentials: true }));
+    app.use(cors(corsOptions));
     app.use(
         session({
             genid: () => generateRandomToken(),
