@@ -6,6 +6,7 @@ import * as Repository from './user.repository';
 import * as Controller from './user.controller';
 import User from './user.model';
 import { mockUsers, mockUsersWithAvatar, mockRandomUser } from '../utils/userTestUtils';
+import { mockTestAccountResponse } from '../utils/mockData';
 import { normalizeRandomUserData } from '../utils/userUtils';
 import { clearMailTransporterCache } from '../mailer/mailer';
 
@@ -695,15 +696,21 @@ describe('User controller', () => {
     });
 
     describe('forgotPassword()', () => {
-        let req, stub, resolvedUser, mailerStub;
+        let req,
+            generateAndSetResetTokenStub,
+            resolvedUser,
+            createTransportStub,
+            createTestAccountStub;
+
         before(() => {
             // ensure the mail transporter is cleared from other tests...
             clearMailTransporterCache();
         });
 
         beforeEach(() => {
-            mailerStub = sinon.stub(nodemailer, 'createTransport');
-            stub = sinon.stub(Repository, 'generateAndSetResetToken');
+            createTransportStub = sinon.stub(nodemailer, 'createTransport');
+            createTestAccountStub = sinon.stub(nodemailer, 'createTestAccount');
+            generateAndSetResetTokenStub = sinon.stub(Repository, 'generateAndSetResetToken');
             req = {};
             resolvedUser = new User(mockUsers[1]);
             resolvedUser.passwordResetToken = '562835a1c7c63581ee81f15bad8bbc851123b581';
@@ -711,8 +718,9 @@ describe('User controller', () => {
         });
 
         afterEach(() => {
-            mailerStub.restore();
-            stub.restore();
+            createTransportStub.restore();
+            createTestAccountStub.restore();
+            generateAndSetResetTokenStub.restore();
             req = {};
             resolvedUser = null;
             clearMailTransporterCache();
@@ -747,19 +755,18 @@ describe('User controller', () => {
         });
 
         it('rejects with error if there is an error sending the email', () => {
-            let mockTransporter = {
-                sendMail: (data, cb) => {
-                    const err = new Error('Oops, there was an error sending the message');
-                    cb(err, null);
-                }
-            };
+            createTestAccountStub.yields(null, mockTestAccountResponse);
+            const err = new Error('Oops, there was an error sending the message');
 
-            mailerStub.returns(mockTransporter);
+            const mockTransporter = {
+                sendMail: sinon.stub().yieldsRight(err, null)
+            };
+            createTransportStub.returns(mockTransporter);
 
             req.body = {
                 email: 'oliver@qc.com'
             };
-            stub.resolves(resolvedUser);
+            generateAndSetResetTokenStub.resolves(resolvedUser);
             const promise = Controller.forgotPassword(req);
             expect(promise).to.be.a('Promise');
             return promise.catch(response => {
@@ -768,10 +775,11 @@ describe('User controller', () => {
         });
 
         it('resolves with an object with success (false) and message property if user is not found', () => {
+            createTestAccountStub.yields(null, mockTestAccountResponse);
             req.body = {
                 email: 'notfound@email.com'
             };
-            stub.resolves(null);
+            generateAndSetResetTokenStub.resolves(null);
             const promise = Controller.forgotPassword(req);
             expect(promise).to.be.a('Promise');
             return promise.then(response => {
@@ -782,20 +790,20 @@ describe('User controller', () => {
         });
 
         it('resolves with an object with success (true) and message property if user is found', () => {
-            let mockTransporter = {
-                sendMail: (data, cb) => {
-                    cb(null, {
-                        messageId: '<1b519020-5bfe-4078-cd5e-7351a09bd766@sandboxapi.com>'
-                    });
-                }
+            createTestAccountStub.yields(null, mockTestAccountResponse);
+            const info = {
+                messageId: '<1b519020-5bfe-4078-cd5e-7351a09bd766@sandboxapi.com>'
             };
 
-            mailerStub.returns(mockTransporter);
+            const mockTransporter = {
+                sendMail: sinon.stub().yieldsRight(null, info)
+            };
+            createTransportStub.returns(mockTransporter);
 
             req.body = {
                 email: 'oliver@qc.com'
             };
-            stub.resolves(resolvedUser);
+            generateAndSetResetTokenStub.resolves(resolvedUser);
             const promise = Controller.forgotPassword(req);
             expect(promise).to.be.a('Promise');
             return promise.then(response => {

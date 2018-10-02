@@ -8,7 +8,10 @@ const allowedRoles = ['user', 'admin', 'dev'];
 
 const userSchema = new Schema(
     {
-        name: { type: String, required: true },
+        name: {
+            first: { type: String, required: true },
+            last: { type: String, required: true }
+        },
         email: { type: String, required: true, unique: true },
         isEmailVerified: { type: Boolean, default: false },
         emailVerificationToken: { type: String },
@@ -67,7 +70,10 @@ userSchema.methods.hasCustomAvatar = function() {
 userSchema.methods.toClientJSON = function() {
     let userDataForClient = {
         _id: this._id,
-        name: this.name,
+        name: {
+            first: this.name.first,
+            last: this.name.last
+        },
         email: this.email,
         avatarUrl: this.avatarUrl,
         roles: this.roles

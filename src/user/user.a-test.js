@@ -7,13 +7,19 @@ import { expectJSONShape } from '../utils/testUtils';
 import { createUserUtil } from '../utils/userTestUtils';
 
 const barry = {
-    name: 'Barry Allen',
+    name: {
+        first: 'Barry',
+        last: 'Allen'
+    },
     email: 'barry@starlabs.com',
     password: '123456'
 };
 
 const oliver = {
-    name: 'Oliver Queen',
+    name: {
+        first: 'Oliver',
+        last: 'Queen'
+    },
     email: 'oliver@qc.com',
     roles: ['admin', 'user'],
     password: '123456'
@@ -65,9 +71,10 @@ describe('User acceptance tests', () => {
                 .send(oliver)
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body, 'user');
-                    expectJSONShape(res.body, 'token');
-                    expect(res.body.success).to.be.true;
+                    const jsonResponse = res.body;
+                    expectJSONShape(jsonResponse, 'user');
+                    expectJSONShape(jsonResponse, 'token');
+                    expect(jsonResponse.success).to.be.true;
                 });
         }).timeout(8000);
 
@@ -77,9 +84,10 @@ describe('User acceptance tests', () => {
                 .send({})
                 .expect(500)
                 .then(res => {
-                    expect(res.body).to.have.property('success');
-                    expect(res.body.success).to.be.false;
-                    expect(res.body).to.have.property('message');
+                    const jsonResponse = res.body;
+                    expect(jsonResponse).to.have.property('success');
+                    expect(jsonResponse.success).to.be.false;
+                    expect(jsonResponse).to.have.property('message');
                 });
         });
     });
@@ -99,6 +107,8 @@ describe('User acceptance tests', () => {
                     expect(res.body.success).to.be.true;
                     expect(user).to.have.property('_id');
                     expect(user).to.have.property('name');
+                    expect(user.name).to.have.property('first');
+                    expect(user.name).to.have.property('last');
                     expect(user).to.have.property('email');
                     expect(user).to.have.property('avatarUrl');
                     expect(user.avatarUrl).not.to.contain('default');
@@ -117,9 +127,10 @@ describe('User acceptance tests', () => {
                 .send({})
                 .expect(500)
                 .then(res => {
-                    expect(res.body).to.have.property('success');
-                    expect(res.body.success).to.be.false;
-                    expect(res.body).to.have.property('message');
+                    const jsonResponse = res.body;
+                    expect(jsonResponse).to.have.property('success');
+                    expect(jsonResponse.success).to.be.false;
+                    expect(jsonResponse).to.have.property('message');
                 });
         });
 
@@ -129,9 +140,10 @@ describe('User acceptance tests', () => {
                 .send({ email: 'notfound@email.com' })
                 .expect(200)
                 .then(res => {
-                    expect(res.body).to.have.property('success');
-                    expect(res.body.success).to.be.false;
-                    expect(res.body).to.have.property('message');
+                    const jsonResponse = res.body;
+                    expect(jsonResponse).to.have.property('success');
+                    expect(jsonResponse.success).to.be.false;
+                    expect(jsonResponse).to.have.property('message');
                 });
         });
 
@@ -141,12 +153,13 @@ describe('User acceptance tests', () => {
                 .send({ email: oliver.email })
                 .expect(200)
                 .then(res => {
-                    expect(res.body).to.have.property('success');
-                    expect(res.body.success).to.be.true;
-                    expect(res.body).to.have.property('message');
-                    expect(res.body).to.have.property('payload');
-                    expect(res.body.payload.email).to.be.a('string');
-                    expect(res.body.payload.info).to.be.a('object');
+                    const jsonResponse = res.body;
+                    expect(jsonResponse).to.have.property('success');
+                    expect(jsonResponse.success).to.be.true;
+                    expect(jsonResponse).to.have.property('message');
+                    expect(jsonResponse).to.have.property('payload');
+                    expect(jsonResponse.payload.email).to.be.a('string');
+                    expect(jsonResponse.payload.info).to.be.a('object');
                 });
         }).timeout(8000);
     });
@@ -164,11 +177,12 @@ describe('User acceptance tests', () => {
                     .send(payload)
                     .expect(200)
                     .then(res => {
-                        expect(res.body).to.be.an('Object');
-                        expect(res.body).to.have.property('success');
-                        expect(res.body).to.have.property('message');
-                        expect(res.body.success).to.be.true;
-                        expect(res.body.message).to.contain('user password changed');
+                        const jsonResponse = res.body;
+                        expect(jsonResponse).to.be.an('Object');
+                        expect(jsonResponse).to.have.property('success');
+                        expect(jsonResponse).to.have.property('message');
+                        expect(jsonResponse.success).to.be.true;
+                        expect(jsonResponse.message).to.contain('user password changed');
                     })
             );
         });
@@ -184,10 +198,11 @@ describe('User acceptance tests', () => {
                         .set('x-access-token', token)
                         .expect(200)
                         .then(res => {
-                            expectJSONShape(res.body, 'users');
-                            expect(res.body.success).to.be.true;
-                            expect(res.body.payload.users).to.be.an('Array');
-                            expect(res.body.payload.users.length).to.equal(2);
+                            const jsonResponse = res.body;
+                            expectJSONShape(jsonResponse, 'users');
+                            expect(jsonResponse.success).to.be.true;
+                            expect(jsonResponse.payload.users).to.be.an('Array');
+                            expect(jsonResponse.payload.users.length).to.equal(2);
                         })
                 );
         });
@@ -201,8 +216,9 @@ describe('User acceptance tests', () => {
                     .set('x-access-token', token)
                     .expect(200)
                     .then(res => {
-                        expect(res.body.success).to.be.true;
-                        expect(res.body.payload.user.email).to.eql(oliver.email);
+                        const jsonResponse = res.body;
+                        expect(jsonResponse.success).to.be.true;
+                        expect(jsonResponse.payload.user.email).to.eql(oliver.email);
                     })
                     .catch(err => console.log(err))
             );
@@ -216,13 +232,17 @@ describe('User acceptance tests', () => {
                     .get(`/api/users/${user._id}`)
                     .expect(200)
                     .then(res => {
-                        expectJSONShape(res.body, 'user');
-                        expect(res.body.success).to.be.true;
-                        expect(res.body.payload.user).to.have.property('_id');
-                        expect(res.body.payload.user).to.have.property('name');
-                        expect(res.body.payload.user).to.have.property('email');
-                        expect(res.body.payload.user).to.have.property('avatarUrl');
-                        expect(res.body.payload.user.name).to.equal(barry.name);
+                        const jsonResponse = res.body;
+                        const { user } = res.body.payload;
+                        expectJSONShape(jsonResponse, 'user');
+                        expect(jsonResponse.success).to.be.true;
+                        expect(user).to.have.property('_id');
+                        expect(user).to.have.property('name');
+                        expect(user.name).to.have.property('first');
+                        expect(user.name).to.have.property('last');
+                        expect(user).to.have.property('email');
+                        expect(user).to.have.property('avatarUrl');
+                        expect(user.name.first).to.equal(barry.name.first);
                     })
             );
         });
@@ -231,7 +251,10 @@ describe('User acceptance tests', () => {
     context('PUT /api/users/:id', () => {
         it('updates the user with the provided data', () => {
             const updatedUserData = {
-                name: 'The Flash',
+                name: {
+                    first: 'The',
+                    last: 'Flash'
+                },
                 email: 'flash@starlabs.com'
             };
             return createUserUtil(barry).then(user =>
@@ -240,13 +263,17 @@ describe('User acceptance tests', () => {
                     .send(updatedUserData)
                     .expect(200)
                     .then(res => {
-                        expectJSONShape(res.body, 'user');
-                        expect(res.body.success).to.be.true;
-                        expect(res.body.payload.user).to.have.property('_id');
-                        expect(res.body.payload.user).to.have.property('name');
-                        expect(res.body.payload.user).to.have.property('email');
-                        expect(res.body.payload.user.name).to.equal(updatedUserData.name);
-                        expect(res.body.payload.user.email).to.equal(updatedUserData.email);
+                        const jsonResponse = res.body;
+                        const { user } = res.body.payload;
+                        expectJSONShape(jsonResponse, 'user');
+                        expect(jsonResponse.success).to.be.true;
+                        expect(user).to.have.property('_id');
+                        expect(user).to.have.property('name');
+                        expect(user.name).to.have.property('first');
+                        expect(user.name).to.have.property('last');
+                        expect(user).to.have.property('email');
+                        expect(user.name.first).to.equal(updatedUserData.name.first);
+                        expect(user.email).to.equal(updatedUserData.email);
                     })
             );
         });
@@ -259,10 +286,13 @@ describe('User acceptance tests', () => {
                     .delete(`/api/users/${user._id}`)
                     .expect(200)
                     .then(res => {
-                        expectJSONShape(res.body, 'user');
-                        expect(res.body.success).to.be.true;
-                        expect(res.body.payload).to.be.an('Object');
-                        expect(res.body.payload.user.name).to.equal(barry.name);
+                        const jsonResponse = res.body;
+                        const { user } = res.body.payload;
+                        expectJSONShape(jsonResponse, 'user');
+                        expect(jsonResponse.success).to.be.true;
+                        expect(jsonResponse.payload).to.be.an('Object');
+                        expect(user.name.first).to.equal(barry.name.first);
+                        expect(user.name.last).to.equal(barry.name.last);
                     })
             );
         });
@@ -274,10 +304,11 @@ describe('User acceptance tests', () => {
                 .get('/api/users/randomuser')
                 .expect(200)
                 .then(res => {
-                    expectJSONShape(res.body, 'user');
-                    expect(res.body.success).to.be.true;
+                    const jsonResponse = res.body;
+                    expectJSONShape(jsonResponse, 'user');
+                    expect(jsonResponse.success).to.be.true;
                 });
-        }).timeout(4000);
+        }).timeout(8000);
     });
 
     context('private utility function to', () => {

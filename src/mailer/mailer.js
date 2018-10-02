@@ -1,16 +1,46 @@
+import debug from 'debug';
 import nodemailer from 'nodemailer';
 
 import config from '../config/config';
 
+const log = debug('mailer');
 let _transporter = null;
 
 export const getMailTransporter = () => {
     if (!_transporter) {
-        _transporter = nodemailer.createTransport(config.emailAcct);
+        return getEmailAcctConfig().then(creds => {
+            _transporter = nodemailer.createTransport(creds);
+            return _transporter;
+        });
     }
-    return _transporter;
+    return Promise.resolve(_transporter);
 };
 
 export const clearMailTransporterCache = () => {
     _transporter = null;
+};
+
+export const createTestAccount = () => {
+    return new Promise((resolve, reject) => {
+        nodemailer.createTestAccount((err, account) => {
+            if (err) {
+                return reject(err);
+            }
+            if (!account.user.includes('test-account')) {
+                log('Test account user: %s', account.user);
+                log('Test account password: %s', account.pass);
+            }
+            const rawAccount = account;
+            const smtpMailConfig = Object.assign({}, account.smtp, {
+                auth: { user: account.user, pass: account.pass }
+            });
+            resolve({ rawAccount, smtpMailConfig });
+        });
+    });
+};
+
+const getEmailAcctConfig = () => {
+    if (process.env.NODE_ENV != 'production') {
+        return createTestAccount().then(creds => creds.smtpMailConfig);
+    }
 };

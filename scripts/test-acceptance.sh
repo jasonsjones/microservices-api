@@ -13,9 +13,13 @@ if [ -z $1 ]
         echo -e "${CYAN}*** Running acceptance tests for $1 feature and/or module ***${RESTORE}"
 fi
 
-NODE_ENV=test DEBUG=db:connection,test npx mocha --exit $SRC_SETUP $SRC
+NODE_ENV=test DEBUG=db:connection,test,mailer npx mocha --exit $SRC_SETUP $SRC
 TEST_STATUS=$?
 
 process_exit_status $TEST_STATUS
+
+if [ -d "test-sessions" ]; then
+    rm -rf test-sessions
+fi
 
 exit $TEST_STATUS

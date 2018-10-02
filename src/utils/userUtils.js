@@ -2,7 +2,10 @@ import { generateRandomToken } from '../common/auth.utils';
 
 export const normalizeRandomUserData = randomUserData => {
     return {
-        name: `${titleCase(randomUserData.name.first)} ${titleCase(randomUserData.name.last)}`,
+        name: {
+            first: titleCase(randomUserData.name.first),
+            last: titleCase(randomUserData.name.last)
+        },
         email: randomUserData.email,
         isEmailVerified: false,
         emailVerificationToken: generateRandomToken(),

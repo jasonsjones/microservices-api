@@ -7,5 +7,5 @@ const log = debug('app');
 db(config);
 
 app.listen(config.port, () => {
-    log(`node server running at ${config.url}`);
+    log(`node server running at ${config.apiUrl}`);
 });

@@ -1,6 +1,6 @@
 {
     "name": "microservices-api",
-    "version": "0.2.11",
+    "version": "0.2.12",
     "description": "A sandbox API built on microservices",
     "nyc": {
         "exclude": [
@@ -18,10 +18,9 @@
     "scripts": {
         "prebuild": "yarn clean",
         "build": "babel src -d build",
-        "predev": "npm run dbSeed",
         "dev": "NODE_ENV=development DEBUG=db*,app nodemon src/server.js --inspect=0.0.0.0:5858 --watch src/ --exec babel-node",
-        "clean": "rm -rf .v8flags* uploads/* build",
-        "dbSeed": "babel-node src/utils/dbSeed.js",
+        "clean": "rm -rf .v8flags* uploads/* sessions build",
+        "dbSeed": "DEBUG=db*,app babel-node src/utils/dbSeed.js",
         "security-check": "nsp check",
         "lint": "eslint src/**/*.js src/*.js",
         "test:unit": "scripts/test-unit.sh",
@@ -75,7 +74,8 @@
         "nodemailer": "^4.6.7",
         "passport": "^0.4.0",
         "passport-forcedotcom": "^0.1.4",
-        "passport-local": "^1.0.0"
+        "passport-local": "^1.0.0",
+        "session-file-store": "^1.2.0"
     },
     "devDependencies": {
         "babel-eslint": "^8.2.2",

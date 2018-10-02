@@ -17,6 +17,7 @@ const closeConnections = (db, localServer) => {
     });
     localServer.close(() => {
         log('server closed');
+        process.exit(0);
     });
 };
 

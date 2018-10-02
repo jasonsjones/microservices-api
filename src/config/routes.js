@@ -10,15 +10,18 @@ import indexRoute from '../index/index.routes';
 
 const log = debug('app');
 
+const sessionLogger = (req, res, next) => {
+    if (config.logging) {
+        log('****** SESSION DATA ******');
+        log(`Session ID: ${req.session.id}`);
+        log(`user authenticated? ${req.isAuthenticated()}`);
+        log('****** END SESSION DATA ******');
+    }
+    next();
+};
+
 export default (app, passport) => {
-    app.use((req, res, next) => {
-        if (config.logging) {
-            log('******************');
-            log(`Session ID: ${req.session.id}`);
-            log(`user is authenticated: ${req.isAuthenticated()}`);
-        }
-        next();
-    });
+    app.use(sessionLogger);
 
     app.use(
         '/graphql',

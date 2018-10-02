@@ -6,12 +6,18 @@ import { dbConnection, dropCollection } from '../utils/dbTestUtils';
 
 const users = [
     {
-        name: 'Barry Allen',
+        name: {
+            first: 'Barry',
+            last: 'Allen'
+        },
         email: 'barry@starlabs.com',
         password: '123456'
     },
     {
-        name: 'Oliver Queen',
+        name: {
+            first: 'Oliver',
+            last: 'Queen'
+        },
         email: 'oliver@qc.com',
         password: '123456'
     }
@@ -20,6 +26,8 @@ const users = [
 const expectUserShape = res => {
     expect(res).to.have.property('_id');
     expect(res).to.have.property('name');
+    expect(res.name).to.have.property('first');
+    expect(res.name).to.have.property('last');
     expect(res).to.have.property('email');
     expect(res).to.have.property('isEmailVerified');
     expect(res).to.have.property('emailVerificationToken');
@@ -42,11 +50,8 @@ describe('User repository integration tests', () => {
         });
 
         it('saves a new user to the db', () => {
-            const newUser = {
-                name: 'Barry Allen',
-                email: 'barry@starlabs.com',
-                password: '123456'
-            };
+            const newUser = users[0];
+
             return Repository.createUser(newUser).then(response => {
                 expectUserShape(response);
                 // ensure the password is hashed
@@ -147,20 +152,21 @@ describe('User repository integration tests', () => {
             });
 
             it('returns an array of user based on the query condition', () => {
-                return Repository.getUsers({ name: 'Oliver Queen' }).then(response => {
+                return Repository.getUsers({ email: users[1].email }).then(response => {
                     expect(response).to.be.an('array');
                     expect(response).to.have.lengthOf(1);
                     expectUserShape(response[0]);
-                    expect(response[0].name).to.equal('Oliver Queen');
+                    expect(response[0].email).to.equal(users[1].email);
                 });
             });
 
             it('returns an array of users with the avatar model populated', () => {
-                return Repository.getUsers({ name: 'Oliver Queen' }, true).then(response => {
+                return Repository.getUsers({ email: users[1].email }, true).then(response => {
                     expect(response).to.be.an('array');
                     expect(response).to.have.lengthOf(1);
                     expectUserShape(response[0]);
-                    expect(response[0].name).to.equal('Oliver Queen');
+                    expect(response[0].name.first).to.equal(users[1].name.first);
+                    expect(response[0].email).to.equal(users[1].email);
                     expect(response[0].avatar).to.exist;
                     expect(response[0].avatar).to.be.an('object');
                     expect(response[0].avatar.defaultImg).to.be.false;
@@ -172,14 +178,14 @@ describe('User repository integration tests', () => {
             it('returns the user with the given id', () => {
                 return Repository.getUser(barryId).then(response => {
                     expectUserShape(response);
-                    expect(response.name).to.equal('Barry Allen');
+                    expect(response.name.first).to.equal('Barry');
                 });
             });
 
             it('returns the user with the given id and avatar populated if requested', () => {
                 return Repository.getUser(oliverId, true).then(response => {
                     expectUserShape(response);
-                    expect(response.name).to.equal('Oliver Queen');
+                    expect(response.name.first).to.equal('Oliver');
                     expect(response.avatar).to.be.an('object');
                     expect(response.avatar.defaultImg).to.be.false;
                 });
@@ -197,7 +203,7 @@ describe('User repository integration tests', () => {
             it('returns the user with the given email', () => {
                 return Repository.lookupUserByEmail(users[0].email).then(response => {
                     expectUserShape(response);
-                    expect(response.name).to.equal('Barry Allen');
+                    expect(response.name.first).to.equal('Barry');
                 });
             });
 
@@ -210,7 +216,7 @@ describe('User repository integration tests', () => {
             it('returns the user with the given email and avatar populated if requested', () => {
                 return Repository.lookupUserByEmail(users[1].email, true).then(response => {
                     expectUserShape(response);
-                    expect(response.name).to.equal('Oliver Queen');
+                    expect(response.name.first).to.equal('Oliver');
                     expect(response.avatar).to.be.an('object');
                     expect(response.avatar.defaultImg).to.be.false;
                 });
@@ -325,13 +331,17 @@ describe('User repository integration tests', () => {
         context('updateUser()', () => {
             it('returns the updated user with the given id', () => {
                 const updatedData = {
-                    name: 'The Flash',
+                    name: {
+                        first: 'The',
+                        last: 'Flash'
+                    },
                     email: 'flash@starlabs.com'
                 };
 
                 return Repository.updateUser(barryId, updatedData).then(response => {
                     expectUserShape(response);
-                    expect(response.name).to.equal(updatedData.name);
+                    expect(response.name.first).to.equal(updatedData.name.first);
+                    expect(response.name.last).to.equal(updatedData.name.last);
                     expect(response.email).to.equal(updatedData.email);
                     expect(response.createdAt).not.to.equal(response.updatedAt);
                 });
@@ -374,7 +384,8 @@ describe('User repository integration tests', () => {
             it('returns the deleted user with the given id', () => {
                 return Repository.deleteUser(oliverId).then(response => {
                     expectUserShape(response);
-                    expect(response.name).to.equal(users[1].name);
+                    expect(response.name.first).to.equal(users[1].name.first);
+                    expect(response.name.last).to.equal(users[1].name.last);
                     expect(response.email).to.equal(users[1].email);
                 });
             });

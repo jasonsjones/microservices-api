@@ -2,38 +2,54 @@ import debug from 'debug';
 import fetch from 'node-fetch';
 import request from 'supertest';
 import { getUsers } from '../user/user.repository';
+import { getAvatars } from '../avatar/avatar.repository';
 import config from '../config/config';
 
 const log = debug('db:seed');
 
-const url = config.url;
+const url = config.apiUrl;
 const assetPath = `${__dirname}/../../assets`;
 const defaultAvatarFile = `${assetPath}/sfdc_default_avatar.png`;
 const initialUsers = [
     {
-        name: 'Oliver Queen',
+        name: {
+            first: 'Oliver',
+            last: 'Queen'
+        },
         email: 'oliver@qc.com',
         roles: ['admin', 'user'],
         password: 'arrow'
     },
     {
-        name: 'John Diggle',
+        name: {
+            first: 'John',
+            last: 'Diggle'
+        },
         email: 'dig@qc.com',
         password: 'spartan'
     },
     {
-        name: 'Felicity Smoak',
+        name: {
+            first: 'Felicity',
+            last: 'Smoak'
+        },
         email: 'felicity@qc.com',
         roles: ['admin', 'user'],
         password: 'felicity'
     },
     {
-        name: 'Roy Harper',
+        name: {
+            first: 'Roy',
+            last: 'Harper'
+        },
         email: 'roy@qc.com',
         password: 'arsenal'
     },
     {
-        name: 'Thea Queen',
+        name: {
+            first: 'Thea',
+            last: 'Queen'
+        },
         email: 'thea@qc.com',
         password: 'thea'
     }
@@ -50,7 +66,7 @@ const seedAvatarImage = imgPath => {
 };
 
 const seedUser = userData => {
-    return fetch(`${url}/api/users`, {
+    return fetch(`${url}/api/users?verifyEmail=false`, {
         method: 'POST',
         body: JSON.stringify(userData),
         headers: {
@@ -59,14 +75,14 @@ const seedUser = userData => {
     }).then(response => response.json());
 };
 
-const getDefaultAvatars = data => {
-    return data.payload.avatars.filter(image => image.defaultImg);
+const getDefaultAvatars = avatars => {
+    return avatars.filter(image => image.defaultImg);
 };
 
 const seedDefaultAvatarAPI = () => {
     return getResource('/api/avatars').then(data => {
         if (data.success) {
-            const defaults = getDefaultAvatars(data);
+            const defaults = getDefaultAvatars(data.payload.avatars);
             if (defaults.length === 0) {
                 log('adding default avatar...');
                 return seedAvatarImage(defaultAvatarFile);
@@ -74,6 +90,19 @@ const seedDefaultAvatarAPI = () => {
                 log('default avatar(s) already in db');
                 return Promise.resolve('avatar not required');
             }
+        }
+    });
+};
+
+const seedDefaultAvatarDb = () => {
+    return getAvatars().then(avatars => {
+        const defaults = getDefaultAvatars(avatars);
+        if (defaults.length === 0) {
+            log('adding default avatar...');
+            return seedAvatarImage(defaultAvatarFile);
+        } else {
+            log('default avatar(s) already in db');
+            return Promise.resolve('avatar not required');
         }
     });
 };
@@ -107,6 +136,6 @@ const seedDefaultUserDb = () => {
 
 export const seedData = () => {
     const userPromise = seedDefaultUserDb();
-    const avatarPromise = seedDefaultAvatarAPI();
+    const avatarPromise = seedDefaultAvatarDb();
     return Promise.all([userPromise, avatarPromise]);
 };
