@@ -4,7 +4,7 @@ import configTest from './configTest';
 import configProd from './configProd';
 dotenv.config();
 
-const version = '0.2.11';
+const version = '0.2.12';
 const env = process.env.NODE_ENV || 'development';
 const port = process.env.PORT || 3000;
 const token_secret = process.env.JWT_SECRET;
