@@ -55,4 +55,21 @@ describe('Authentication acceptance tests', () => {
         expect(res.body.success).to.be.true;
         expect(token.split('.')).to.have.lengthOf(3);
     });
+
+    it('logs out the user', async () => {
+        await request(app)
+            .post('/api/login')
+            .send({
+                email: 'oliver@qc.com',
+                password: '123456'
+            })
+            .expect(200);
+
+        const res = await request(app)
+            .get('/api/logout')
+            .expect(200);
+
+        expectJSONShape(res.body);
+        expect(res.body.success).to.be.true;
+    });
 });

@@ -4,10 +4,14 @@ import * as AuthUtils from './auth.utils';
 export default passport => {
     let AuthRouter = express.Router();
 
-    AuthRouter.get('/signout', (req, res) => {
+    AuthRouter.get('/logout', (req, res) => {
         req.logout();
         req.session.destroy(() => {
-            res.redirect('/login');
+            res.json({
+                success: true,
+                message: 'user logged out',
+                payload: null
+            });
         });
     });
 
