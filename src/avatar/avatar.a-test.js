@@ -21,9 +21,7 @@ const getAvatarId = response => {
 };
 
 describe('Avatar acceptence tests', () => {
-    afterEach(() => {
-        dropCollection(dbConnection, 'avatars');
-    });
+    afterEach(done => dropCollection(dbConnection, 'avatars', done));
 
     context('POST /api/avatars/default', () => {
         it('uploads a default user avatar', async () => {
@@ -80,9 +78,7 @@ describe('Avatar acceptence tests', () => {
     });
 
     context('GET /api/avatars/:id', () => {
-        afterEach(() => {
-            dropCollection(dbConnection, 'users');
-        });
+        afterEach(done => dropCollection(dbConnection, 'users', done));
 
         it('returns an avatar with the given id', async () => {
             // create a new user
@@ -114,9 +110,7 @@ describe('Avatar acceptence tests', () => {
     });
 
     context('DELETE /api/avatars/:id', () => {
-        afterEach(() => {
-            dropCollection(dbConnection, 'users');
-        });
+        afterEach(done => dropCollection(dbConnection, 'users', done));
 
         it('deletes a custom avatar with the given id', async () => {
             // create a new user

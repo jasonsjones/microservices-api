@@ -77,15 +77,14 @@ const expectErrorResponse = (errorResponse, errMsg) => {
 };
 
 describe('User controller integration tests', () => {
-    before(() => {
-        dropCollection(dbConnection, 'users');
-        dropCollection(dbConnection, 'avatars');
+    before(done => {
+        dropCollection(dbConnection, 'users', () => {
+            dropCollection(dbConnection, 'avatars', done);
+        });
     });
 
     context('createUser()', () => {
-        afterEach(() => {
-            dropCollection(dbConnection, 'users');
-        });
+        afterEach(done => dropCollection(dbConnection, 'users', done));
 
         it('returns error payload if the user data is not provided', () => {
             return Controller.createUser().catch(error => {
@@ -112,9 +111,7 @@ describe('User controller integration tests', () => {
     });
 
     context('getUsers()', () => {
-        afterEach(() => {
-            dropCollection(dbConnection, 'users');
-        });
+        afterEach(done => dropCollection(dbConnection, 'users', done));
 
         it('returns all the users', () => {
             return createUserUtil(users[0])
@@ -133,9 +130,7 @@ describe('User controller integration tests', () => {
     });
 
     context('getUser()', () => {
-        afterEach(() => {
-            dropCollection(dbConnection, 'users');
-        });
+        afterEach(done => dropCollection(dbConnection, 'users', done));
 
         it('returns a payload with the user with the given id', () => {
             return createUserUtil(users[1])
@@ -175,9 +170,7 @@ describe('User controller integration tests', () => {
     });
 
     context('unlinkSFDCAccount()', () => {
-        afterEach(() => {
-            dropCollection(dbConnection, 'users');
-        });
+        afterEach(done => dropCollection(dbConnection, 'users', done));
 
         it('returns an error if the user does not have a linked SFDC profile', () => {
             return createUserUtil(users[1])
@@ -188,9 +181,7 @@ describe('User controller integration tests', () => {
     });
 
     context('updateUser()', () => {
-        afterEach(() => {
-            dropCollection(dbConnection, 'users');
-        });
+        afterEach(done => dropCollection(dbConnection, 'users', done));
 
         it('updates the user with the provided data', () => {
             return createUserUtil(users[1])
@@ -220,9 +211,7 @@ describe('User controller integration tests', () => {
     });
 
     context('deleteUser()', () => {
-        afterEach(() => {
-            dropCollection(dbConnection, 'users');
-        });
+        afterEach(done => dropCollection(dbConnection, 'users', done));
 
         it('returns the a payload with the user that was just deleted', () => {
             return createUserUtil(users[1])
@@ -245,9 +234,10 @@ describe('User controller integration tests', () => {
             });
         });
 
-        after(() => {
-            dropCollection(dbConnection, 'users');
-            dropCollection(dbConnection, 'avatars');
+        after(done => {
+            dropCollection(dbConnection, 'users', () => {
+                dropCollection(dbConnection, 'avatars', done);
+            });
         });
 
         it('returns error payload if the request is not provided', () => {
@@ -306,9 +296,7 @@ describe('User controller integration tests', () => {
             });
         });
 
-        after(() => {
-            dropCollection(dbConnection, 'users');
-        });
+        after(done => dropCollection(dbConnection, 'users', done));
 
         it("changes the user's password", () => {
             const req = {

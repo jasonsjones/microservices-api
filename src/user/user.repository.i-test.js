@@ -39,15 +39,14 @@ const expectUserShape = res => {
 };
 
 describe('User repository integration tests', () => {
-    after(() => {
-        dropCollection(dbConnection, 'users');
-        dropCollection(dbConnection, 'avatars');
+    after(done => {
+        dropCollection(dbConnection, 'users', () => {
+            dropCollection(dbConnection, 'avatars', done);
+        });
     });
 
     context('createUser()', () => {
-        after(() => {
-            dropCollection(dbConnection, 'users');
-        });
+        after(done => dropCollection(dbConnection, 'users', done));
 
         it('saves a new user to the db', () => {
             const newUser = users[0];
@@ -84,9 +83,10 @@ describe('User repository integration tests', () => {
             });
         });
 
-        after(() => {
-            dropCollection(dbConnection, 'users');
-            dropCollection(dbConnection, 'avatars');
+        after(done => {
+            dropCollection(dbConnection, 'users', () => {
+                dropCollection(dbConnection, 'avatars', done);
+            });
         });
 
         it('uploads a custom avatar and associates with the user', () => {
@@ -136,9 +136,10 @@ describe('User repository integration tests', () => {
                 });
         });
 
-        after(() => {
-            dropCollection(dbConnection, 'users');
-            dropCollection(dbConnection, 'avatars');
+        after(done => {
+            dropCollection(dbConnection, 'users', () => {
+                dropCollection(dbConnection, 'avatars', done);
+            });
         });
 
         context('getUsers()', () => {

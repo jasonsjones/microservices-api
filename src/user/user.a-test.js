@@ -54,14 +54,16 @@ const loginUser = userCreds => {
 };
 
 describe('User acceptance tests', () => {
-    before(() => {
-        dropCollection(dbConnection, 'users');
-        dropCollection(dbConnection, 'avatars');
+    before(done => {
+        dropCollection(dbConnection, 'users', () => {
+            dropCollection(dbConnection, 'avatars', done);
+        });
     });
 
-    afterEach(() => {
-        dropCollection(dbConnection, 'users');
-        dropCollection(dbConnection, 'avatars');
+    afterEach(done => {
+        dropCollection(dbConnection, 'users', () => {
+            dropCollection(dbConnection, 'avatars', done);
+        });
     });
 
     context('POST /api/users', () => {
@@ -312,9 +314,7 @@ describe('User acceptance tests', () => {
     });
 
     context('private utility function to', () => {
-        after(() => {
-            dropCollection(dbConnection, 'users');
-        });
+        after(done => dropCollection(dbConnection, 'users', done));
 
         it('get the token', () => {
             return signupAndLogin(oliver).then(token => {

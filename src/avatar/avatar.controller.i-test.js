@@ -2,7 +2,7 @@ import fs from 'fs';
 import { expect } from 'chai';
 
 import * as Controller from './avatar.controller';
-import { dbConnection, dropAvatarCollection } from '../utils/dbTestUtils';
+import { dbConnection, dropCollection } from '../utils/dbTestUtils';
 
 const assetPath = `${__dirname}/../../assets`;
 const defaultAvatarFile = `${assetPath}/sfdc_default_avatar.png`;
@@ -29,9 +29,7 @@ const expectErrorResponse = (errorResponse, errMsg) => {
 describe('Avatar controller integration tests', () => {
     let customAvatarId;
 
-    after(() => {
-        dropAvatarCollection(dbConnection);
-    });
+    after(done => dropCollection(dbConnection, 'avatars', done));
 
     context('uploadDefaultAvatar()', () => {
         it('uploads default avatar to db and returns success payload', async () => {

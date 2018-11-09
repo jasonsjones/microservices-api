@@ -18,9 +18,7 @@ describe('Authentication acceptance tests', () => {
         });
     });
 
-    after(() => {
-        dropCollection(dbConnection, 'users');
-    });
+    after(done => dropCollection(dbConnection, 'users', done));
 
     it('returns error if attempting to log in with incorrect password', async () => {
         const res = await request(app)
