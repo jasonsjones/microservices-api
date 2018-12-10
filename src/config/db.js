@@ -8,7 +8,7 @@ export default config => {
     mongoose.Promise = global.Promise;
     mongoose.connect(
         config.dbUrl,
-        { useNewUrlParser: true }
+        { useCreateIndex: true, useFindAndModify: false, useNewUrlParser: true }
     );
     let db = mongoose.connection;
 
