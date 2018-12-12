@@ -3,10 +3,12 @@ import nodemailer from 'nodemailer';
 import sinon from 'sinon';
 import { expect } from 'chai';
 
+import User from './user.model';
+import Avatar from '../avatar/avatar.model';
 import * as Controller from './user.controller';
 import { createUserUtil } from '../utils/userTestUtils';
 import { mockTestAccountResponse } from '../utils/mockData';
-import { dbConnection, dropCollection } from '../utils/dbTestUtils';
+import { dbConnection, deleteCollection } from '../utils/dbTestUtils';
 import { clearMailTransporterCache } from '../mailer/mailer';
 
 const users = [
@@ -77,14 +79,13 @@ const expectErrorResponse = (errorResponse, errMsg) => {
 };
 
 describe('User controller integration tests', () => {
-    before(done => {
-        dropCollection(dbConnection, 'users', () => {
-            dropCollection(dbConnection, 'avatars', done);
-        });
+    before(async () => {
+        await deleteCollection(dbConnection, User, 'users');
+        await deleteCollection(dbConnection, Avatar, 'avatars');
     });
 
     context('createUser()', () => {
-        afterEach(done => dropCollection(dbConnection, 'users', done));
+        afterEach(async () => await deleteCollection(dbConnection, User, 'users'));
 
         it('returns error payload if the user data is not provided', () => {
             return Controller.createUser().catch(error => {
@@ -111,7 +112,7 @@ describe('User controller integration tests', () => {
     });
 
     context('getUsers()', () => {
-        afterEach(done => dropCollection(dbConnection, 'users', done));
+        afterEach(async () => await deleteCollection(dbConnection, User, 'users'));
 
         it('returns all the users', () => {
             return createUserUtil(users[0])
@@ -130,7 +131,7 @@ describe('User controller integration tests', () => {
     });
 
     context('getUser()', () => {
-        afterEach(done => dropCollection(dbConnection, 'users', done));
+        afterEach(async () => await deleteCollection(dbConnection, User, 'users'));
 
         it('returns a payload with the user with the given id', () => {
             return createUserUtil(users[1])
@@ -170,7 +171,7 @@ describe('User controller integration tests', () => {
     });
 
     context('unlinkSFDCAccount()', () => {
-        afterEach(done => dropCollection(dbConnection, 'users', done));
+        afterEach(async () => await deleteCollection(dbConnection, User, 'users'));
 
         it('returns an error if the user does not have a linked SFDC profile', () => {
             return createUserUtil(users[1])
@@ -181,7 +182,7 @@ describe('User controller integration tests', () => {
     });
 
     context('updateUser()', () => {
-        afterEach(done => dropCollection(dbConnection, 'users', done));
+        afterEach(async () => await deleteCollection(dbConnection, User, 'users'));
 
         it('updates the user with the provided data', () => {
             return createUserUtil(users[1])
@@ -211,7 +212,7 @@ describe('User controller integration tests', () => {
     });
 
     context('deleteUser()', () => {
-        afterEach(done => dropCollection(dbConnection, 'users', done));
+        afterEach(async () => await deleteCollection(dbConnection, User, 'users'));
 
         it('returns the a payload with the user that was just deleted', () => {
             return createUserUtil(users[1])
@@ -234,10 +235,9 @@ describe('User controller integration tests', () => {
             });
         });
 
-        after(done => {
-            dropCollection(dbConnection, 'users', () => {
-                dropCollection(dbConnection, 'avatars', done);
-            });
+        after(async () => {
+            await deleteCollection(dbConnection, User, 'users');
+            await deleteCollection(dbConnection, Avatar, 'avatars');
         });
 
         it('returns error payload if the request is not provided', () => {
@@ -296,7 +296,7 @@ describe('User controller integration tests', () => {
             });
         });
 
-        after(done => dropCollection(dbConnection, 'users', done));
+        after(async () => await deleteCollection(dbConnection, User, 'users'));
 
         it("changes the user's password", () => {
             const req = {
