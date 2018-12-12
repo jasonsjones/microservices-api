@@ -2,7 +2,9 @@ import { expect } from 'chai';
 import request from 'supertest';
 
 import app from '../config/app';
-import { dbConnection, dropCollection } from '../utils/dbTestUtils';
+import User from './user.model';
+import Avatar from '../avatar/avatar.model';
+import { dbConnection, deleteCollection } from '../utils/dbTestUtils';
 import { expectJSONShape } from '../utils/testUtils';
 import { createUserUtil } from '../utils/userTestUtils';
 
@@ -54,16 +56,14 @@ const loginUser = userCreds => {
 };
 
 describe('User acceptance tests', () => {
-    before(done => {
-        dropCollection(dbConnection, 'users', () => {
-            dropCollection(dbConnection, 'avatars', done);
-        });
+    before(async () => {
+        await deleteCollection(dbConnection, User, 'users');
+        await deleteCollection(dbConnection, Avatar, 'avatars');
     });
 
-    afterEach(done => {
-        dropCollection(dbConnection, 'users', () => {
-            dropCollection(dbConnection, 'avatars', done);
-        });
+    afterEach(async () => {
+        await deleteCollection(dbConnection, User, 'users');
+        await deleteCollection(dbConnection, Avatar, 'avatars');
     });
 
     context('POST /api/users', () => {
@@ -78,7 +78,7 @@ describe('User acceptance tests', () => {
                     expectJSONShape(jsonResponse, 'token');
                     expect(jsonResponse.success).to.be.true;
                 });
-        }).timeout(8000);
+        }).timeout(20000);
 
         it('returns status code 500 and json payload if user data is not provided', () => {
             return request(app)
@@ -163,7 +163,7 @@ describe('User acceptance tests', () => {
                     expect(jsonResponse.payload.email).to.be.a('string');
                     expect(jsonResponse.payload.info).to.be.a('object');
                 });
-        }).timeout(8000);
+        }).timeout(20000);
     });
 
     context('POST /api/users/changepassword', () => {
@@ -310,11 +310,11 @@ describe('User acceptance tests', () => {
                     expectJSONShape(jsonResponse, 'user');
                     expect(jsonResponse.success).to.be.true;
                 });
-        }).timeout(8000);
+        }).timeout(20000);
     });
 
     context('private utility function to', () => {
-        after(done => dropCollection(dbConnection, 'users', done));
+        after(async () => await deleteCollection(dbConnection, User, 'users'));
 
         it('get the token', () => {
             return signupAndLogin(oliver).then(token => {
