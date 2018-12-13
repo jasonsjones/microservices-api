@@ -7,7 +7,8 @@ const getDbName = url => {
 };
 
 const dockerDbUriTest = 'mongodb://mongo:27017/sandboxapi-test';
-const dbUrl = process.env.RUNNING_IN_DOCKER ? dockerDbUriTest : process.env.MLAB_DB_TEST_URI;
+const { RUNNING_IN_DOCKER, MLAB_DB_TEST_URI, DOCKER_DB_TEST_URI = dockerDbUriTest } = process.env;
+const dbUrl = RUNNING_IN_DOCKER ? DOCKER_DB_TEST_URI : MLAB_DB_TEST_URI;
 
 // TODO: Need to start up another cluster to use the atlas Mongo SAAS solution.
 // const atlasUri = "mongodb://dbadmin:" + process.env.DB_PASSWD + "@sandboxcluster-shard-00-00-ks6uh.mongodb.net:27017,"+
