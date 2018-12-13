@@ -7,6 +7,7 @@ export default passport => {
     AuthRouter.get('/logout', (req, res) => {
         req.logout();
         req.session.destroy(() => {
+            res.clearCookie('connect.sid');
             res.json({
                 success: true,
                 message: 'user logged out',
