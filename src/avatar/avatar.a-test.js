@@ -2,10 +2,12 @@ import { expect } from 'chai';
 import request from 'supertest';
 
 import app from '../config/app';
+import User from '../user/user.model';
+import Avatar from './avatar.model';
 import { expectAvatarShape } from '../utils/avatarTestUtils';
 import { expectJSONShape } from '../utils/testUtils';
 import { createUserUtil } from '../utils/userTestUtils';
-import { dbConnection, dropCollection } from '../utils/dbTestUtils';
+import { dbConnection, deleteCollection } from '../utils/dbTestUtils';
 
 const uploadDefaultAvatar = fileName => {
     return request(app)
@@ -21,7 +23,7 @@ const getAvatarId = response => {
 };
 
 describe('Avatar acceptence tests', () => {
-    afterEach(done => dropCollection(dbConnection, 'avatars', done));
+    afterEach(async () => await deleteCollection(dbConnection, Avatar, 'avatars'));
 
     context('POST /api/avatars/default', () => {
         it('uploads a default user avatar', async () => {
@@ -78,7 +80,7 @@ describe('Avatar acceptence tests', () => {
     });
 
     context('GET /api/avatars/:id', () => {
-        afterEach(done => dropCollection(dbConnection, 'users', done));
+        afterEach(async () => await deleteCollection(dbConnection, User, 'users'));
 
         it('returns an avatar with the given id', async () => {
             // create a new user
@@ -110,7 +112,7 @@ describe('Avatar acceptence tests', () => {
     });
 
     context('DELETE /api/avatars/:id', () => {
-        afterEach(done => dropCollection(dbConnection, 'users', done));
+        afterEach(async () => await deleteCollection(dbConnection, User, 'users'));
 
         it('deletes a custom avatar with the given id', async () => {
             // create a new user

@@ -2,7 +2,8 @@ import { expect } from 'chai';
 import request from 'supertest';
 
 import app from '../config/app';
-import { dbConnection, dropCollection } from '../utils/dbTestUtils';
+import User from '../user/user.model';
+import { dbConnection, deleteCollection } from '../utils/dbTestUtils';
 import { expectJSONShape } from '../utils/testUtils';
 import { createUserUtil } from '../utils/userTestUtils';
 
@@ -18,7 +19,7 @@ describe('Authentication acceptance tests', () => {
         });
     });
 
-    after(done => dropCollection(dbConnection, 'users', done));
+    after(async () => await deleteCollection(dbConnection, User, 'users'));
 
     it('returns error if attempting to log in with incorrect password', async () => {
         const res = await request(app)
