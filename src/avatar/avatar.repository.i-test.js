@@ -1,8 +1,9 @@
 import fs from 'fs';
 import { expect } from 'chai';
 
+import Avatar from './avatar.model';
 import * as Repository from './avatar.repository';
-import { dbConnection, dropAvatarCollection } from '../utils/dbTestUtils';
+import { dbConnection, deleteCollection } from '../utils/dbTestUtils';
 
 const assetPath = `${__dirname}/../../assets`;
 
@@ -17,9 +18,7 @@ const expectAvatarShape = response => {
 describe('Avatar repository integration tests', () => {
     let defatultAvatarId, customAvatarId;
 
-    after(() => {
-        dropAvatarCollection(dbConnection);
-    });
+    after(async () => await deleteCollection(dbConnection, Avatar, 'avatars'));
 
     context('uploadDefaultAvatar()', () => {
         it('saves a default avatar to the db', async () => {

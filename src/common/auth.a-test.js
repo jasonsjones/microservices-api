@@ -2,7 +2,8 @@ import { expect } from 'chai';
 import request from 'supertest';
 
 import app from '../config/app';
-import { dbConnection, dropCollection } from '../utils/dbTestUtils';
+import User from '../user/user.model';
+import { dbConnection, deleteCollection } from '../utils/dbTestUtils';
 import { expectJSONShape } from '../utils/testUtils';
 import { createUserUtil } from '../utils/userTestUtils';
 
@@ -18,9 +19,7 @@ describe('Authentication acceptance tests', () => {
         });
     });
 
-    after(() => {
-        dropCollection(dbConnection, 'users');
-    });
+    after(async () => await deleteCollection(dbConnection, User, 'users'));
 
     it('returns error if attempting to log in with incorrect password', async () => {
         const res = await request(app)
@@ -54,5 +53,22 @@ describe('Authentication acceptance tests', () => {
         expect(res.body.payload).to.have.property('token');
         expect(res.body.success).to.be.true;
         expect(token.split('.')).to.have.lengthOf(3);
+    });
+
+    it('logs out the user', async () => {
+        await request(app)
+            .post('/api/login')
+            .send({
+                email: 'oliver@qc.com',
+                password: '123456'
+            })
+            .expect(200);
+
+        const res = await request(app)
+            .get('/api/logout')
+            .expect(200);
+
+        expectJSONShape(res.body);
+        expect(res.body.success).to.be.true;
     });
 });

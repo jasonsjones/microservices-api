@@ -1,8 +1,10 @@
 import fs from 'fs';
 import { expect } from 'chai';
 
+import Avatar from '../avatar/avatar.model';
+import User from './user.model';
 import * as Repository from './user.repository';
-import { dbConnection, dropCollection } from '../utils/dbTestUtils';
+import { dbConnection, deleteCollection } from '../utils/dbTestUtils';
 
 const users = [
     {
@@ -39,15 +41,8 @@ const expectUserShape = res => {
 };
 
 describe('User repository integration tests', () => {
-    after(() => {
-        dropCollection(dbConnection, 'users');
-        dropCollection(dbConnection, 'avatars');
-    });
-
     context('createUser()', () => {
-        after(() => {
-            dropCollection(dbConnection, 'users');
-        });
+        after(async () => await deleteCollection(dbConnection, User, 'users'));
 
         it('saves a new user to the db', () => {
             const newUser = users[0];
@@ -84,9 +79,9 @@ describe('User repository integration tests', () => {
             });
         });
 
-        after(() => {
-            dropCollection(dbConnection, 'users');
-            dropCollection(dbConnection, 'avatars');
+        after(async () => {
+            await deleteCollection(dbConnection, User, 'users');
+            await deleteCollection(dbConnection, Avatar, 'avatars');
         });
 
         it('uploads a custom avatar and associates with the user', () => {
@@ -136,9 +131,9 @@ describe('User repository integration tests', () => {
                 });
         });
 
-        after(() => {
-            dropCollection(dbConnection, 'users');
-            dropCollection(dbConnection, 'avatars');
+        after(async () => {
+            await deleteCollection(dbConnection, User, 'users');
+            await deleteCollection(dbConnection, Avatar, 'avatars');
         });
 
         context('getUsers()', () => {

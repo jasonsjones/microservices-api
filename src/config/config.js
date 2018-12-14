@@ -4,13 +4,15 @@ import configTest from './configTest';
 import configProd from './configProd';
 dotenv.config();
 
-const version = '0.2.12';
-const env = process.env.NODE_ENV || 'development';
-const port = process.env.PORT || 3000;
-const token_secret = process.env.JWT_SECRET;
-const session_secret = process.env.SESSION_SECRET;
-
+const version = '0.2.13';
 const emailAddr = '"Sandbox API" <support@sandboxapi.com>';
+
+const {
+    NODE_ENV: env = 'development',
+    PORT: port = 3000,
+    JWT_SECRET: token_secret = 'defaultjwtsecret1234',
+    SESSION_SECRET: session_secret = 'defaultsessionsecret4321'
+} = process.env;
 
 let configBase = {
     version,
