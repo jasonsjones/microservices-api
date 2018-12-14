@@ -4,7 +4,7 @@ import configTest from './configTest';
 import configProd from './configProd';
 dotenv.config();
 
-const version = '0.2.12';
+const version = '0.2.13';
 const emailAddr = '"Sandbox API" <support@sandboxapi.com>';
 
 const {
