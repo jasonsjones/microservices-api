@@ -1,7 +1,8 @@
 import debug from 'debug';
 import nodemailer from 'nodemailer';
 
-import { getMailTransporter } from './mailer';
+// import { getMailTransporter } from './mailer';
+import mailer from './mailer';
 import config from '../config/config';
 import * as templates from '../mailer/email-templates';
 
@@ -11,7 +12,7 @@ export const sendPasswordResetEmail = user => {
     return new Promise((resolve, reject) => {
         const resetUrl = `${config.clientUrl}/api/users/reset-password/${user.passwordResetToken}`;
         let mailOptions = getMailOptionsForPasswordReset(user, resetUrl);
-        getMailTransporter().then(transporter => {
+        mailer.getMailTransporter().then(transporter => {
             transporter.sendMail(mailOptions, (error, info) => {
                 if (error) {
                     return reject(error);
@@ -34,7 +35,7 @@ export const sendEmailVerificationEmail = user => {
             user.emailVerificationToken
         }`;
         let mailOptions = getMailOptionsForEmailVerification(user, verifyUrl);
-        getMailTransporter().then(transporter => {
+        mailer.getMailTransporter().then(transporter => {
             transporter.sendMail(mailOptions, (error, info) => {
                 if (error) {
                     return reject(error);

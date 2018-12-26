@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer';
 
 import { sendPasswordResetEmail, sendEmailVerificationEmail } from './mailer-utils';
 import { mockUsers } from '../utils/userTestUtils';
-import { clearMailTransporterCache } from './mailer';
+import mailer from './mailer';
 import { mockTestAccountResponse } from '../utils/mockData';
 
 describe('Mailer utils', () => {
@@ -32,7 +32,7 @@ describe('Mailer utils', () => {
     afterEach(() => {
         createTransportStub.restore();
         createTestAccountStub.restore();
-        clearMailTransporterCache();
+        mailer.clearMailTransporterCache();
     });
 
     describe('sendPasswordResetEmail()', () => {

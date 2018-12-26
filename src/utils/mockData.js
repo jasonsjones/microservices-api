@@ -1,5 +1,7 @@
+import config from '../config/config';
+
 export const mockTestAccountResponse = {
-    user: 'test-account@sandboxapi.com',
+    user: config.testEmailAddr,
     pass: 'u6XKFA5qGUjhgzrBaw',
     smtp: { host: 'smtp.sandboxpi.com', port: 587, secure: false },
     imap: { host: 'imap.sandboxapi.com', port: 993, secure: true },

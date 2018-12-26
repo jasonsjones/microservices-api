@@ -9,7 +9,7 @@ import * as Controller from './user.controller';
 import { createUserUtil } from '../utils/userTestUtils';
 import { mockTestAccountResponse } from '../utils/mockData';
 import { dbConnection, deleteCollection } from '../utils/dbTestUtils';
-import { clearMailTransporterCache } from '../mailer/mailer';
+import mailer from '../mailer/mailer';
 
 const users = [
     {
@@ -337,11 +337,11 @@ describe('User controller integration tests', () => {
 
     context('forgotPassword()', () => {
         before(() => {
-            clearMailTransporterCache();
+            mailer.clearMailTransporterCache();
         });
 
         afterEach(() => {
-            clearMailTransporterCache();
+            mailer.clearMailTransporterCache();
         });
 
         it('returns an error if the request parameter is not provided', () => {

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 import nodemailer from 'nodemailer';
 
-import { getMailTransporter, clearMailTransporterCache, createTestAccount } from './mailer';
+import mailer from './mailer';
 import { mockTestAccountResponse } from '../utils/mockData';
 
 describe('Mailer', () => {
@@ -11,7 +11,7 @@ describe('Mailer', () => {
         let createTestAccountStub;
 
         before(() => {
-            clearMailTransporterCache();
+            mailer.clearMailTransporterCache();
             createTestAccountStub = sinon
                 .stub(nodemailer, 'createTestAccount')
                 .yields(null, mockTestAccountResponse);
@@ -21,11 +21,11 @@ describe('Mailer', () => {
         after(() => {
             nodemailerSpy.restore();
             createTestAccountStub.restore();
-            clearMailTransporterCache();
+            mailer.clearMailTransporterCache();
         });
 
         it('returns a mail transporter', () => {
-            getMailTransporter().then(transporter => {
+            mailer.getMailTransporter().then(transporter => {
                 expect(transporter).to.exist;
             });
         });
@@ -35,7 +35,7 @@ describe('Mailer', () => {
         });
 
         it('subsequent calls return cached transporter', () => {
-            getMailTransporter().then(() => {
+            mailer.getMailTransporter().then(() => {
                 // nodemailer.createTransport() should not be called again
                 // calledOnce still should be true
                 expect(nodemailerSpy.calledOnce).to.be.true;
@@ -61,11 +61,12 @@ describe('Mailer', () => {
         });
 
         it('resets the mail transporter', () => {
-            getMailTransporter()
+            mailer
+                .getMailTransporter()
                 .then(() => {
                     expect(nodemailerSpy.calledOnce).to.be.true;
-                    clearMailTransporterCache();
-                    return getMailTransporter();
+                    mailer.clearMailTransporterCache();
+                    return mailer.getMailTransporter();
                 })
                 .then(() => {
                     expect(nodemailerSpy.calledTwice).to.be.true;
@@ -86,7 +87,7 @@ describe('Mailer', () => {
         it('returns a raw account and smtpConfig', async () => {
             createTestAccountStub.yields(null, mockTestAccountResponse);
 
-            const account = await createTestAccount();
+            const account = await mailer.createTestAccount();
 
             expect(account).to.have.property('rawAccount');
             expect(account).to.have.property('smtpMailConfig');
@@ -101,7 +102,7 @@ describe('Mailer', () => {
             );
 
             try {
-                await createTestAccount();
+                await mailer.createTestAccount();
             } catch (error) {
                 expect(error).to.exist;
                 expect(error.message).to.contain('not able to create account');

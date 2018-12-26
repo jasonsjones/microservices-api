@@ -6,6 +6,10 @@ dotenv.config();
 
 const version = '0.2.13';
 const emailAddr = '"Sandbox API" <support@sandboxapi.com>';
+const testEmailAddr = 'test-account@sandboxapi.com';
+const apiUrl = 'http://localhost:3000';
+const clientUrl = 'http://localhost:4200';
+const dbUrl = 'mongodb://mongo:27017/sandboxapi-default';
 
 const {
     NODE_ENV: env = 'development',
@@ -21,9 +25,10 @@ let configBase = {
     token_secret,
     session_secret,
     emailAddr,
-    apiUrl: 'http://localhost:3000',
-    clientUrl: 'http://localhost:4200',
-    dbUrl: 'mongodb://mongo:27017/sandboxapi-default'
+    testEmailAddr,
+    apiUrl,
+    clientUrl,
+    dbUrl
 };
 
 let config;

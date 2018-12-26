@@ -8,7 +8,7 @@ import User from './user.model';
 import { mockUsers, mockUsersWithAvatar, mockRandomUser } from '../utils/userTestUtils';
 import { mockTestAccountResponse } from '../utils/mockData';
 import { normalizeRandomUserData } from '../utils/userUtils';
-import { clearMailTransporterCache } from '../mailer/mailer';
+import mailer from '../mailer/mailer';
 
 describe('User controller', () => {
     describe('getUsers()', () => {
@@ -704,7 +704,7 @@ describe('User controller', () => {
 
         before(() => {
             // ensure the mail transporter is cleared from other tests...
-            clearMailTransporterCache();
+            mailer.clearMailTransporterCache();
         });
 
         beforeEach(() => {
@@ -723,7 +723,7 @@ describe('User controller', () => {
             generateAndSetResetTokenStub.restore();
             req = {};
             resolvedUser = null;
-            clearMailTransporterCache();
+            mailer.clearMailTransporterCache();
         });
 
         it('rejects with error if req parameter is not provided', () => {
